@@ -1,0 +1,1107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title><![CDATA[瘦人说]]></title>
+  
+  <link href="/atom.xml" rel="self"/>
+  <link href="http://slender-man.github.io/"/>
+  <updated>2014-12-02T07:26:03.179Z</updated>
+  <id>http://slender-man.github.io/</id>
+  
+  <author>
+    <name><![CDATA[Slenderman 瘦人]]></name>
+    <email><![CDATA[winsonwq@gmail.com]]></email>
+  </author>
+  
+  <generator uri="http://zespia.tw/hexo/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[在JavaScript异步和同步之间穿梭]]></title>
+    <link href="http://slender-man.github.io/2014/03/06/2014-03-06-traveling-in-sync-and-async/"/>
+    <id>http://slender-man.github.io/2014/03/06/2014-03-06-traveling-in-sync-and-async/</id>
+    <published>2014-03-05T16:00:00.000Z</published>
+    <updated>2014-12-02T05:21:34.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="异步和同步">异步和同步</h2>
+<p>如果你正在使用JavaScript，那么你对异步和同步的代码并不会陌生。经常接触到的异步的用法很多，比如一个DOM事件的调用，一个Ajax请求或是NodeJS中读文件方法的调用等等都是在使用异步调用。当你遍历取到的数据并加上处理逻辑的时候，你就会使用上同步的代码。整个编码的过程里，其实你就是在同步和异步的方式之间穿梭。</p>
+<p>无需多说同步代码是怎么运行的，程序顺序执行的方式是学习编程的第一课，但它却先入为主地给我们的脑子里烙了个印，以至于很多开发者想学JS的时候，觉得JS是个调用方式特别的语言，需要时间去适应同步到异步的思维转换。所以我期望更多地介绍异步方式的调用，帮助大家打破那些<a href="http://blog.zhaojie.me/2011/12/the-stuck-mind-of-asynchronous-programming.html" target="_blank" rel="external">受禁锢的异步编程思维</a>。</p>
+<p>异步调用并不会阻止代码的顺序执行，而是在将来的某一个时刻触发设置好的逻辑，所以我们</p>
+<ol>
+<li>并不知道逻辑什么时候会被调用</li>
+<li>只能定义当触发的时候逻辑是什么</li>
+<li>只能等待，同时可以去处理其他的逻辑</li>
+</ol>
+<p><code>setTimeout</code>就是这样的一个异步调用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{</div><div class="line">  <span class="built_in">console</span>.log(<span class="number">1</span>);</div><div class="line">}, <span class="number">0</span>);</div><div class="line"><span class="built_in">console</span>.log(<span class="number">2</span>);</div><div class="line"><span class="comment">// output</span></div><div class="line"><span class="comment">// 2</span></div><div class="line"><span class="comment">// 1</span></div></pre></td></tr></table></figure>
+
+<h3 id="冒泡排序动画的例子">冒泡排序动画的例子</h3>
+<p>冒泡算法人人都会，但是如果需要加上动画效果，算法就会变得有趣得多。先看看冒泡逻辑是怎么写的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">bubbleSort</span><span class="params">(arr)</span> </span>{</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>, len = arr.length ; i &lt; len - <span class="number">1</span> ; i++){</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> ii = <span class="number">0</span>; ii &lt; len - i - <span class="number">1</span>; ii++){</div><div class="line">      <span class="keyword">if</span>(arr[ii] &gt; arr[ii + <span class="number">1</span>]){</div><div class="line">        swap(arr, ii, ii + <span class="number">1</span>);</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>需要改变的点就是<code>swap</code>方法需要是异步的，当两两交换的动画结束后，继续下一步比较，请参考<a href="http://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html" target="_blank" rel="external">Comparison Sorting Algorithms</a>里的动画。这个例子虽然简单，但其实在Web应用和页游中，需要在计算逻辑（同步）和可视化（异步）之间频繁切换的场景还很多。</p>
+<p>为达目的，于是把代码写成了这样。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">asyncBubbleSort</span><span class="params">(arr, i)</span></span>{</div><div class="line">  i = i || <span class="number">0</span>;</div><div class="line">  <span class="keyword">if</span>(i == arr.length - <span class="number">1</span>) <span class="keyword">return</span>;</div><div class="line">  (<span class="function"><span class="keyword">function</span> <span class="title">bubble</span><span class="params">(arr, ii)</span></span>{</div><div class="line">    <span class="keyword">if</span>(ii != arr.length - i - <span class="number">1</span>){</div><div class="line">      <span class="keyword">if</span>(arr[ii] &gt; arr[ii + <span class="number">1</span>]){</div><div class="line">        <span class="comment">/* 异步的swap */</span></div><div class="line">        asyncSwap(arr, ii, ii + <span class="number">1</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span></span>{</div><div class="line">          bubble(arr, ++ii);</div><div class="line">        });  </div><div class="line">      }<span class="keyword">else</span> bubble(arr, ++ii);</div><div class="line">    }<span class="keyword">else</span>{</div><div class="line">      bubble(arr, ++i);</div><div class="line">    }</div><div class="line">  })(arr, <span class="number">0</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这个冒泡的算法逻辑已经面目全非，和脑海中的冒泡排序天差地别，试想如果是遇到更加复杂的场景，那这个逻辑将会多么的复杂。带着问题，我们先看看目前在JS异步调用方面，我们都有些什么尝试。<br><!--break--></p>
+<h2 id="异步调用方式的进化">异步调用方式的进化</h2>
+<p>其实我们没有停止过对更好的异步调用方式的追求，目的就是让代码更易读，更接近我们最初认为的那个样子。多层嵌套是异步调用的一个特点，你的代码可能会是这样的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">step1(<span class="function"><span class="keyword">function</span> <span class="params">(value1)</span> </span>{</div><div class="line">  step2(value1, <span class="function"><span class="keyword">function</span><span class="params">(value2)</span> </span>{</div><div class="line">    step3(value2, <span class="function"><span class="keyword">function</span><span class="params">(value3)</span> </span>{</div><div class="line">      doSomething(value1, value2, value3);</div><div class="line">    });</div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>为了让代码可读，传统方式一般会定义一个新的方法让主体代码更整洁些，如下所示。但<code>step1</code>、<code>step2</code>、<code>step3</code>三个方法的组合方式会有很多种的，代码的结构会变得复杂，变得不好维护。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">steps</span><span class="params">(callback)</span> </span>{</div><div class="line">  step1(<span class="function"><span class="keyword">function</span> <span class="params">(value1)</span> </span>{</div><div class="line">    step2(<span class="function"><span class="keyword">function</span><span class="params">(value2)</span> </span>{</div><div class="line">      step3(<span class="function"><span class="keyword">function</span><span class="params">(value3)</span> </span>{</div><div class="line">        callback && callback(value1, value2, value3);</div><div class="line">      });</div><div class="line">    });</div><div class="line">  });</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line">steps(<span class="function"><span class="keyword">function</span> <span class="params">(value1, value2, value3)</span> </span>{</div><div class="line">  doSomething(value1, value2, value3);</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<h3 id="CommonJS_Promise">CommonJS Promise</h3>
+<p>当CommonJS的Promise出来之后，在异步调用的控制，可读性上有了很大的进步。代码变成了这个样子，并不用抽新的方法，三个方法的组合方式也可任意组织。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$.when(step1(), step2(), step3(), <span class="function"><span class="keyword">function</span> <span class="params">(value1, value2, value3)</span> </span>{</div><div class="line">  doSomething(value1, value2, value3);</div><div class="line">});</div><div class="line"><span class="comment">//</span></div><div class="line"><span class="comment">// 和</span></div><div class="line"><span class="comment">//</span></div><div class="line">$.when(step1(), step3(), <span class="function"><span class="keyword">function</span> <span class="params">(value1, value3)</span> </span>{</div><div class="line">  doAnotherThing(value1, value3);</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>再如支持Promise的<code>$.ajax</code>API比之前配置的方式优雅了很多。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">$.ajax( <span class="string">"example.php"</span> )</div><div class="line">  .done(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert( <span class="string">"success"</span> );</div><div class="line">  })</div><div class="line">  .fail(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert( <span class="string">"error"</span> );</div><div class="line">  })</div><div class="line">  .always(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert( <span class="string">"complete"</span> );</div><div class="line">  });</div></pre></td></tr></table></figure>
+
+<p>但是稍微改一下，就会发现Promise也不是完美的。如果遇到多个函数之间是相互依赖的情况，还是会利用到多层<code>callback</code>的方式，相比起来并没有多大的改进。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">step1().done(<span class="function"><span class="keyword">function</span> <span class="params">(value1)</span> </span>{</div><div class="line">  step2(value1).done(<span class="function"><span class="keyword">function</span> <span class="params">(value2)</span> </span>{</div><div class="line">  	step3(value2).done(<span class="function"><span class="keyword">function</span> <span class="params">(value3)</span> </span>{</div><div class="line">  	  doSomething(value1, value2, value3);</div><div class="line">  	});</div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>如果你想要使用Promise，提供几个库给大家按照需求选择使用。jQuery的<a href="http://api.jquery.com/?s=deferred" target="_blank" rel="external">Deferred对象</a>, <a href="https://github.com/cujojs/when" target="_blank" rel="external">When</a>和强力推荐的<a href="https://github.com/kriskowal/q" target="_blank" rel="external">Q</a>。</p>
+<h3 id="控制异步运行队列">控制异步运行队列</h3>
+<p>最易读的方式当然是像同步一样去编写异步代码，让现有逻辑能够复用，降低异步的编程复杂度。虽然是异步方法，但期望依然可以串行调用。刚接触到这种想法的时候，我其实是很惊讶的，因为从没这么颠覆性的去思考解决这个问题。刚以为这完全是不可能的，但实际上已经接触到了很多这样的例子，比如<a href="https://github.com/karma-runner/karma-ng-scenario" target="_blank" rel="external"><code>karma-ng-scenario</code></a>, <a href="https://github.com/winsonwq/karma-e2e-dsl" target="_blank" rel="external"><code>karma-e2e-dsl</code></a>和<a href="https://code.google.com/p/selenium/" target="_blank" rel="external"><code>selenium-webdriver</code></a>实现的那样。</p>
+<p>这是一段ng-scenario的API调用，你会发现在输入框中填值，点击按钮，断言等操作都是异步调用，但是代码确是同步方式编写的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">describe(<span class="string">'Buzz Client'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">  it(<span class="string">'should filter results'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    input(<span class="string">'user'</span>).enter(<span class="string">'jacksparrow'</span>);</div><div class="line">    element(<span class="string">':button'</span>).click();</div><div class="line">    expect(repeater(<span class="string">'ul li'</span>).count()).toEqual(<span class="number">10</span>);</div><div class="line">    input(<span class="string">'filterText'</span>).enter(<span class="string">'Bees'</span>);</div><div class="line">    expect(repeater(<span class="string">'ul li'</span>).count()).toEqual(<span class="number">1</span>);</div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>非常神奇，不是么！你可以参考<a href="https://github.com/winsonwq/karma-e2e-dsl" target="_blank" rel="external"><code>karma-e2e-dsl</code></a>的代码是怎么利用promise对象做到的。</p>
+<p>这其实都是烟雾弹，这种顺序的写法在代码运行的时候，每一个语句其实并没有去执行相应的逻辑，而是把它真正的逻辑入队列delay运行了，等到某一个时刻，把队列里面的逻辑挨个串起来运行一遍。所以你会发现，这种设计它是不可能出现返回值的，如下的例子就是无法实现的，因为赋值表达式立即执行，不受运行队列控制。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> val = step1();</div><div class="line"><span class="comment">// step1() 让step1真正的逻辑进入队列</span></div><div class="line"><span class="comment">// step1() 的返回值赋给val变量 &lt;= 赋值逻辑未受队列控制</span></div><div class="line">step2();</div><div class="line"><span class="comment">// step2() 让step2的真正逻辑进入队列</span></div><div class="line"><span class="built_in">console</span>.log(val);</div><div class="line"><span class="comment">// 立即输出val的值，此时step1的逻辑在控制中还没有执行</span></div></pre></td></tr></table></figure>
+
+<p>所谓强扭的瓜不甜，硬要在现有JS调用方式下把异步写成同步方式肯定会有些不足，像之前提到的Promise和利用控制延迟的逻辑队列的方式，都是利用技巧和聪明才智的小步改进，并不能彻底达到目的。</p>
+<h3 id="把异步调用推向极致优雅">把异步调用推向极致优雅</h3>
+<p>早在2008年，<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/1.7" target="_blank" rel="external">JavaScript 1.7</a>中，Firefox和Opera就开始支持一种良好的，可用于代码控制的功能，它叫迭代器<strong>Iterator</strong>和<strong>Generator</strong>，详细的说明可以参考<a href="https://developer.mozilla.org/zh-CN/docs/JavaScript/Guide/Iterators_and_Generators" target="_blank" rel="external">MDN</a>的例子。（混乱的JS版本和功能衍进可以参考<a href="https://en.wikipedia.org/wiki/JavaScript" target="_blank" rel="external">Wiki</a>）</p>
+<p>我在这里要介绍的是Generator对异步调用方式的改变。先回到文章开始时的冒泡排序的例子，如果使用了<strong>Generator去控制代码运行队列的方式</strong>来编写冒泡动画的话，代码可以写成这样。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">swapAsync</span><span class="params">(arr, i, ii)</span> </span>{</div><div class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(done)</span> </span>{</div><div class="line">    <span class="keyword">var</span> tmp = arr[i];</div><div class="line">    arr[i] = arr[ii];</div><div class="line">    arr[ii] = tmp;</div><div class="line">    <span class="comment">// 等待动画运行完</span></div><div class="line">    swapAnimation(i, ii, done);</div><div class="line">  };</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">run</span><span class="params">(generator)</span> </span>{</div><div class="line">  <span class="keyword">var</span> g = generator();</div><div class="line">  (<span class="function"><span class="keyword">function</span> <span class="title">move</span><span class="params">(val)</span> </span>{</div><div class="line">    <span class="keyword">var</span> next = g.next(val);</div><div class="line">    <span class="keyword">if</span> (!next.done) {</div><div class="line">      next.value(<span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{</div><div class="line">        move(next.value)</div><div class="line">      });</div><div class="line">    }</div><div class="line">  })();</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bubbleSort</span><span class="params">(arr)</span> </span>{</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>, len = arr.length ; i &lt; len - <span class="number">1</span> ; i++){</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> ii = <span class="number">0</span>; ii &lt; len - i - <span class="number">1</span>; ii++){</div><div class="line">      <span class="keyword">if</span>(arr[ii] &gt; arr[ii + <span class="number">1</span>]){</div><div class="line">        <span class="keyword">yield</span> swapAsync(arr, ii, ii + <span class="number">1</span>);</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line">run(bubbleSort([<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>]));</div></pre></td></tr></table></figure>
+
+<p>其中的run就是一个简单的利用Generator控制代码队列调用的实现，每次取到yield的对象时，得到的时一个异步的可运行的方法（<code>swapAsync()</code>调用的返回值是方法）。立即运行此方法，等待异步调用结束后又让代码继续运行（利用<code>move()</code>方法）。</p>
+<p>整个过程就时每当运行到yield的时候，<code>bubbleSort</code>代码就会停止运行，收到通知之后代码继续运行，完全模拟了同步的节奏。因为这种代码控制的方式时JS原生支持的，所以赋值运算也是可以被控制的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> val = <span class="keyword">yield</span> randomNumAsync();</div></pre></td></tr></table></figure>
+
+<p>变得可行。同时，可以把<code>yield</code>语法后面的对象称为<code>yieldable</code>对象。这里就有一个<a href="https://gist.github.com/winsonwq/9319377" target="_blank" rel="external">异步随机数赋值运算实现</a>的例子，里面可以看到如何定义赋值运算和不同种类的<code>yieldable</code>对象的。</p>
+<p>Iterator和Generator并不是新鲜的事物，JS1.7的这个功能因为当时浏览器的兼容性问题，没有大范围被使用，在.NET Framework 4.5里也出现了<code>await</code>关键字的语法，支持了这种异步方式。那么为什么现在要“新瓶装老酒”呢，是因为<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/ECMAScript_6_support_in_Mozilla" target="_blank" rel="external">EcmaScript 6</a>将要登上舞台，在NodeJS和浏览器端都会有更多强大的功能和优雅的语法出现，之前阻止其发展的屏障也会被慢慢打破。目前github上很多library都可以开始使用上了ES6的特性，TJ大神的<a href="https://github.com/koajs/koa" target="_blank" rel="external">Koa</a>和<a href="https://github.com/visionmedia/co" target="_blank" rel="external">co</a>就是其中的典范。</p>
+<p>从最基础的callback调用方式到generator的比较完美的异步调用方式的过程里，我们这些在异步和同步之间游走的开发者不断得到新的开发体验，提升开发效率，更重要的是，我们也作为这门语言的使用者和贡献者，见证了一个语言的进步。希望会有更多的好的异步调用方式出现和应用，相信最近这几年里这些编程方式和思维会在游戏开发和数据可视化等领域被大量使用。</p>
+<p>最后还是忍不住放出2012年在我自己的<a href="https://github.com/winsonwq/Mr.Async" target="_blank" rel="external">Mr.Async</a>里面实现的<a href="http://winsonwq.github.io/demo/bubblesort.html" target="_blank" rel="external">冒泡排序动画</a>，纪念下我就是从那个时候开始思考怎么让异步变得更优雅的，当时受到很多老赵的影响。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[介绍如何使用更好的方式编写异步调用]]>
+    
+    </summary>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Viff，一种新的页面样式测试策略]]></title>
+    <link href="http://slender-man.github.io/2013/09/09/2013-09-09-viff-introduction/"/>
+    <id>http://slender-man.github.io/2013/09/09/2013-09-09-viff-introduction/</id>
+    <published>2013-09-08T16:00:00.000Z</published>
+    <updated>2014-12-02T05:03:48.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="测试页面样式时遇到的问题">测试页面样式时遇到的问题</h2>
+<p>在我们测试Web页面的时候，往往需要面对如下几个问题</p>
+<h3 id="手工测试多个浏览器">手工测试多个浏览器</h3>
+<p><img src="http://ww2.sinaimg.cn/mw1024/64eae748gw1e8g7owrnx4j214w0aggnb.jpg" alt="多浏览器"><br>跨浏览器测试，测试页面在多个浏览器中的表现，浏览器可能包括Chrome，Firefox，Safari，IE和Opera。除了测试基本功能是否健全以外，还需要测试外观样式，因为当前的CSS技术在各个浏览器里的表现不完全一致。比如会看看IE和其他现代浏览器的差距有多大，从而判定之间的差别是否能被接受。</p>
+<p>除了测试多个浏览器之外，很可能需要进行多版本的测试，现在浏览器的更新速度是非常快的，这样就导致了用户群在浏览器版本之间的跨度变大，为了保证质量，多个版本的测试也是必要的。比如IE6到IE10的测试。</p>
+<p>其次，随着Mobile Webapp的发展，响应式设计的广泛应用，页面的测试还需要照顾到移动设备和多尺寸屏幕。</p>
+<p>可以看出，页面样式的测试情况是十分复杂的，更甚的是，我们现在都是用手工在测试，耽误很多时间。</p>
+<h3 id="可复用的样式代码容易影响现有样式">可复用的样式代码容易影响现有样式</h3>
+<p><img src="http://ww1.sinaimg.cn/mw1024/64eae748gw1e8g7tk8v2uj210k0jsgpd.jpg" alt="可复用的样式开发"></p>
+<p>我们推荐在开发样式的时候使用SASS或LESS的CSS预编译语言，这样可以更好的管理CSS代码，但是也会导致一个问题，一个可复用的样式的修改可能会影响很多个页面，比如一个颜色变量的改变。而我们往往是让页面引入所有样式，很难判断哪些页面会有影响。可能一个能力很强的QA能预见到一些并做了测试，可能有些影响到了回归测试的时候才发现，也可能到了生产环境上也没有发现。</p>
+<h3 id="现有CSS测试的问题">现有CSS测试的问题</h3>
+<p>样式不是不可以“测试”的，项目中可能会使用<br><!--break--></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">expect($(<span class="string">'#my-target'</span>)).toHaveCss({margin: <span class="string">'10px'</span>});</div><div class="line">expect($(<span class="string">'#my-target'</span>)).toHaveClass(<span class="string">'box'</span>);</div></pre></td></tr></table></figure>
+
+<p>的方式去测试某个元素是否含有某种特定的属性并断言值是多少，但是每个元素在页面上的样式是由它的Computed Style决定的，这些属性是非常多的，几乎做不到通过这些属性值来表达某个元素是否显示得正确，而且这样代码维护成本是非常大的，频繁的UI修改你同时需要修改测试。同样地，如果你断言某个元素是否拥有某种样式，最终的页面显示难以预见。</p>
+<h3 id="依赖感觉的测试是不严谨的">依赖感觉的测试是不严谨的</h3>
+<p><img src="http://ww4.sinaimg.cn/mw1024/64eae748gw1e8g7oywm55j212m0j2ac8.jpg" alt="对比图"></p>
+<p>无论是谁来做页面样式的测试，都是基于看和感觉的，这种测试不能有效的发现细节问题，不能得出严谨的结果，每个测试者都会有自己的答案。虽然说眼见为实，但有时候看到了也不可信赖。例子中的两个对比图片，肉测很难发现细小的差异。</p>
+<h2 id="感知测试中的新成员_-_Viff">感知测试中的新成员 - Viff</h2>
+<p><a href="http://winsonwq.github.io/viff/" target="_blank" rel="external">在Github上查看Viff</a></p>
+<p>Viff的解决方式是，通过配置测试页面，对比在同一个浏览器下，同一个页面在不同环境（开发环境，生产环境）的截图差异来，发现最终样式的影响，从而提升交付质量和信心。</p>
+<p>Viff的出现不是用来解决“依赖感觉来测试困难”这个问题的。它作为感知测试领域中的一员，是一个<em>半自动</em>的测试框架，通过（整体或部分）的截图对比来帮助测试人员快速发现开发造成的样式改变和影响，提升页面样式的测试效率和软件交付信心。</p>
+<p>现在Viff支持的功能有</p>
+<ol>
+<li>基于CSS的部分页面截图对比</li>
+<li>支持Firefox、Chrome、Safari、Opera、PhantomJS、IE、iOS、Android。Firefox、PhantomJS、iOS表现完美</li>
+<li>命令行支持</li>
+<li>定义处理页面事件</li>
+<li>报表功能帮助差异Review</li>
+</ol>
+<h2 id="Viff测试策略">Viff测试策略</h2>
+<p>在使用Viff的过程中，几个基本的测试策略有</p>
+<ol>
+<li>尽量保持一样的页面内容，如果页面内容是动态生成的，尽量使用基于CSS的部分截图功能</li>
+<li>没有必要测试所有页面，尽量找到能够找到覆盖CSS样式的最小集合。推荐模块化的方式开发CSS的好处就在于此</li>
+<li>针对复用性的UI组件，推荐使用基于CSS的部分截图功能</li>
+<li>如果有style guide页面，直接测试它也可以</li>
+<li>期望建立一种使用Viff的机制，每天或者部署前查看Viff的报表，也可以把Viff继承到CI中，每天定时运行。但不推荐每次提交都运行，因为生成的图片文件会很快占满你的硬盘。</li>
+</ol>
+<h2 id="在PPT里了解更多">在PPT里了解更多</h2>
+<script async class="speakerdeck-embed" data-id="e47f4df0fb8a013095b13ad66989d671" data-ratio="2" src="//speakerdeck.com/assets/embed.js"></script>
+
+<h2 id="Viff才刚开始">Viff才刚开始</h2>
+<p>Viff从刚开始从想法到今天这个版本，开发周期只有不到4周的时间。Viff需要经历更多的项目验证才能走得更远，如果你对Viff还有那么点兴趣，打算尝试一下，欢迎在<a href="https://github.com/winsonwq/viff/issues" target="_blank" rel="external">Github Issue页面</a>提交反馈。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[Viff的解决方式是，通过配置测试页面，对比在同一个浏览器下，同一个页面在不同环境（开发环境，生产环境）的截图差异来，发现最终样式的影响，从而提升交付质量和信心。Viff的出现不是用来解决“依赖感觉来测试困难”这个问题的，它是感知测试领域中的一员，是一个半自动的测试框架，通过（整体或部分）的截图对比来帮助测试人员快速发现开发造成的样式改变和影响，提升页面样式的测试效率和软件交付信心。]]>
+    
+    </summary>
+    
+      <category term="testing" scheme="http://slender-man.github.io/tags/testing/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Web应用E2E测试框架]]></title>
+    <link href="http://slender-man.github.io/2013/06/30/2013-06-30-e2e-testing-of-web-application/"/>
+    <id>http://slender-man.github.io/2013/06/30/2013-06-30-e2e-testing-of-web-application/</id>
+    <published>2013-06-29T16:00:00.000Z</published>
+    <updated>2014-12-02T05:03:57.000Z</updated>
+    <content type="html"><![CDATA[<p>Web应用E2E（End To End）测试是模拟用户进行页面操作，通过来判断页面状态的变化，从而检查功能是否运行正常的测试方法。为了模拟用户操作，开发者会选择浏览器驱动来完成，<a href="http://docs.seleniumhq.org/" target="_blank" rel="external">Selenium</a>就是其中一个。开发者可以使用多种语言开发Selenium脚本，并且运行在多种浏览器上。我是两年前接触到selenium的，当时还不知道什么是E2E测试，就知道使用了一种能够模拟用户浏览器操作的神器，那时使用的语言是C#，其实想过它是怎么工作的，但由于当时学艺不精，未能完全破解。</p>
+<p>这篇文章并不是来说Selenium的好，它的好处显而易见，而且目前几乎没有另一工具能取代它的地位。时间在推移，各种技术在飞速发展，我们却还是一如既往地在使用Selenium或者建立在它之上的测试框架。反思下，我之前从没想过开发者需要的E2E测试框架中到底应该有什么，如果你也没有想过，那看看我现在的理解是什么。</p>
+<h2 id="我期望的E2E框架">我期望的E2E框架</h2>
+<h3 id="支持多浏览器">支持多浏览器</h3>
+<p>首先，为了测试浏览器兼容性，需要考虑桌面浏览器和移动平台浏览器。目前Selenium已经解决了iOS和Android的浏览器驱动问题，可以在真实移动设备上模拟用户行为，测试移动网络上的表现。</p>
+<p>其次，每当想到所有浏览器都需要测试就觉得糟透了，即使有了自动化E2E测试，如果是每个浏览器顺序跑一遍，那么每一次提交都需要等待十多二十分钟的测试时间，当然是不能接受的。所以说，具备<strong>同时</strong>驱动所有浏览器的能力是非常必要的。</p>
+<h3 id="支持远程测试">支持远程测试</h3>
+<p>如果我把测试看成一种检测的服务，待测设备看成一个目标的话，那么只要我有设备，不管是真机还是模拟器，只要有浏览器我就可以使用该服务看Web应用在此设备上的表现。同时，我也期望设备不需要通过USB连接到电脑上来测试。<br><!--break--></p>
+<h3 id="一门语言就行">一门语言就行</h3>
+<p>模拟用户页面操作，那么现如今最直接的语言就是JavaScript，这门天生为了操作DOM的语言在此时此刻可以发挥巨大作用。Selenium提供了至少7种语言来让开发者编写测试脚本，虽然听上去足够强大，能让大批后端开发人员使用它们喜欢的语言，但是想想，如果现在一个开发Web应用的人还不会使用JavaScript编写简单脚本的话，那么他应该反思一下了；或者说，你作为全能的开发者，前端后端都靠谱，让你来选择用JavaScript还是其他语言，我觉得你会毫不犹豫的选择前者。</p>
+<p>JavaScript既有天生的优势，在NodeJS出现之后又拥有了更多的拥护和使用者，目前可以说是势不可挡。对于Web应用的E2E测试来说，一门最准确的语言就够了，多的都是浪费。</p>
+<h3 id="和现有BDD框架集成">和现有BDD框架集成</h3>
+<p>如果选择了JavaScript，那么目前有很多的前端BDD框架等着你去使用，像Jasmine/Mocha/QUnit都是非常优秀的。如果E2E测试框架能和这些集成起来，可以发挥现有测试框架的技术优势，比如代码覆盖率，报错机制，导出Report等等。到那时，E2E测试框架会变得更加轻量级，专注成为一个Test Runner而已了。</p>
+<p>现有的BDD框架如果要做功能测试，可能需要加载外部html的机制，把html片段加载到测试中，然后做初始化，事件绑定等等操作，然后在模拟用户操作。这里会有个问题，就是非Single Page这种方式的Web应用很少会用到模板技术（如果使用的模板技术，那么可以针对模板做功能测试），代码是直接利用整个文档中的一部分，那么测试的html片段和最终呈现出的代码是有差距的，即使测试通过也心里没底。那么为了解决这个问题，只有把测试提高到E2E测试。就是说，现有的BDD框架也需要这样的Test Runner。</p>
+<p>在这个Runner里，只需要指定期望的测试框架是什么，需要测试的脚本是什么，需不需要统计测试覆盖率，导出结果是json还是html就够了。</p>
+<h2 id="Karma">Karma</h2>
+<p>当然，如果是我第一个考虑这些方面的人的话，我将会创造出它来改变世界，但这不可能。改变世界这种事情当你有idea的时候，无数的人就已经在实现在推广了。持续不断地保持新鲜感，不断探索，不断思考才能让你的改变世界更进一步。先不扯淡，我发现<a href="http://karma-runner.github.io/0.8/index.html" target="_blank" rel="external">Karma</a>就是这么一个暂时满足我期望的Test Runner。</p>
+<p>Karma是基于NodeJS的，通过配置的方式支持多种浏览器，多个测试框架，监听文件修改自动运行测试。</p>
+<p>它的前身叫做Testecular，刚出来的时候是针对AngularJS的测试，在我接触AngularJS的时候，发现它的E2E测试使用的是JSTestDriver（用Java写的），所以在Testecular的出现是为了取代JSTestDriver，后来去AngularJS化之后变成了Karma，使用的范围也更加广了。另外，它们都是来自大神Google。</p>
+<p>假如我们的Web应用是在<code>http://localhost:3000</code>，Karma在测试的时候，为了可以驱动页面操作又不影响Web应用（在Web应用中插入样式或脚本），它选择的方式是启动自己的http服务<code>http://localhost:9172</code>，并把这个Web应用嵌到一个<code>iframe</code>中，通过<code>iframe</code>外的测试脚本来驱动<code>iframe</code>内的页面。为了操作不同域的Web应用，对<code>http://localhost:3000/detail.html</code>的访问会被代理到<code>http://localhost:9172/detail.html</code>。这也是突破浏览器同源策略的方法之一（我有篇文章<a href="http://ishouldbeageek.me/2013/05/31/cross-origin-request/" target="_blank" rel="external">跨了个域</a>中详解过）。这样做，既绕过了“必须”使用的浏览器Driver，也可以使用其他测试框架，还能保持被测的网站是干净的。另外，如果把Karma的测试部署到远程服务器，那么当我的移动设备访问远程地址时，就能在此设备上运行测试。</p>
+<p>Karma使用了<code>socket.io</code>，让Karma和各个浏览器之间保持一个长连接。通过这个连接来检查多浏览器是否在，利用这个连接把浏览器测试的状态快速的反馈到命令行中。同时，当检测到文件修改的时候，也可以通过这个连接发送命令给浏览器，让它刷新页面或重新运行某个测试。</p>
+<p>对，Karma就是这么做到的。为什么说是暂时满足我的需求呢？我希望我能让<a href="https://github.com/cucumber/cucumber/wiki/Gherkin" target="_blank" rel="external">Gherkin syntax</a>（Cucomber测试框架选择了这种语法）编写的测试在Karma上运行。</p>
+<p>最后，如果你被我说服了，放下手中的Selenium，试试Karma。</p>
+<p>- 完 -</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Web应用E2E（End To End）测试是模拟用户进行页面操作，通过来判断页面状态的变化，从而检查功能是否运行正常的测试方法。为了模拟用户操作，开发者会选择浏览器驱动来完成，<a href="http://docs.seleniumhq.org/" target="_b]]>
+    </summary>
+    
+      <category term="testing" scheme="http://slender-man.github.io/tags/testing/"/>
+    
+      <category term="e2e" scheme="http://slender-man.github.io/tags/e2e/"/>
+    
+      <category term="karma" scheme="http://slender-man.github.io/tags/karma/"/>
+    
+      <category term="selenium" scheme="http://slender-man.github.io/tags/selenium/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[JavaScript严格模式]]></title>
+    <link href="http://slender-man.github.io/2013/06/09/2013-06-09-strict-mode/"/>
+    <id>http://slender-man.github.io/2013/06/09/2013-06-09-strict-mode/</id>
+    <published>2013-06-08T16:00:00.000Z</published>
+    <updated>2014-12-02T05:04:10.000Z</updated>
+    <content type="html"><![CDATA[<blockquote>
+<p>本文是我对<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode" target="_blank" rel="external">《Strict mode》</a>的翻译，文中的描述含我个人的理解，有可能和原文有所出入，望理解。</p>
+</blockquote>
+<p>使用ECMAScript 5的严格模式（“strict mode”）会进入受限制的JavaScript模式。严格模式下的JavaScript并不是标准模式的一个子集，而是直接使用了不同语意的代码。JavaScript在支持和不支持严格模式的浏览器之间会有着不同的表现，所以功能开发时不要依赖于严格模式。严格模式的代码和非严格模式的代码是可以共存的，在严格模式下，非严格模式代码会递增地想严格模式代码转化。</p>
+<p>严格模式下的JavaScript有很多处改变。首先要说说的是，严格模式下的JavaScript会表现得没那么多陷阱，该报错的时候就报错。另外，严格模式修复了JavaScript中的一些错误，使得JavaScript解释器更好地进行代码优化，也就是说严格模式下的代码运行地会快一些。同时，严格模式还阻止开发者使用一些可能会用于以后ECMAScript中的语法。</p>
+<h2 id="如何使用严格模式">如何使用严格模式</h2>
+<p>严格模式可以使用于全局所有脚本代码，也可以单独使用到一个方法中。它可以使用在<code>eval</code>中的代码、<code>Function</code>中的代码、事件处理属性和在<a href="https://developer.mozilla.org/en-US/DOM/window.setTimeout" target="_blank" rel="external">setTimeout</a>方法中传入的字符串和全局脚本中。如果在一个以<code>{}</code>括号包裹住的代码块中使用严格模式是没有作用的。</p>
+<h3 id="全局脚本中使用严格模式">全局脚本中使用严格模式</h3>
+<p>在全局脚本中使用严格模式其实很简单，只用在所有代码之前加入<code>&quot;use strict;&quot;</code>就可以了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Whole-script strict mode syntax</span></div><div class="line"><span class="pi">"use strict"</span>;</div><div class="line"><span class="keyword">var</span> v = <span class="string">"Hi! I'm a strict mode script!"</span>;</div></pre></td></tr></table></figure>
+
+<p>这种语法有个陷阱需要注意，它不能盲目地连接不冲突的脚本。用一段严格模式下的脚本去连接一段严格或非严格模式下的脚本，整段脚本看上去是严格的；用一段非严格模式下的脚本连接一段严格或非严格模式下脚本看上去是非严格的。但是问题就出在多段严格和非严格模式下的脚本混合组合在一起，最终无法判断整段脚本是严格的还是非严格的。所以我们推荐你把<code>&quot;use strict;&quot;</code>设置在方法级别<em>（function_by_function）</em>。</p>
+<p>你可以使用把整段脚本包含在一个<code>function</code>中，然后在方法外部使用严格模式。这可以帮助你避免混合连接脚本的问题，但是你必须把方法中的变量或方法暴露出来供外部使用。</p>
+<h3 id="在方法中使用严格模式">在方法中使用严格模式</h3>
+<p>同样的，如果想要在<code>function</code>上使用严格模式，只要在方法中其他语句之前写上<code>&quot;use strict;&quot;</code>就可以了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function strict () {</div><div class="line">  // Function-level strict mode syntas</div><div class="line">  'use strict';</div><div class="line">  function nested() { return 'And so am I!'; }</div><div class="line">  return 'Hi! I'm a strict mode function!  ' + nested();</div><div class="line">}</div><div class="line"></div><div class="line">function notStrict () {</div><div class="line">  return 'I'm not strict.';</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><!--break--></p>
+<h2 id="严格模式带来的改变">严格模式带来的改变</h2>
+<p>严格模式带来了语法和脚本运行时新的表现。这些改变大概可以分为两类：把设计上的缺陷转变为语法或者运行时报错，简化了一个特定变量是如何被计算的，简化了<code>eval</code>和<code>arguments</code>，同时，这些改变让开发者更容易编写“安全的”JavaScript，也使得下一代的ECMAScript来得更快一些。</p>
+<h3 id="把设计上的缺陷转变为报错">把设计上的缺陷转变为报错</h3>
+<p>严格模式把之前可接受的设计失误转变成了报错，JavaScript当时是为初学开发者设计的，所以有时本来需要报错的地方没有报错。这种做法有时能帮助开发者快速解决问题，但是久而久之会带来更严重的问题。严格模式下这些设计失误会变为报错，他们能被快速的发现并且修复掉。</p>
+<p>第一，严格模式不允许偶然的创建全局变量。在非严格模式下，如果赋值语句中变量拼写错误会导致创建了一个全局变量，而且整个程序依然运行（虽然之后会产生逻辑错误）。在严格模式下发生上述情况会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line">mistypedVariable = <span class="number">17</span>; <span class="comment">// throws a ReferenceError</span></div></pre></td></tr></table></figure>
+
+<p>第二，严格模式使得赋值语句当发生潜在错误时抛出异常。比如，<code>NaN</code>是一个全局的只读变量。非严格模式下，对<code>NaN</code>的赋值运算是没有意义的，而且不会报错；而在严格模式下则会抛出异常。严格模式下任何赋值语句如果有潜在错误（对只读的变量赋值，对只读属性赋值，对一个<a href="https://developer.mozilla.org/en-US/JavaScript/Reference/Global_Objects/Object/preventExtensions" target="_blank" rel="external">“不可扩展的”</a>的对象新属性进行赋值）都会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"></div><div class="line"><span class="comment">// Assignment to a non-writable property</span></div><div class="line"><span class="keyword">var</span> obj1 = {};</div><div class="line"><span class="built_in">Object</span>.defineProperty(obj1, <span class="string">'x'</span>, { value: <span class="number">42</span>, writable: <span class="literal">false</span> });</div><div class="line">obj1.x = <span class="number">9</span>; <span class="comment">// throw a TypeError</span></div><div class="line"></div><div class="line"><span class="comment">// Assignment to a getter-only property</span></div><div class="line"><span class="keyword">var</span> obj2 = { get x() { <span class="keyword">return</span> <span class="number">17</span>; } };</div><div class="line">obj2.x = <span class="number">5</span>; <span class="comment">// throws a TypeError</span></div><div class="line"></div><div class="line"><span class="comment">// Assignment to a new property on a non-extensible object</span></div><div class="line"><span class="keyword">var</span> fixed = {};</div><div class="line"><span class="built_in">Object</span>.preventExtensions(fixed);</div><div class="line">fixed.newProp = <span class="string">'ohai'</span>; <span class="comment">// throws a TypeError</span></div></pre></td></tr></table></figure>
+
+<p>第三，在严格模式下，如果尝试删除一个不可删除的属性也会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">delete</span> <span class="built_in">Object</span>.prototype; <span class="comment">// throws a TypeError;</span></div></pre></td></tr></table></figure>
+
+<p>第四，严格模式要求一个对象上的所有属性名都必须是唯一的。非严格模式下是允许重名变量的，而且是以最后一次声明的值作为此属性的值。因为只有最后一次声明才会起作用，所以在修改某属性值时，改的不时最后一个声明的属性，那么最终的值也没有被修改。在严格模式下，重复的属性名回报出语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> o = { p: <span class="number">1</span>, p: <span class="number">2</span> }; <span class="comment">// !!! syntax error</span></div></pre></td></tr></table></figure>
+
+<p>第五，严格模式要求一个方法的所有参数名都必须时唯一的。非严格模式下存在重名参数，在使用时也只有最后一个声明的参数会被调用。但是之前参数依然能通过<code>arguments[i]</code>的方式访问到，所以他们并不是完全不能被访问到。当然，这种设计可能不是我们想要的。在严格模式下重名的参数会报语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span><span class="params">(a, a, c)</span> </span>{ <span class="comment">// !!! syntax error</span></div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">return</span> a + b + c; <span class="comment">// wrong if this code ran</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>第六，严格模式禁止八进制的语法。八进制语法不属于ECMAScript，但是所有浏览器都支持八进制语法，只要在八进制数字之前加上一个<code>0</code>：<code>0644 === 420</code> 和 <code>&quot;\045&quot; === &quot;%&quot;</code>。初学开发者觉得数字之前的<code>0</code>没有语意，只是为了让数字对齐 —— 但是，这样做确实改变了数字的意义！八进制语法几乎没什么用并且还会被错误的使用，所以在严格模式下会抛出语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> sum = <span class="number">015</span> + <span class="comment">// !!! syntax error</span></div><div class="line">          <span class="number">197</span> + </div><div class="line">          <span class="number">142</span></div></pre></td></tr></table></figure>
+
+<h3 id="简化变量的使用">简化变量的使用</h3>
+<p>严格模式简化了变量名是如何映射到变量的定义的。很多解释器的优化依赖于解释器了解变量和变量的存储映射关系：这是全面优化JavaScript代码非常关键的一点。JavaScript代码有时在运行时才能找到变量名到变量定义之间的映射。严格模式下移除了大部分这样的情况，解释器也能发挥更好的优化作用。</p>
+<p>首先，严格模式下禁止使用<code>with</code>，原因是因为在调用<code>with</code>的代码块中的任何命名有可能指向一个对象的属性，或者指向一个外部的（甚至是全局的）变量，在运行时解释器很难知道该变量指代的对象是什么。这种情况在严格模式下会抛出语法错误，也就避免了在<code>with</code>的代码块中存在不确定指向的变量命名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> x = <span class="number">17</span>;</div><div class="line"><span class="keyword">with</span>(obj) { <span class="comment">// !!! syntax error</span></div><div class="line">  <span class="comment">// if this weren't strict mode, would this be var x, or</span></div><div class="line">  <span class="comment">// would it instead be obj.x? It's impossible in general</span></div><div class="line">  <span class="comment">// to say without running the code, so the name can't be</span></div><div class="line">  <span class="comment">// optimized.</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>替代使用<code>with</code>的简单的方式可以选择直接访问变量上的对应属性进行赋值运算。</p>
+<p>另外，<a href="http://whereswalden.com/2011/01/10/new-es5-strict-mode-support-new-vars-created-by-strict-mode-eval-code-are-local-to-that-code-only/" target="_blank" rel="external">严格模式下的<code>eval</code>方法调用不会给当前作用域上添加新的变量</a>。在非严格模式下，<code>eval(&quot;var x;&quot;)</code>将会创建新的变量<code>x</code>在当前的方法作用域上或者全局作用域上。这就意味着，通常情况下如果一个方法包含了<code>eval</code>语句，并且<code>eval</code>语句创建了新的和方法中某个参数或变量同名的变量，有可能会影响到他它们的值。但是在严格模式下，<code>eval</code>创建出来的变量只属于<code>eval</code>中代码被执行时的作用域，所以<code>eval</code>并不会影响其他局部本两或者参数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> x = <span class="number">17</span>;</div><div class="line"><span class="keyword">var</span> evalX = <span class="built_in">eval</span>(<span class="string">"'use strict'; var x = 42; x"</span>);</div><div class="line">assert(x === <span class="number">17</span>);</div><div class="line">aseert(evalX === <span class="number">42</span>);</div></pre></td></tr></table></figure>
+
+<p>如果<code>eval</code>方法被另一个严格模式下的<code>eval</code>方法调用，那么被调用的<code>eval</code>表达式运行时也会被当作在严格模式下运行，而且这段代码可以显示的设置上严格模式，但是不是必须的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">strict1</span> <span class="params">(str)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">return</span> <span class="built_in">eval</span>(str); <span class="comment">// str will be treated as strict mode code</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">strict2</span> <span class="params">(f, str)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">return</span> f(str); <span class="comment">// not eval(..): str is strict if and only if it invokes strict mode</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">nonstrict</span> <span class="params">(str)</span> </span>{</div><div class="line">  <span class="keyword">return</span> <span class="built_in">eval</span>(str); <span class="comment">// str is strict if and only if it invokes strict mode</span></div><div class="line">}</div><div class="line"></div><div class="line">strict1(<span class="string">"'Strict mode code!'"</span>);</div><div class="line">strict1(<span class="string">"'use strict'; 'Strict mode code!'"</span>);</div><div class="line">strict2(<span class="built_in">eval</span>, <span class="string">"'Non-strict code.'"</span>);</div><div class="line">strict2(<span class="built_in">eval</span>, <span class="string">"'use strict'; 'Strict mode code!'"</span>);</div><div class="line">nonstrict(<span class="string">"'Non-strict code.'"</span>);</div><div class="line">nonstrict(<span class="string">"'use strict'; 'Strict mode code!'"</span>);</div></pre></td></tr></table></figure>
+
+<p>最后，严格模式下禁止删除一个变量名称。<code>delete name</code>在严格模式下会抛出语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="built_in">eval</span>(<span class="string">'var x; delete x;'</span>); <span class="comment">// !!! syntax error</span></div></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">strict1</span> <span class="params">()</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">var</span> x = <span class="number">10</span>;</div><div class="line">  <span class="keyword">delete</span> x; <span class="comment">//  !!! syntax error</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="让使用eval和arguments更加简单">让使用<code>eval</code>和<code>arguments</code>更加简单</h3>
+<p>严格模式让<code>arguments</code>和<code>eval</code>变得没那么神秘莫测。过去在非严格模式下它们都表现得比较诡异：<code>eval</code>有可能影响外部作用域的变量值，而<code>arguments</code>可以通过索引可以访问到参数，而且只是作为参数的一个别名而已。严格模式尽可能的把<code>eval</code>和<code>arguments</code>只是当成关键字来使用，完整的修复可能需要等到新版本的ECMAScript的出现。</p>
+<p>首先，从语法层面就限制了<code>eval</code>和<code>arguments</code>不能被使用到声明和赋值语句中。所有的尝试都会当成语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="built_in">eval</span> = <span class="number">17</span>;</div><div class="line"><span class="built_in">arguments</span>++;</div><div class="line">++<span class="built_in">eval</span>;</div><div class="line"><span class="keyword">var</span> obj = { set p(<span class="built_in">arguments</span>) {} };</div><div class="line"><span class="keyword">var</span> <span class="built_in">eval</span>;</div><div class="line"><span class="keyword">try</span> {} <span class="keyword">catch</span> (<span class="built_in">arguments</span>) {}</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">x</span> <span class="params">(eval)</span> </span>{}</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">arguments</span> <span class="params">()</span> </span>{}</div><div class="line"><span class="keyword">var</span> y = <span class="function"><span class="keyword">function</span> <span class="title">eval</span> <span class="params">()</span> </span>{};</div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">'arguments'</span>, <span class="string">'"use strict"; return 17;'</span>);</div></pre></td></tr></table></figure>
+
+<p>另外，严格模式下的<code>arguments</code>通过索引访问到的参数并不是参数的别名。在非严格模式下，假设有一个方法，方法的第一个参数叫做<code>arg</code>，对<code>arg</code>的修改同时也会修改了<code>arguments[0]</code>，反之亦然（除非没有设置参数或者<code>arguments[0]</code>被删除了）。在严格模式下，<code>arguments</code>只是保存了方法调用时候初始的参数值。<code>arguments[i]</code>不会跟踪对应的参数值，反过来一个参数的改变也不会影响对应的<code>arguments[i]</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span> <span class="params">(a)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  a = <span class="number">42</span>;</div><div class="line">  <span class="keyword">return</span> [a, <span class="built_in">arguments</span>[<span class="number">0</span>]];</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">var</span> pair = f(<span class="number">17</span>);</div><div class="line">assert(pair[<span class="number">0</span>] === <span class="number">42</span>);</div><div class="line">assert(pair[<span class="number">1</span>] === <span class="number">17</span>);</div></pre></td></tr></table></figure>
+
+<p>还有，严格模式下不再支持<code>arguments.callee</code>。在非严格模式下<code>arguments.callee</code>指向了当前调用的方法。<code>arguments.callee</code>本质上阻碍的解释器的优化，因为它必须保持了一个指向当前方法的应用。在严格模式下，<code>arguments.callee</code>变成一个不能被删除的属性，当赋值和取值时都会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> f = <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{ <span class="keyword">return</span> <span class="built_in">arguments</span>.callee; };</div><div class="line">f(); <span class="comment">// throws a TypeError</span></div></pre></td></tr></table></figure>
+
+<h3 id="“安全的”JavaScript">“安全的”JavaScript</h3>
+<p>严格模式让开发者更容易编写“安全的”JavaScript。有些网站可以让用户编写JavaScript，这些脚本会被其他用户的浏览器或网站运行。浏览器中的JavaScript将能够访问到用户的私密信息，所以这段JavaScript能被部分地在运行前转变，去连接被禁止的功能。为了做到“安全的”JavaScript，需要有多次的运行时检查灵活多变的JavaScript代码。但是多次的运行时检查可能带来大量的性能损失。在严格模式下的一些调整，用户提交的JavaScript代码会以某种方式执行，有效的减少了运行时检查的需要。</p>
+<p>首先，在严格模式下，当值作为<code>this</code>传入一个方法时（调用<code>call</code>, <code>apply</code>, <code>bind</code>方法时），不会被装箱成一个对象。非严格模式下，对于一个方法来说，如果作为<code>this</code>传入的值是一个对象，那么方法中的<code>this</code>就是一个对象；如果传入的是<code>Boolean</code>，<code>string</code>，<code>number</code>类型的话，方法中的<code>this</code>就是装箱之后的值；如果传入的值是<code>undefined</code>或者<code>null</code>，那么方法中的<code>this</code>就是全局对象。自动装箱会造成性能损失，而且暴露出来的浏览器全局对象又会造成安全隐患，因为全局对象可以连接功能“安全的”JavaScript环境，这是需要被限制的。因此，对于一个严格模式下的方法，指定的<code>this</code>被视为未改变的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span> <span class="params">()</span> </span>{ <span class="keyword">return</span> <span class="keyword">this</span>; }</div><div class="line">assert(fun() === <span class="literal">undefined</span>); <span class="comment">// this is unchanged, before is global variable</span></div><div class="line">assert(fun.call(<span class="number">2</span>) === <span class="number">2</span>);</div><div class="line">assert(fun.apply(<span class="literal">null</span>) === <span class="literal">null</span>);</div><div class="line">assert(fun.call(<span class="literal">undefined</span>) === <span class="literal">undefined</span>);</div><div class="line">assert(fun.bind(<span class="literal">true</span>)() === <span class="literal">true</span>);</div></pre></td></tr></table></figure>
+
+<p>另外，严格模式下不能使用ECMAScript的通用实现的扩展去“查看”JavaScript的堆栈。通常实现的扩展程序中，当方法<code>fun</code>被另一个方法调用时，<code>fun.caller</code>指向了最近调用<code>fun</code>的方法，<code>fun.arguments</code>指向了<code>fun</code>方法调用时候的参数。两个属性的访问都时被严格模式限制的，因为它们允许“安全的”代码访问“特权函数”及其（有隐患的）参数。如果<code>fun</code>处于严格模式下，<code>fun.caller</code>和<code>fun.arguments</code>都是不可删除的属性，在设值和取值的时候会抛出异常：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">restricted</span> <span class="params">()</span> </span>{</div><div class="line">  <span class="string">'use restrict'</span>;</div><div class="line">  restricted.caller; <span class="comment">// throws a TypeError</span></div><div class="line">  restricted.arguments; <span class="comment">// throws a TypeError</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">privilegedInvoker</span> <span class="params">()</span> </span>{</div><div class="line">  <span class="keyword">return</span> restricted();</div><div class="line">}</div><div class="line"></div><div class="line">privilegedInvoker();</div></pre></td></tr></table></figure>
+
+<p>还有，在严格模式下，方法的<code>arguments</code>不能访问到方法调用时的变量。在较老版本的ECMAScript实现的<code>arguments.caller</code>是一个对象，对象的属性是指向了该方法调用时参数的别名。这也是一个<a href="http://stuff.mit.edu/iap/2008/facebook/" target="_blank" rel="external">安全隐患</a>，因为它不能通过方法抽象来隐藏特权值；也会给解释器优化带来困难。目前来说，还没有近代浏览器实现它。因为一些历史原因，严格模式下的方法中<code>arguments.caller</code>是一个不可被删除的属性，并且设值和取值时都会抛出异常：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span> <span class="params">(a, b)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">var</span> v = <span class="number">12</span>;</div><div class="line">  <span class="keyword">return</span> <span class="built_in">arguments</span>.caller; <span class="comment">// throws a TypeError</span></div><div class="line">}</div><div class="line"></div><div class="line">fun(<span class="number">1</span>, <span class="number">2</span>); <span class="comment">// doesn't expose v (or a or b)</span></div></pre></td></tr></table></figure>
+
+<h3 id="为未来的ECMAScript铺路">为未来的ECMAScript铺路</h3>
+<p>未来的ECMAScript版本将可能带来新的语法，ECMAScript5中的严格模式应用了多种限制来缓和即将来临的变化。严格模式限制了这些改变的核心部分，使得ECMAScript改变起来更加容易一些。</p>
+<p>首先，严格模式下一些标识变成了保留关键字：<code>implements</code>，<code>interface</code>，<code>let</code>，<code>package</code>，<code>private</code>，<code>protected</code>，<code>protected</code>，<code>public</code>，<code>static</code>和<code>yield</code>。所以你不能把它们用作变量名和参数名。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">package</span> <span class="params">(protected)</span> </span>{ <span class="comment">// !!!</span></div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">var</span> implements; <span class="comment">// !!!</span></div><div class="line">  </div><div class="line">  interface: <span class="comment">// !!!</span></div><div class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) {</div><div class="line">    <span class="keyword">break</span> interface; <span class="comment">// !!!</span></div><div class="line">  }</div><div class="line">  </div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">private</span> <span class="params">()</span> </span>{} <span class="comment">// !!!</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span> <span class="params">(static)</span> </span>{ <span class="comment">// !!!</span></div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在Firefox下有两个特殊的地方：第一，如果你的代码使用的是JavaScript1.7或以上（你使用的时Chrome，或者你使用了正确的<code>&lt;script type=&quot;&quot;&gt;</code>），并且使用了严格模式，<code>let</code>和<code>yield</code>在它们第一次引入的时候就已经可以使用。但是如果脚本是使用<code>&lt;script src=&quot;&quot;&gt;</code>或<code>&lt;script&gt;…&lt;/script&gt;</code>加载的，那么你不可以使用<code>let</code>/<code>yield</code>作为标识符。第二，ES5还保留了更多的关键字：<code>class</code>，<code>enum</code>，<code>export</code>，<code>export</code>，<code>extend</code>，<code>import</code>和<code>super</code>，在Firefox5之前，它们只在严格模式下保留。</p>
+<p>另外，<a href="http://whereswalden.com/2011/01/24/new-es5-strict-mode-requirement-function-statements-not-at-top-level-of-a-program-or-function-are-prohibited/" target="_blank" rel="external">严格模式禁止在一段脚本或一个方法内有不标准的方法声明</a>。在非严格模式下，浏览器允许在任何地方声明方法。这种方式并不是来自ES5，甚至不是来自ES3！，它是不同浏览器不同的实现导致的。未来的ECMAScript版本将会为不标准的方法声明定义新的语意。严格模式下<a href="http://wiki.ecmascript.org/doku.php?id=conventions:no_non_standard_strict_decls" target="_blank" rel="external">禁止了这种方法申明</a>，为未来的ECMAScript标准的定制扫清障碍。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">if</span> (<span class="literal">true</span>) {</div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">f</span> <span class="params">()</span> </span>{ } <span class="comment">// !!! syntax error</span></div><div class="line">  f();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span> ; i &lt; <span class="number">5</span> ; i ++) {</div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">f2</span> <span class="params">()</span> </span>{} <span class="comment">// !!! syntax error</span></div><div class="line">  f2();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">baz</span> <span class="params">()</span></span>{ <span class="comment">// kosher, clear</span></div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">eit</span> <span class="params">()</span> </span>{} <span class="comment">// also kosher, clear</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这种限制不是严格模式特有的，因为这样的方法申明是基础的ES5的一个扩展。并且它已经成为ECMAScript委员会推荐的方式，浏览器在不久的将来会实现这种行为。</p>
+<h2 id="浏览器下的严格模式">浏览器下的严格模式</h2>
+<p>浏览起还没有完全实现严格模式，所以不要盲目的依赖它。<em>严格模式会改变脚本的语意</em>。如果浏览器还没有实现某种严格模式下的行为，依赖这些行为的地方将会导致错误。使用的时候需要保持练习的心态，通过功能测试来保证你使用的严格模式都被浏览器实现了。最后，确保你测试过你的代码在不支持严格模式的浏览器也是可以运行的，否则，你可能会遇到些问题，反之亦然。</p>
+<h2 id="更多阅读">更多阅读</h2>
+<ul>
+<li><a href="http://whereswalden.com/2010/09/08/new-es5-strict-mode-support-now-with-poison-pills/" target="_blank" rel="external">Where’s Walden? » New ES5 strict mode support: now with poison pills!</a></li>
+<li><a href="http://whereswalden.com/2011/01/24/new-es5-strict-mode-requirement-function-statements-not-at-top-level-of-a-program-or-function-are-prohibited/" target="_blank" rel="external">Where’s Walden? » New ES5 strict mode requirement: function statements not at top level of a program or function are prohibited</a></li>
+<li><a href="http://whereswalden.com/2011/01/10/new-es5-strict-mode-support-new-vars-created-by-strict-mode-eval-code-are-local-to-that-code-only/" target="_blank" rel="external">Where’s Walden? » New ES5 strict mode support: new vars created by strict mode eval code are local to that code only</a></li>
+<li><a href="http://ejohn.org/blog/ecmascript-5-strict-mode-json-and-more/" target="_blank" rel="external">John Resig - ECMAScript 5 Strict Mode, JSON, and More</a></li>
+<li><a href="http://dmitrysoshnikov.com/ecmascript/es5-chapter-2-strict-mode/" target="_blank" rel="external">ECMA-262-5 in detail. Chapter 2. Strict Mode.</a></li>
+<li><a href="http://kangax.github.com/es5-compat-table/strict-mode/" target="_blank" rel="external">Strict mode compatibility table</a></li>
+</ul>
+]]></content>
+    <summary type="html">
+    <![CDATA[使用ECMAScript 5的严格模式（“strict mode”）会进入受限制的JavaScript模式。严格模式下的JavaScript并不是标准模式的一个子集，而是直接使用了不同语意的代码。JavaScript在支持和不支持严格模式的浏览器之间会有着不同的表现，所以功能开发时不要依赖于严格模式。严格模式的代码和非严格模式的代码是可以共存的，在严格模式下，非严格模式代码会递增地想严格模式代码转化。]]>
+    
+    </summary>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[跨了个域]]></title>
+    <link href="http://slender-man.github.io/2013/05/31/2013-05-31-cross-origin-request/"/>
+    <id>http://slender-man.github.io/2013/05/31/2013-05-31-cross-origin-request/</id>
+    <published>2013-05-30T16:00:00.000Z</published>
+    <updated>2014-12-02T05:04:17.000Z</updated>
+    <content type="html"><![CDATA[<p>如今是一个平台众多，软件开发平民化，软件服务可拼凑成产品的时代。优秀的互联网产品，像微博，微信，Github，Instagram都变成平台，提供一些优雅或不优雅的API让靠谱或不靠谱的开发者来玩，这些API里肯定会涉及到跨域访问的知识。靠谱的开发者即使遇到没有开发文档也能摸索出套路，反之就需要了解下跨域访问的知识了。</p>
+<h2 id="为什么需要“踩过界”">为什么需要“踩过界”</h2>
+<p>跨域访问指的是不同源的A和B网站，A请求访问B的资源。资源包括B网站的图片、视频、数据、文件等等。例如，新浪微博提供的微博API就是提供给不同源网站访问微博数据的接口；又如，A网站嵌入了B网站的图片或视频资源也属于跨域访问。</p>
+<p>那么，为什么不能直接访问呢？等等，让我们先来聊聊浏览器<strong>同源策略（Same-Origin Policy）</strong>，同源策略限制了本网站的<strong>脚本</strong>不能对其他源的网站资源进行<strong>读</strong>和<strong>写</strong>操作。两个域必须满足协议（protocol）、端口（port）、主地址（host）都是一致的，才能相互请求资源。</p>
+<p>假设有不同源的源A和源B，源A对源B的读操作指的是：</p>
+<ol>
+<li>读取源B的JavaScript，CSS的源代码<em>（受到限制）</em></li>
+<li>读取源B的返回的文档，JSON等数据<em>（受到限制）</em></li>
+<li>读取源B的图片的二进制数据<em>（受到限制）</em></li>
+</ol>
+<p>源A对源B的写操作指的是源A发送数据到源B，主要包括：</p>
+<ol>
+<li>源A对源B进行表单，Ajax（XMLHttpRequest或XDomainRequest）<strong>POST</strong>方式提交</li>
+<li>源A嵌入指向源B的链接，点击后发生的跳转</li>
+<li>源A的脚本操作嵌入到iframe中的源B的DOM对象<em>（受到限制）</em></li>
+<li>源A使用postMessage发送嵌入到iframe中的的源B</li>
+</ol>
+<p>以上读和写操作，加上了<em>（受到限制）</em>的操作都属于浏览器同源策略限制。</p>
+<p>其中最重要的危害最大的是写操作中的对源B的DOM对象进行操作。就以支付宝做一个例子，作为攻击者，我申请了一个网址叫做<em><a href="http://alipay.tb.com" target="_blank" rel="external">http://alipay.tb.com</a></em>，整个网站没有内容就一个隐藏的iframe嵌入了<em><a href="http://alipay.com" target="_blank" rel="external">http://alipay.com</a></em>，因为支付宝会记录登陆用户的cookie为了让用户不用每次访问都需要登陆，在没有同源策略的保护下，我可以控制你支付宝，获取你的余额记录和消费记录（此时没有了读取文档限制）或直接利用脚本帮我进行支付，而用户不会洞察到什么，只是收到了消费的短信通知，钱财不翼而飞，损失很大。可见在没有同源策略下的互联网是多么的恐怖。不过放心，即使没有同源策略我们的支付宝也没有这么弱，支付时还需要支付密码。</p>
+<p>不过光有浏览器同源策略是不能完全阻止脚本在你已经登陆的网站上肆虐操作，如果用户主动点击了页面上加载不安全脚本的链接，不安全脚本也会趁虚而入，我们把这种攻击叫做<strong>XSS（Cross Site Scripting）</strong>。目前可能遇见的方式有这么几种：1、点击了链接加载不安全脚本，2、保存成bookmark的脚本不安全，3、Chrome插件被注入恶意脚本。这里就有个血淋淋的<a href="http://coolshell.cn/articles/4914.html" target="_blank" rel="external">新浪微博遭到XSS攻击的例子</a> 。</p>
+<p>在读取操作中有一项限制很有趣，就是不同源之间读取文档，JSON数据是受限制的。提供API就是为了让不同源之间可以相互访问，但是因为同源策略的存在，源B的JSON数据不能直接被读取到，导致现在出现了各种各样的跨域访问方式，例如JSONP，CORS（Cross Origin Resource Sharing），后台代理等。</p>
+<p>跨域访问需要跨越的就是同源策略的多个限制。现在我们来看看几种使用广泛的跨域访问方式是如何工作的。</p>
+<!--break-->
+
+<h2 id="跨域请求方式">跨域请求方式</h2>
+<h3 id="JSONP">JSONP</h3>
+<p>JSONP（JSON with padding)是目前使用的最广，最简单的一种跨域访问方式。既然说同源策略限制了脚本于不同源网站资源进行交互，那么JSONP的原理是什么呢？其实同源策略中还存在另一种脚本和资源的交互方式，叫做<strong>嵌入（Embed）方式</strong>。也就是说，源A可以嵌入源B的资源，比如嵌入源B中的图片、样式文件、脚本文件。样式文件和脚本文件嵌入之后会被运行。JSONP就是利用了网站可以嵌入脚本并运行这一点。</p>
+<p>让我们来看一个列子。定义了简单的后端HTTP GET服务，每次请求返回一段脚本代码，并且把后段数据“hello world”发送回去。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> </span>jsonp</div><div class="line">  str = <span class="string">'hello world'</span></div><div class="line">  func = params[<span class="symbol">:callback</span>]</div><div class="line">  render <span class="symbol">:js</span> =&gt;</div><div class="line">    <span class="string">"try{"</span> +</div><div class="line">      <span class="string">"<span class="subst">#{func}</span>({ str : '<span class="subst">#{str}</span>'});"</span> + </div><div class="line">    <span class="string">"}catch(e){"</span> +</div><div class="line">      <span class="string">"console.error('request error');"</span> + </div><div class="line">    <span class="string">"}"</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+
+<p>实现一个简单的前端调用，使用的是jQuery的getJSON方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">$.getJSON(<span class="string">'http://localhost:3000/jsonp?callback=?'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(ret)</span> </span>{</div><div class="line">  <span class="built_in">console</span>.log(ret.str); <span class="comment">// output "hello world"</span></div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>在调用getJSON方法之后发送了callback参数告诉后端生产的JavaScript代码需要调用这个方法，并且把后端的资源“hello world”准备成该方法的一个参数返回回来，达到跨域访问的目的。为了更仔细观察整个过程，我们来看看HTTP的包是什么样子的。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Request</div><div class="line">GET /jsonp?callback=jQuery19008820020072162151_1359426298971 HTTP/1.1</div><div class="line"></div><div class="line">Host: localhost:3000</div><div class="line">Connection: keep-alive</div><div class="line"><span class="operator"><span class="keyword">Cache</span>-Control: <span class="keyword">max</span>-age=<span class="number">0</span></span></div><div class="line">…</div><div class="line"></div><div class="line">// Response</div><div class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</div><div class="line"></div><div class="line">Content-Type: <span class="built_in">text</span>/javascript; charset=utf-8</div><div class="line">Etag: "a60520e11c6991b89099c84cb4742f39”</div><div class="line"><span class="operator"><span class="keyword">Cache</span>-Control: <span class="keyword">max</span>-age=<span class="number">0</span>, private, must-revalidate</span></div><div class="line">Content-Length: <span class="number">112</span></div><div class="line">…</div><div class="line"></div><div class="line">try{jQuery19008820020072162151_1359426298971({ <span class="keyword">str</span> : <span class="string">'hello world'</span> });}catch(e){console.error('request error');}</div></pre></td></tr></table></figure>
+
+
+
+<p>需要注意的是jQuery为我们准备的方法叫做<code>jQuery19008820020072162151_1359426298971</code>，这和response内容中的方法调用对应。另一个需要注意的是，response的<code>Content-Type</code>为<code>text/javascript; charset=utf-8</code>，在调用方来看想要得到的是JSON数据，不是脚本，response中的描述出现了“错误”。</p>
+<p>JSONP方式请求，实质上是一个对脚本的GET请求，它不像Ajax请求那样存在加载，调用完成等状态；安全性也不是特别高，存在加载不安全的脚本在本站运行具有风险。jQuery提供的getJSON这样的方式让开发者掉用起来不会感觉和Ajax调用有多大差别。虽然它并不完善，但它的易用性使它现在适用范围最广的跨域访问方式，目前几乎所有的API都会准备JSONP调用方式。</p>
+<h3 id="CORS">CORS</h3>
+<p>CORS(Corss Origin Resource Sharing)跨域资源共享是真正用来解决资源共享问题。不像JSONP那么旁门左道，它是通过HTTP方式来实现资源共享，让每个请求的服务直接返回资源。它使用了HTTP交互方式来确定请求源是否有资格请求该资源，并且通过设置HTTP Header来控制访问资源的权限。</p>
+<p>我们来看一个例子。同样还是定义后端服务，返回的资源仍然是“hello world”。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> </span>cors</div><div class="line">  response.headers[<span class="string">'Access-Control-Allow-Origin'</span>] = <span class="string">"*"</span></div><div class="line">  response.headers[<span class="string">'Access-Control-Allow-Methods'</span>] = <span class="string">"GET"</span></div><div class="line">  response.headers[<span class="string">'Access-Control-Max-Age'</span>] = <span class="string">'60'</span></div><div class="line">  </div><div class="line">  ret = { <span class="symbol">:str</span> =&gt; <span class="string">'hello world'</span> }</div><div class="line">  render <span class="symbol">:json</span> =&gt; ret.to_json</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+
+<p>看到了一些HTTP Header的配置，过会再来分析它们是什么。接着，使用jQuery简单实现前端调用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$.getJSON(<span class="string">'http://localhost:3000/cors'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(ret)</span> </span>{</div><div class="line">  <span class="built_in">console</span>.log(ret.str); <span class="comment">// output "hello world"</span></div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>虽然结果是一样的，但其实其中经过了很多过程，我们看看HTTP请求过程就知道。第一次请求后端时候，浏览器意识到是访问一个跨与资源，没有直接发送GET请求获取数据，而是发送了一个OPTIONS请求询问是否可以访问该资源。我们称之为Preflight请求。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="request">OPTIONS <span class="string">/cors</span> HTTP/1.1</span></div><div class="line"></div><div class="line"><span class="avrasm"><span class="label">Host:</span> localhost:<span class="number">3000</span></span></div><div class="line"><span class="label">Origin:</span> http://localhost:<span class="number">8000</span></div><div class="line"><span class="label">Accept:</span> application/json, text/javascript, *<span class="comment">/*; q=0.01</span></div><div class="line">Access-Control-Request-Method: GET</div><div class="line">…</div></pre></td></tr></table></figure>
+
+<p>浏览器尝试用GET方式请求资源<em><a href="http://localhost:3000/cors" target="_blank" rel="external">http://localhost:3000/cors</a></em>，默认因为同源策略的存在，肯定是请求失败的，所以经常看到的一个错误<code>XMLHttpRequest cannot load http://localhost:3000/. Origin XXX is not allowed by Access-Control-Allow-Origin.</code> 就会出现。这个例子中，Preflight请求的到的response是</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="status">HTTP/1.1 <span class="number">200</span> OK</span></div><div class="line"></div><div class="line"><span class="mathematica"><span class="keyword">Date</span>: Mon, <span class="number">01</span> Dec <span class="number">2013</span> <span class="number">01</span>:<span class="number">15</span>:<span class="number">39</span> GMT</span></div><div class="line">Server: Apache/<span class="number">2.0</span><span class="number">.61</span> (Unix)</div><div class="line">Access-<span class="keyword">Control</span>-Allow-Origin: *</div><div class="line">Access-<span class="keyword">Control</span>-Allow-Methods: GET</div><div class="line">Access-<span class="keyword">Control</span>-<span class="keyword">Max</span>-Age: <span class="number">60</span></div><div class="line">Content-Encoding: gzip</div><div class="line">Content-<span class="keyword">Length</span>: <span class="number">0</span></div><div class="line">Connection: Keep-Alive</div><div class="line">Content-Type: text/text</div><div class="line">…</div></pre></td></tr></table></figure>
+
+<p>通过response，服务器告知浏览器所有域都可以使用GET方式请求请求该资源，有效时间为60秒。得到回复后，浏览器自动再次发出真正的请求并且得到真正的资源。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Actual Request</span></div><div class="line">GET /cors HTTP/<span class="number">1.1</span></div><div class="line"></div><div class="line">Host: localhost:<span class="number">3000</span></div><div class="line">Origin: http:<span class="comment">//localhost:8000</span></div><div class="line">Accept: application/json, <span class="keyword">text</span>/javascript, <span class="variable">*/</span><span class="variable">*;</span> q=<span class="number">0.01</span></div><div class="line">Referer: http:<span class="comment">//localhost:8000/temp.html</span></div><div class="line">Accept-Encoding: gzip,deflate,sdch</div><div class="line">Accept-Language: en-US,en;q=<span class="number">0.8</span></div><div class="line">…</div><div class="line"></div><div class="line"><span class="comment">// Return Resource</span></div><div class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</div><div class="line"></div><div class="line">Access-Control-Allow-Origin: *</div><div class="line">Access-Control-Allow-Methods: GET</div><div class="line">Access-Control-Max-Age: <span class="number">60</span></div><div class="line">Content-Type: application/json; charset=utf-<span class="number">8</span></div><div class="line">Content-Length: <span class="number">24</span></div><div class="line">…</div><div class="line"></div><div class="line">{ <span class="string">"str"</span> : <span class="string">"hello world"</span> }</div></pre></td></tr></table></figure>
+
+<p>和JSONP方式不同，资源最终返回到请求方时并不是脚本代码，而且资源本省，response包的<code>Content-Type</code>也正确地对资源进行了描述。虽然是两次请求，但是浏览器自动处理，开发者并不需要做其他处理。BTW，现在还有很多人分不清楚JSON数据对象和JavaScript对象的联系和区别。</p>
+<p>CORS使用HTTP Header来控制资源的可访问性，可以使用的属性主要有：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Origin</span>: &lt;origin&gt; | * // 授权的源控制</div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Max</span>-<span class="type">Age</span>: &lt;delta-seconds&gt; // 授权的时间</div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Credentials</span>: <span class="literal">true</span> | <span class="literal">false</span> // 控制是否开启与<span class="type">Ajax</span>的<span class="type">Cookie</span>提交方式</div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Methods</span>: &lt;<span class="keyword">method</span>&gt;[, &lt;<span class="keyword">method</span>&gt;]* // 允许请求的<span class="type">HTTP</span> <span class="type">Method</span></div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Headers</span>: &lt;field-name&gt;[, &lt;field-name&gt;]* // 控制哪些header能发送真正的请求</div></pre></td></tr></table></figure>
+
+<p>CORS方式我很喜欢，目前支持的浏览器有Chrome 4+, FF 3.5+, IE 8+, Opera 12+, Safari 4+，虽然不是全都支持，但是这种优雅的方式会渐渐取代JSONP成为主流，目前发现的Github, W3C文档都已经实现。</p>
+<h3 id="后端请求">后端请求</h3>
+<p>后端请求没有存在同源策略，因为后端请求不会发送Cookie到后端，不存在登陆过的网站Cookie被其他域的网站调用的情况，所以后端请求也经常用来作为跨域访问。有时提供资源方只让授权的第三方请求数据，往往会给予一个token个第三方，作为请求时的验证信息。这种做法是非常安全的。</p>
+<p>前端需要显示跨域资源时，往往时发送请求到自己的后端，通过后端请求到跨域资源并且返回，像代理一样工作。比起前两种，无疑需要更多的开发工作去设计并实现包装的接口。此方式比较简单，我们看一个请求新浪微博的例子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> httplib</div><div class="line">conn = httplib.HTTPSConnection(<span class="string">"api.weibo.com"</span>)</div><div class="line">conn.request(<span class="string">"GET"</span>, </div><div class="line">  <span class="string">"/2/statuses/user_timeline.json?source=3168xxx&uid=264xxx"</span>)</div><div class="line">response = conn.getresponse()</div><div class="line"><span class="keyword">print</span> response.read()</div><div class="line">conn.close()</div></pre></td></tr></table></figure>
+
+<h2 id="其他方式">其他方式</h2>
+<p>当然还有很多跨域方式，在这就不一一详细介绍了：</p>
+<ul>
+<li>域与子域之间的跨域访问通过<code>document.domain</code>来解决</li>
+<li>新的HTML5中window.postMessage API可以让消息在多个窗口中传递</li>
+<li>还有之前flash使用的crossdomain.xml文件</li>
+</ul>
+<p>更多理论的介绍可以去Google上搜索，不过还时推荐几篇文章给大家，<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Same_origin_policy_for_JavaScript?redirectlocale=en-US&amp;redirectslug=Same_origin_policy_for_JavaScript" target="_blank" rel="external">Same-origin Policy – MDN</a>，<a href="http://blogs.msdn.com/b/ieinternals/archive/2009/08/28/explaining-same-origin-policy-part-1-deny-read.aspx" target="_blank" rel="external">Same Origin Policy Part1 – No Peeking</a>，<a href="http://blogs.msdn.com/b/ieinternals/archive/2012/04/03/explaining-same-origin-policy-part-2-limited-write.aspx" target="_blank" rel="external">Same Origin Policy Part2 – Limited Write</a>，<a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS" target="_blank" rel="external">CORS – MDN</a>。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>如今是一个平台众多，软件开发平民化，软件服务可拼凑成产品的时代。优秀的互联网产品，像微博，微信，Github，Instagram都变成平台，提供一些优雅或不优雅的API让靠谱或不靠谱的开发者来玩，这些API里肯定会涉及到跨域访问的知识。靠谱的开发者即使遇到没有开发文档也能摸]]>
+    </summary>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Drupal开发体验]]></title>
+    <link href="http://slender-man.github.io/2012/11/20/2012-11-20-what-i-found-form-drupal/"/>
+    <id>http://slender-man.github.io/2012/11/20/2012-11-20-what-i-found-form-drupal/</id>
+    <published>2012-11-19T16:00:00.000Z</published>
+    <updated>2014-12-02T05:04:28.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="“新的”用户">“新的”用户</h2>
+<p>CMS给开发人员带来了新的用户角色—编辑Editor。使得开发人员需要提供强大的编辑功能给他们来创建内容，比如一个公用博客程序，Editor需要的是简单快捷的方式能把他掌握的内容录入系统，并且让最终用户看到。Editor是CMS的使用最多的用户，用户体验对终端查看者和Editor都很重要，设计时必须同等对待。</p>
+<p>有时候为了达到页面内容都是可配置的，那么就需要Editor懂得他创建的内容的每一个字段在页面上是怎么显示的，比如说，每个文章都有一个缩略图和一个放在页面最上方的大图片，一个主页面需要显示文章列表并且要求只显示出缩略图，标题和内容的前140个字，那么开发人员就必须考虑Editor是怎么编辑的。</p>
+<p>面对上述要求，开发人员（如果BA没这么干的话）应该问：</p>
+<ol>
+<li>缩略图是由主图片通过系统缩小处理还是由Editor上传，如果是上传，那么规格是什么？</li>
+<li>显示的140个字是来自于存于另一个字段的简介，还是文章内容的头140字？</li>
+</ol>
+<p>很多种方式都可以实现功能，但是我们应该以用户体验为主导，反复推敲追求最佳实践的方式进行开发。对细致的追求一个靠谱的前端工程师的基础。</p>
+<h2 id="更侧重页面视觉和信息结构设计">更侧重页面视觉和信息结构设计</h2>
+<p>CMS的核心是内容的操作和显示，相比其他项目，我们更加重视起视觉设计和信息结构设计。</p>
+<p>UX人员想往前端开发走，前端开发想往UX方向发展。在一个“UX”被神话，写过几篇文章就能称作“体验设计师”的年代，我觉得想要成为UX的人必须专注在一个重视视觉设计和信息结构的平台上，没有必要一定要向前端开发方向发展，因为我觉得UX更需要实践，需要分析，研究已有的内容，用数据来支持你的设计比天赋和品味更加重要。Drupal就是这么一个平台，可以让UX发挥特长，可以把信息结构设计发挥到极致的一个平台。</p>
+<p>Drupal拥有强大的建站能力，能够快速的组织内容，而且通过Drupal方式创建出来的功能十分稳定，那么一个站点的成功之处就在于页面布局，视觉效果，页面加载速度，信息结构，阅读和编辑体验。</p>
+<p>目前观察来看，客户公司已经开始重视起来UX的作用，并且还专门成立了一个UXTeam专门做所有站点的页面设计，这也是其中一个我们可以合作的地方，把我们公司的UX放到项目中来锻炼，通过实战累计经验，不做网络上各种浮夸的设计师。（PS：目前客户公司好像没有这种需求）</p>
+<h2 id="大量前端开发任务">大量前端开发任务</h2>
+<p>成都Drupal Team目前是TW中国唯一一个几乎所有任务都是前端开发的，目前客户有很多前端工作，主要分成两种：BAU维护工作和功能开发。</p>
+<p>客户公司有20多个品牌，所有品牌的网站都是Drupal做的，每个品牌有一些人维护，修复bug，解决IE兼容性问题什么的。也会有添加新的功能，比如创建一个新的内容类型，创建一个View之类的。这些都和HTML，CSS，JavaScript息息相关。Drupal开发和纯前端开发很类似，实现目标的方式非常多，难在对最佳实践的追求，在Drupal中选择最佳的module来实现就是一种最佳实践。</p>
+<p>另外，还有一种任务是创建活动页面，在搞一个活动之前创建一些临时页面，做一些表单存储用户注册信息，每次都感觉业务人员到发布前才来关心这个事情，都要到最后赶出一个页面来，搞得大家都很累。我们在推敏捷，可是由于身份十分卑微，正在影响但是还不是很深。</p>
+<p>由于有大量的前端任务，在Team里培养前端开发人员是可行的，也是一个难得的机会专注到前端领域，又可以和设计师一起工作，这不就是我一年前的向往么，所以管它php还是ruby了，都是浮云，现在都不惧。何况Drupal对我们来说是挑战和机会并存。</p>
+<h2 id="强调功能测试">强调功能测试</h2>
+<p>刚开始使用Drupal的时候十分不习惯，没有人写测试的，大家都是在Drupal系统里面配置来配置去的，但是总体功能上没有我想象得那么糟糕。渐渐才发现，我们如果只是通过Drupal系统配置来开发，那么我们本身就是Drupal的使用者，没有必要花费大量经历去测试创建了一个新的文章类型之后，能不能创建相应的文章，这些点都不是我们的产出物。</p>
+<p>而且，如果不编写module，作为Drupal的使用者来看，开发人员根本没有机会写单元测试。那么，首先我们要测试的是什么，有这么几个方面：</p>
+<ol>
+<li>样式是否正确</li>
+<li>内容（意义）显示是否正确</li>
+<li>兼容性问题</li>
+<li>性能问题，比如在Drupal里面推荐使用drupal_add_css添加css文件，它将会创建一个<code>@import</code>语句，如果你直接使用link进行修改，那会破坏了性能。</li>
+<li>页面跳转是否正确</li>
+<li>如果有自定义module，需要通过Simpletest编写单元测试</li>
+</ol>
+<p>你会发现，很多东西都是功能性的，单元测试都只是集中到自定义的代码上，而且我觉得没有必要要求100%测试覆盖率，主要逻辑cover到就可以了。</p>
+<p>关于样式的测试最好还是人工来测，眼见为实的道理谁都明白，当然我们也可以来做自动化测试，主要检测页面跳转，301、302跳转是否正确，form提交是否成功等等。有了测试我们才知道系统状态是什么，也是我们做持续集成的重要组成部分。</p>
+<h2 id="持续集成">持续集成</h2>
+<p>我们目前也在推广Drupal的C·I，这个在Drupal业界都是一个比较困难的问题，通过4天的培训之后，有一个很重要的转变，就是遇到需求的时候，能从一个Drupal开发的角度来看解决方案。我们学了很多有用的Module，也和培训师聊了下C·I的问题，更加发现我们做的C·I Demo有很多地方可以改进。</p>
+<p>如果要推广Drupal的C·I，那么最重要的还是提高开发人员的技能水平，而且问题不出在能力上，客户这边的开发人员总是在说着想改变，但是连Drush都不用，大部分人都关心自己的工作是否完成，而且还积极地在上司面前表现他完成了多么多么重要的工作，Fu…u…u…n…k，瞬间感到技术问题在人性面前都弱爆了。咨询工作最难的地方莫过于此。</p>
+<p>-就乱写这么多，完-</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h2 id="“新的”用户">“新的”用户</h2>
+<p>CMS给开发人员带来了新的用户角色—编辑Editor。使得开发人员需要提供强大的编辑功能给他们来创建内容，比如一个公用博客程序，Editor需要的是简单快捷的方式能把他掌握的内容录入系统，并且让最终用户看到。Edito]]>
+    </summary>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Drupal初体验]]></title>
+    <link href="http://slender-man.github.io/2012/11/16/2012-11-16-what-we-can-get-from-drupal/"/>
+    <id>http://slender-man.github.io/2012/11/16/2012-11-16-what-we-can-get-from-drupal/</id>
+    <published>2012-11-15T16:00:00.000Z</published>
+    <updated>2014-12-02T05:04:35.000Z</updated>
+    <content type="html"><![CDATA[<p>开发Drupal都接近4个月了，从当时的非常排斥到现在变成有点喜欢，找到了些开发的感觉。之前在普特的那段时间虽知道有CMS（Content Management System）这个东西，但是都没有仔细用过，唯一映像比较深的就是国内的CMS都长得差不多。。。</p>
+<p>加入到Drupal Team之前根本不知道Drupal是啥玩意儿，听说是php的，感觉好像技术倒退了好几年，不愿意学，但是现在了解了Drupal生态圈的很多事情之后发现Drupal真是个好东西，虽已经是10多年前就有的东西了，随着版本的不断升级，很多理念到现在都是比较流行的，尤其在前端开发领域。</p>
+<p>加入到Drupal Team的人都说是来做前端开发的，谢谢HTML+CSS，修修BUG就了事了，实则不是，Drupal入门很容易，但Drupal也有高级的功能，而且这些高级功能也大大可以提高我们开发效率。Drupal对TW来说算是个空白，成都Drupal Team对Drupal的研究无疑将会填充这块空白。</p>
+<p>Drupal作为一个CMS系统，在国外被广泛使用，很多站点都是Drupal制作的，像白宫<a href="http://www.whitehouse.gov/" target="_blank" rel="external">whitehouse</a>，Sydney动物园<a href="http://taronga.org.au/taronga-zoo" target="_blank" rel="external">Taronga Zoo</a>，澳洲最大保险品牌<a href="http://www.aami.com.au/" target="_blank" rel="external">AAMI</a>，还有<a href="http://www.nasa.gov/" target="_blank" rel="external">NASA</a>，<a href="http://www.ubuntu.com/" target="_blank" rel="external">ubuntu</a>等等。通过对Drupal的了解的加深，渐渐悟出了些心得。</p>
+<h2 id="Drupal建站">Drupal建站</h2>
+<p>作为CMS系统，最强劲的就是各种内容的编辑功能，组织和显示内容的功能。非常适合把Drupal拿来做门户，新闻，品牌，校园信息，商品销售等网站。国内好像大多用自主品牌的CMS比较多，但是发现公家、很多公司的网站都还是重金打造的“豆腐渣”，没有一个统一。</p>
+<h3 id="模板">模板</h3>
+<p>页面显示离不开前端模板，Drupal7使用的依然是传统php模板。Drupal内建了一套模板加载机制，从顶层的HTML到Page页面，再到每个内容都有自己的模板，可以进行重载。从另一个侧面，每个功能点，比如每个内容类型，每个显示的View，甚至到View上显示的每个Field都有很多重载方式，并有优先级的概念，重载方式之多之灵活。虽然不能一味的进行模板重载，但也可见Drupal的模板重载之强大。</p>
+<h3 id="大量的Modules">大量的Modules</h3>
+<p>刚接触Drupal的时候，就发现要安装很多很多module，渐渐地发现Drupal整个生态圈最重要的就是module，module几乎就是Drupal的最大组成部分。</p>
+<p>Drupal作为开源程序，拥有强大的社区力量，设计累计到现在的module数量多达<em>19169</em>个，rubygem.org上也只有<em>3025</em>个而已。在开发过程中发现，只要你能想到的功能，一般module都已经提供了，怕就怕你找不到相应的module，当一个人对Drupal基础熟悉之后，那么拼的就是懂的module数量，或者可以说高级的Drupal工程师强是强在module上。</p>
+<p>众多的module之中，做样式的，做页面结构的，做数据库操作的应有尽有，而且Drupal提供了一套hook机制，开发人员可以使用hook机制编写很多hook方法，当Drupal程序运行时，一个操作可能产生一个workflow，在这个工作流上的所有hook都会被调用，想想和JavaScript事件一样一样的。</p>
+<h3 id="Views">Views</h3>
+<p>内容的显示离不开各种各样组成方式的View（视图），Drupal有一个Module叫做Views，通过它我们可以定义各种类型的视图，比如说RSS、单个页面Page、一个Block、Views的组合等。Views可以对内容进行排序，过滤，甚至可以加载与当前内容相关的内容，有点想ORM关系加载一样，当你确定后，Views会生产SQL对数据库进行查询，得到你想要的结果。</p>
+<p>结果并不是每行字符串数据，你可以选择是显示Node对象还是各个相关的字段，组成方式自由多变。除了得到数据之外，还能够修改Views的显示模板，自由组织标签和属性来显示结果，最终配置好view之后，还可以进行preview，看看显示是否正确。</p>
+<p>CMS页面上有各种各样的内容组织显示方式，Views就是最好的工具，创建出来的Views看作为block放到页面的任何位置。而且Views如果遇到分页的话，可以选择ajax分页方式，前端开发人员关注的就只有样式了。</p>
+<h3 id="Drush">Drush</h3>
+<p>Drush是Drupal的命令行工具，除了可以干一些日常下载，安装，卸载module的事情之外，我们还可以通过drush创建用户，创建内容，修改权限，还可以创建数据库，删除内容，dump数据等等。通过使用drush的<code>drush make</code>和<code>drush si [profile]</code>命令可以快速建立站点，帮你安装好所有module依赖，达到安装之后就和买了一个产品给你一样，拿过来就能用了。</p>
+<p>Drush还提供了api扩张开发方式，可以扩张自己想要的命令，通过drush去运行。这对Drupal站点的自动化提供了基础，我们已经使用drush搭建了一个C·I（持续集成）的演示程序，可以自动化建站，运行单元测试，提供反馈。</p>
+<p>使用Drupal的人只会觉得Drupal越来越强大，从官方文档到issues的评论，到处都显示出来了Drupal的GEEK范。作为前端工程师，也发现在使用Drupal建站的时候，更能关注到前端的任务，内容的展示，不像之前ROR时期的感觉，什么功能都得从头来。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>开发Drupal都接近4个月了，从当时的非常排斥到现在变成有点喜欢，找到了些开发的感觉。之前在普特的那段时间虽知道有CMS（Content Management System）这个东西，但是都没有仔细用过，唯一映像比较深的就是国内的CMS都长得差不多。。。</p>
+<p>加]]>
+    </summary>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[ThoughtWorks西安前端那些事]]></title>
+    <link href="http://slender-man.github.io/2012/11/12/2012-11-12-front-end-in-xi-an/"/>
+    <id>http://slender-man.github.io/2012/11/12/2012-11-12-front-end-in-xi-an/</id>
+    <published>2012-11-11T16:00:00.000Z</published>
+    <updated>2014-12-02T05:04:40.000Z</updated>
+    <content type="html"><![CDATA[<p>刚加入ThoughtWorks，就来到了西安办公室，这是个充满活力的环境，在西安办公室那段时间对我意义非常大，不仅我的前端技能提升了不少，还让我认识到在这样的环境里面工作是那么的舒服，开心。</p>
+<h2 id="说说我们的目标">说说我们的目标</h2>
+<p>前端工程师在ThoughtWorks还是个新鲜职位，但是热度很高，我想在整个行业也是如此。在ThoughtWorks工作是没有特别明确的职位划分的，前端工程师在公司是和非前端开发在一起工作，朝夕相处，结对编程，也不会只专注于做前端开发，更多的作用是为了把前端技能分享给大家，作为靠谱的前端工程师需要帮助其他开发，提供一些最佳实践，让他们成长得更快。另一方面，公司的技术栈更新是非常迅速的，不在乎是否是前端技能。开发之间都能互相学习到更新更好的技术，我在西安那段时间学到了很多RubyOnRails相关技能。</p>
+<p>那么我们的目标是什么？作为知识型工作者，我们的目标是通过知识分享消除知识壁垒，通过实践快速的验证和提升自己，从而应对变化，变化是指技术栈更新，行业变化等等。所以在开发方面不需要很严格的工作职责划分，尽量做到所有人做所有事。有句话最近经常听说，就是“招聘一个靠谱的前端工程师是比较难的”。在ThoughtWorks，除了招聘，我们可以通过这种方式培养公司内部的人才，这样不是更可靠么。</p>
+<h2 id="在分享中学习">在分享中学习</h2>
+<h3 id="前端知识分享">前端知识分享</h3>
+<p>技术分享在西安办公室是非常平常的一件事，我和另一个前端工程师商量着给大家做一个长期的前端知识分享，他负责CSS部分，我负责JavaScript部分。通过准备PPT，才发现自以为了解的透彻前端知识在分享给大家的时候，往往发现了细节之处只知其表面而不知其原理，懂怎么使用而从没想过为什么需要这么设计。</p>
+<p>我给大家准备的连续性JavaScript分享的主题是《Dive Into JavaScript》，第一次分享的题目就是关于原型继承，选这个比较偏难的题目的原因就是想大家先啃“硬骨头”，在今后的开发遇到问题时能从原型继承方面思考下。为了不误人子弟，我准备PPT花了很长时间，每一个细节都得弄明白，还得想一个让大家觉得有趣的方式，怎么才能让分享通俗易懂，这种没有完美解决方案的最伤脑筋。给大家分享之后发现大家都听的云里雾里，虽然都觉得一知半解，但我发现大家都能从原型继承上思考了，我的目标也就达到了。这次分享发生了一个小插曲，有个实习生在我分享完之后直接给我说，我发现你讲错了，我当时一惊，马上和他讨论清楚，他弄明白之后才放心的走开，事后发现问问题或产生怀疑的人学到的东西更多，也更扎实。像这位同事一样，思考之后的结果印象会更深。作为分享的人，在和他讨论甚至争论中，会发现更多细节，说服别人理解你的理论是这么的困难，又会在得出“正确”结论之后无论你是否对错都会松口气，说句原来就是这么回事，终于搞懂了。</p>
+<p>在西安办公室做分享，一般每次都会有10人左右来参加，时间长了，总是那几个人来，随着大家技术的提升，前端支持分享也变得更注重细节，更偏向动手实践，相互作用下，参与者学习得就越快，分享者也能抽出更多时间去专研更高级的领域。除了上文提到的原型继承分享，我做的分享还有《DOM和BOM》、《脚本和样式》、《Why Not Using Async Like This Way?》、《渐进增强在Webapp开发中的应用》、《Inception和Ideation》等等；在CSS方面我的前端同事分享了《盒模型》、《CSS布局 - 圣杯布局》、《Web颜色搭配》等等。</p>
+<h3 id="项目经验总结">项目经验总结</h3>
+<p>在ThoughtWorks，你会发不仅仅是前端工程师来做前端技术分享。我的另一位同事是一位Geek，ROR高手，在他们组的Web项目中使用到Backbone前端开发框架，这是西安办公室前端技术最前卫的一个项目。他在项目做完一个阶段的时侯给大家做了一次Backbone前端MVC框架的使用的技术分享，说来羞愧，他分享的时候我还在对前端MVC框架属于刚研究阶段。在分享中，他不仅给大家介绍了Backbone的优势劣势，多种最佳实践，还讲到如何进行Backbone的测试，这个在其他公司的技术分享时是很少提到的，他们的项目中，前端代码的测试覆盖率一直保持100%，这是非常令人惊讶的，很多互联网公司都有可能做不到这点。</p>
+<h3 id="UX小组">UX小组</h3>
+<p>UX和前端开发是一家么？我觉得是的。很多公司都会说我们有专业web设计人员，有优秀的前端开发工程师，如果把职位划分的很清楚只会加大沟通成本，现在的软件开发变得越来越容易，软件的好与坏不停留在功能是否完善而是集中在用户体验好不好，而好的用户体验来自多次的用户使用软件的反馈，为了让软件快速适用于最终用户，可用的软件的迭代速度必须加快，对UX设计人员来说，除了要求快速出设计和交互界面之外，在ThoughtWorks还会要求UX能做些前端开发的工作，集中在HTML+CSS上。如果是前端工程师向前再走一步提升多一些UX设计能力，UX设计师能退后一步实践下前端开发怎么工作，既加强的交流也使得从设计图到实现变得很平滑。试想一下，一个懂前端开发的UX或一个略懂UX的前端开发是多么的强大，在敏捷团队里变得无比给力。</p>
+<p>为了实现这一目标，在西安办公室成立了UX小组，有纯美工、前端工程师、用户体验设计师、开发工程师等，几乎网罗了各种角色。我们创建了知识分享墙，每周会追踪几次知识分享，也会安排下一周会有哪些人来做知识分享，美工可以教程序员画画啊，体验设计师带大家一起做主要用户分析啊，开发分享前端开发经验啊，一切的一切都十分有趣，并且能学到知识。同时，墙上还有一个许愿区域，就是任何人都可以在这个区域上写你想让UX小组的成员分享什么样的知识，这样才能鼓励更多的人一起来参与活动，因为UX组中一个同事来自香港，所以有人写上了“想学粤语”，结果参加那次分享的人特别多。</p>
+<p>除了分享墙之外，我们还组织了每个星期一次的酷站分享，平时大家都收集几个觉得设计得比较好的网站，收藏在pinterest里，然后在酷站分享会上给别人讲解为什么你会喜欢这个网站的设计，缺点有哪些，同时呢，体验设计师会给出他对这个网站设计方面的专业看法，开发的也会说说实现这样设计的网站的难度有多大，需要注意的地方有哪些，而很多其他角色就说说看用户角度出发他的看法是什么，总之就是通过大家的讨论，提升大家的品味，也看看现在网站的设计趋势是什么。个人感觉非常有意义。</p>
+<p>现在西安UX小组办得非常成功，打算也在其他办公室也推广一下。</p>
+<p>不难看出，在ThoughtWorks有很多人都在进行知识分享，其中前端技术分享渐渐变得越来越多，而且它并不是前端工程师的专利和职责，大家都在通过分享帮助到更多有兴趣的人，提升自己的演讲能力和专业水平，从分享中学习。</p>
+<h2 id="写在最后">写在最后</h2>
+<p>通过分享能让人快速成长，ThoughtWorks的分享活动也不局限于办公室之内，不限制在前端技术或者是设计。虽说在前端领域，ThoughtWorks西安还处于中级发展阶段，但它的成长的非常迅速，希望有更多人加入到我们的分享行列中来。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>刚加入ThoughtWorks，就来到了西安办公室，这是个充满活力的环境，在西安办公室那段时间对我意义非常大，不仅我的前端技能提升了不少，还让我认识到在这样的环境里面工作是那么的舒服，开心。</p>
+<h2 id="说说我们的目标">说说我们的目标</h2>
+<p>前端工程]]>
+    </summary>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[前端技术共享和传递]]></title>
+    <link href="http://slender-man.github.io/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/"/>
+    <id>http://slender-man.github.io/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/</id>
+    <published>2012-09-22T06:08:12.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<h3>进入探索大门</h3>
+<p>在西安搞session知识分享的时候，就发现前端技术分享有些难，一个是因为前端技术不像Java, C++那样超主流技术被业界广泛使用，导致群众基础差，有兴趣的人只能选择自学；另一个因为前端生态圈里内容太多，太散，又为那部分想自学的人形成障碍。</p>
+<p>开始做session的时候，就把前端技术分成了HTML + CSS + JavaScript三个部分，分别为每个部分准备分享的内容。我主要负责JavaScript部分。为了让大家从最基础的开始学，我选择把原型继承放在第一讲。之前的文章<a title="《Dive Into JavaScript》Session 1" href="http://sheldonw.sinaapp.com/?p=307" target="_blank" rel="external">《Dive Into JavaScript Session 1》</a>说的就是这事，结果把大家讲的云里雾里，反馈都说偏难，实际意义不大。</p>
+<p>第二次和第三次选择了<a title="《Dive Into JavaScript》 Session 2之BOM和DOM简介" href="http://sheldonw.sinaapp.com/?p=357" target="_blank" rel="external">《DOM和BOM》</a>和<a title="《Dive Into JavaScript》Session3之脚本与样式" href="http://sheldonw.sinaapp.com/?p=393" target="_blank" rel="external">《脚本和样式操作》</a>，效果有变好但也没达到预期。反馈说需要更多实际的练习。</p>
+<h3>前端Skills简单分类</h3>
+<p>回成都之后组内大部分都是新人，而且整组人都要面对大量的前端工作，尤其HTML + CSS，前端技术共享和传递显得尤为重要。如何找到一个可重复实践，时间在两个月内，让新人快速提升到可为项目做贡献的分享方案迫在眉睫，我依然还是选择原来的分类方式HTML + CSS + JavaScript。</p>
+<p>在这两个月内组内做了很多次培训，就是在摸索的路上前进。最近这两次给了我很多体会，我需要从新整理需要分享的知识的范围，深度，分享方式。并强调每种技术的要点是什么。</p>
+<p>从HTML开始，可以深度讲解盒模型，布局，表单元素，强调HTML文档的语意，简单清晰的结构和渐进增强。</p>
+<p>CSS方面，深度讲解CSS组织应用方式，盒模型，选择器，浮动和清浮动，优先级计算，属性的继承，常用布局方式的style（左右布局，圣杯布局等），Twitter Bootstrap，LESS和SASS，常见bug处理方式（非hack技术）。强调如何命名id和class，CSS文档结构，复用性。我们现在把CSS称为类<strong>黑魔法</strong>的技术，这个那个材料混在一起效果就出来了，所以更需要我们总结最佳实践。</p>
+<p>JavaScript作为一门语言，学习它和学习其它语言一样，如Java，或者可以说不应该有JavaScript和其它这种划分。JavaScript的出现是为了操作DOM，那最基础的DOM API是一定要讲的，接着是DOM和BOM，事件冒泡捕获，脚本和样式的操作，jQuery API，Ajax基础，Tritter Bootstrap，原型继承（对象模型），闭包，前端MVC及框架介绍。除了强调对语言的熟练，写代码的基本功外，还需时刻注意代码的模块化，命名空间，脚本的加载，压缩等问题。</p>
+<p>我想如果你了解以上知识点的话，那你可以胜任前端工作了。在做分享时候，如何能把这么多知识共享和专递呢？之前纯理论的分享方式只能起到一种引导别人的作用，给有兴趣的人一个方向，但知识传递并不只想达到这个级别。</p>
+<p>我现在在做的是以练习为内容的技术分享，内容是上述的每个知识点，这样的话，我们的知识传递就是追踪的，就像我们在学校里学习课程需要遵循教学大纲一样。同时，练习也是学习者发现自身差距，并且在实践中寻找规律，循序渐进提高的有效方式。并且每次培训完成之后让学习者说一条他在此次分享中学到的东西，只能说一条，这个方式是从徐大师的OO Bootstrap里面学来的，当时参加这个课的时候就被问到，虽然只是说出一条学到的东西，但是脑子里过了一遍培训过程，感觉很好。当然，为了节省时间和提高学习者交流，推荐pair进行实现。</p>
+<h3>一次尝试和实践</h3>
+<p>最近一次知识分享的内容是实现一个WP7的列表界面：</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/09/1.png" rel="external" target="_blank"><img class="size-medium wp-image-486 alignnone" title="WP7列表界面" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/09/1-180x300.png" alt="" width="180" height="300"></a></p>
+<p>要求大家用静态页面实现，把它当作webapp开发，内容比较简单但是考察了语意的标签，文档结构和信息划分，浮动和清浮动，CSS class的命名等等细节。因为是第一次这种形式，大家的完成程度不是很好，所以我才推荐下次pair来做。下次的界面将会选择同样是WP7界面的表单界面，让大家学习下UI开发和后台交互时需要考虑的细节。完成之后还有人反馈说意识到自己的差距了，我很欣慰。</p>
+<h3>开放课程</h3>
+<p>公司有可能开放课程让我司外的各路好友来参加这样的培训，到时候也可以多多给予反馈。刚好在做一个SIP项目，是帮助<a title="教育大发现论坛" href="http://sociallearnlab.org/" target="_blank" rel="external">教育大发现</a>老师们制作的一个老师共享idea，分享教案的平台，目的是可以提出教案让各位老师进行讨论，总结。我这样的培训想法也可以放到这个平台上，让各位前端开发讨论，一起把前端的生态圈完善那么一点点。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<h3>进入探索大门</h3>
+<p>在西安搞session知识分享的时候，就发现前端技术分享有些难，一个是因为前端技术不像Java, C++那样超主流技术被业界广泛使用，导致群众基础差，有兴趣的人只能选择自学；另一个因为前端生态圈里内容太多，太散，又为那部分想自学的人形成障碍。]]>
+    </summary>
+    
+      <category term="Session" scheme="http://slender-man.github.io/tags/Session/"/>
+    
+      <category term="Frond-end Skills" scheme="http://slender-man.github.io/tags/Frond-end-Skills/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[几个前端技术框架（工具）分享]]></title>
+    <link href="http://slender-man.github.io/2012/08/25/old/2012-08-25-several-front-end-frameworks/"/>
+    <id>http://slender-man.github.io/2012/08/25/old/2012-08-25-several-front-end-frameworks/</id>
+    <published>2012-08-25T01:15:23.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>不晓得有多少人在做前端技术开发，问过在我之后加入公司的，或者面试过的前端工程师，几乎都没有在写前端技术。他们有的来自于百度，新浪，SAP等。当然，我在这不能以偏概全，写了Testing的不情愿来也说不一定。半年前，我还没受TW的影响，无聊中在看过jQuery的Testing之后有了一些Testing方面的思考，开始尝试地去为我的各种库加单元Testing。那时候接触到的唯一一个Testing框架就是<a title="QUnit" href="http://qunitjs.com/" target="_blank">QUnit</a>。</p>
+<p>QUnit不但是我接触到的第一个前端框架，也是那时候<strong>了解</strong>的最全面的单元Testing框架，超越了对JUnit和NUnit（后两个只是蜻蜓点水般玩了下）。在完成功能之后加上Testing，然后看Testing通过，然后开心地又加几个功能，再写几个Testing，那种感觉说不出的爽。</p>
+<p>我把前端技术分成两个大类，一类是使用js开发的模块，偏向逻辑的单元Testing，比如前端MVC中的Controller的Testing，JS类库（underscore、jQuery、Wind.js）的Testing。另一类是UI组件的Testing，因为UI一般包含了标记、事件处理、动画、样式等元素，Testing将会变成功能Testing，甚至是集成Testing。而且因为含有标记，样式和复杂的事件处理，不能使用自动化Testing百分百模拟人工操作，所以做这一类的Testing比较难一些。据我所知，现在的前端开发Testing框架数<strong>QUnit、Jasmine、Mocha、JsTestDriver</strong>这四个比较出名，用来写Testing都是很上手的。</p>
+<p><span id="more-439"></span></p>
+<h3>QUnit</h3>
+<p>QUnit是XUnit系列在前端技术领域中的后继者，提供了单一的testcase的写法和assert断言方式，结构十分简单。详细的介绍可以在<a href="http://qunitjs.com/intro/" target="_blank" rel="external">官网介绍页面</a>找到，其所有的assert断言方式也可以<a href="http://qunitjs.com/cookbook/#asserting_results" target="_blank" rel="external">断言列表</a>中查看。</p>
+<p>QUnit编写的单元Testing可以在浏览器和Nodejs进行Testing，由于QUnit提供了非常华丽的浏览器报表样式，个人还是推荐QUnit用例放在浏览器中跑。</p>
+<p>QUnit自身没有提供任何Spy，Stub和mock的技术，所以在集成Testing方面比其他框架要弱，可以使用第三方的Testing类库帮助，比如<a href="http://sinonjs.org/" target="_blank" rel="external">Sinon.js</a>，是一个独立的Testing帮助类库，以后写文章详细介绍。</p>
+<h3>Jasmine</h3>
+<p><a href="http://pivotal.github.com/jasmine/" target="_blank" rel="external">Jasmine</a>号称自己是行为驱动Testing（BDD）框架，语法和RSpec几乎一样，用describe描述Suites，用it描述一个Testing用例。在单元Testing中，一般一个Suite用来描述一个类，或者一个含有多个Testing用例的方法。Jasmine中提供了有语义的断言方式，使用expect和not的链式调用。看看下面这个case就能了解到Testing写起来也可以很优雅。</p>
+
+<div class="wp_codebox"><table><tr id="p4395"><td class="code" id="p439code5"><pre class="javascript" style="font-family:consolas;">it<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;and can have a negative case&quot;</span><span style="color: #339933;">,</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">false</span><span style="color: #009900;">&#41;</span>.<span style="color: #660066;">not</span>.<span style="color: #660066;">toBe</span><span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">true</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Jasmine和QUnit一样，可以在Nodejs环境和浏览器中执行，在Nodejs环境中有很多NPM包可以使用，比如<a href="https://github.com/mhevery/jasmine-node" target="_blank" rel="external">jasmine-node</a>。在公司接触到的Rails项目，基本上都是集成jasmine来做前端技术，传统运行界面比较丑，可以试试有所改善<a href="https://github.com/pivotal/jasmine/downloads" target="_blank" rel="external">standalone版本</a>。如果想在jasmine中TestingUI操作，可以使用<a href="https://github.com/velesin/jasmine-jquery" target="_blank" rel="external">jasmine-jquery</a>，它提供了载入fixture的功能，并且自定义了很多断言中使用到的matchers，比如断言一个元素是否有某个样式可以这么写：</p>
+
+<div class="wp_codebox"><table><tr id="p4396"><td class="code" id="p439code6"><pre class="javascript" style="font-family:consolas;">expect<span style="color: #009900;">&#40;</span>$<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'#target'</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span>.<span style="color: #660066;">toHaveCss</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#123;</span>margin<span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;10px&quot;</span><span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Jasmine提供了spy方法，可以通过它创建fake方法调用，从而断言方法是否被调用，被调用多少次，或者验证接受的参数是否正确等等。另外，使用spy对象的andCallFake方法也能发挥一些stub的作用。之前提到的Sinon.js同样可以和Jasmine配合使用。</p>
+<p>一切都看上还挺顺利的，不过有两个地方我对jasmine不是很爽，一个就是非常ugly的异步Testing，如果在代码Testing中间遇到了异步调用，就需要用到waitsFor方法，此方法接受一个方法，当方法返回true时运行异步调用之后部分，因为异步调用不会阻塞代码运行，所以必须使用一个runs方法把之后部分包住，超过两次的异步调用会导致写出来的代码各种让人看不懂，这一点还不如QUnit的stop和start方法易懂好用，在Mocha中的<a href="http://visionmedia.github.com/mocha/#asynchronous-code" target="_blank" rel="external">异步Testing</a>也优雅得多。另一个是发生在TestingUI组件时，因为所有Testing都会在同一个文件中运行，而且需要预先把Testing的样式和脚本资源都载入到页面中，先不说样式之间会相互影响导致断言失败的问题，在Testing过程中如果存在动态创建元素到页面的情况可能会导致回收fixture时忽略掉新创建的元素导致错误。我期望的UITesting是为每case提供独立的运行环境，首先解决了样式冲突问题，每个UI组件Testing运行的环境只含有为case准备的样式和脚本，我有想过用父子页面实现，脚本在父窗口中运行，操作子窗口中的UI组件。而且，新元素的回收问题在每次子窗口重载UI组件的时候也得到解决。</p>
+<p>这是我觉得ugly的一个Testing</p>
+
+<div class="wp_codebox"><table><tr id="p4397"><td class="code" id="p439code7"><pre class="javascript" style="font-family:consolas;">describe<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;Asynchronous specs&quot;</span><span style="color: #339933;">,</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  <span style="color: #003366; font-weight: bold;">var</span> value<span style="color: #339933;">,</span> flag<span style="color: #339933;">;</span>
+&nbsp;
+  it<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;should support async execution of test preparation and exepectations&quot;</span><span style="color: #339933;">,</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+&nbsp;
+    runs<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+      flag <span style="color: #339933;">=</span> <span style="color: #003366; font-weight: bold;">false</span><span style="color: #339933;">;</span>
+      value <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+&nbsp;
+      setTimeout<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+        flag <span style="color: #339933;">=</span> <span style="color: #003366; font-weight: bold;">true</span><span style="color: #339933;">;</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">500</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+    waitsFor<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+      value<span style="color: #339933;">++;</span>
+      <span style="color: #000066; font-weight: bold;">return</span> flag<span style="color: #339933;">;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">&quot;The Value should be incremented&quot;</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">750</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+    runs<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+      expect<span style="color: #009900;">&#40;</span>value<span style="color: #009900;">&#41;</span>.<span style="color: #660066;">toBeGreaterThan</span><span style="color: #009900;">&#40;</span><span style="color: #CC0000;">0</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+  <span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<h3>Mocha</h3>
+<p><a href="http://visionmedia.github.com/mocha/" target="_blank" rel="external">摩卡</a>coffee，香飘四溢。当我第一次接触到它的时候，我果断放弃了Jasmine，我说放弃是心里上放弃了，因为Mocha主打Nodejs环境，虽也弱弱地支持浏览器运行，但在浏览器端运行和Jasmine比较没有多大优势，但Mocha在Nodejs上的运行比Jasmine-node好出很多，而且支持多种报表的输出，不仅有优秀的字体着色和报错显示，还有些非常有趣，比如飞机从左飞行到右的进度条提示。特别有用的还有json和html格式的jscoverage报表。我的<a href="http://sheldonw.sinaapp.com/?p=420" target="_blank" rel="external">Mr.Coverage</a>就是使用的html格式的报表。</p>
+<p>Mocha的语法和Jasmine几乎一样，有时甚至支持直接跑Jasmine的Testing。它支持三种断言方式，包括QUnit的assert方式、Jasmine的expect方式，另一种是更具语义的方式should.js，最后一种也是我最喜欢的一种，它的<a href="https://github.com/visionmedia/should.js/blob/master/lib/should.js" target="_blank" rel="external">实现</a>强烈推荐去看看。使用should可以看到一些DSL的影子。写法十分优雅呢，使我爱不释手。在这里需要提到一个非常优秀的断言类库<a href="http://chaijs.com/" target="_blank" rel="external">Chaijs</a>，使用它可以让Testing框架支持assert、expect、should三种断言方式。并没试过在QUnit里面使用Chaijs，从文档上看应该是支持的。</p>
+
+<div class="wp_codebox"><table><tr id="p4398"><td class="code" id="p439code8"><pre class="javascript" style="font-family:consolas;"><span style="color: #003366; font-weight: bold;">var</span> user <span style="color: #339933;">=</span> <span style="color: #009900;">&#123;</span>
+    <span style="color: #000066;">name</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">'tj'</span>
+  <span style="color: #339933;">,</span> pets<span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'tobi'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'loki'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'jane'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'bandit'</span><span style="color: #009900;">&#93;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #339933;">;</span>
+&nbsp;
+user.<span style="color: #660066;">should</span>.<span style="color: #660066;">have</span>.<span style="color: #660066;">property</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'name'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'tj'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+user.<span style="color: #660066;">should</span>.<span style="color: #660066;">have</span>.<span style="color: #660066;">property</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'pets'</span><span style="color: #009900;">&#41;</span>.<span style="color: #000066; font-weight: bold;">with</span>.<span style="color: #660066;">lengthOf</span><span style="color: #009900;">&#40;</span><span style="color: #CC0000;">4</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Mocha并没有自己提供什么spy，stub，mockTesting技术，官方也推荐直接使用sinon.js。</p>
+<p>在Nodejs中运行Testing时候都需要运行命令，每次修改代码后都需要重新运行命令，Mocha里面提供了watch的功能，当文件修改之后都会自动运行Testing。</p>
+<p>如果是在浏览器中运行，那么会遇上一个更大的麻烦之处，就是浏览器兼容性Testing，在每次修改代码之后，为了保证每个浏览器都能运行通过，所以需要每个浏览器都刷新一下。想想都觉得程序员浪费时间在这些地方太不值得了。JsTestDriver可以帮我们解决这个问题。</p>
+<h3>JsTestDriver</h3>
+<p><a href="http://code.google.com/p/js-test-driver/" target="_blank" rel="external">JsTestDriver</a>是Google大神的作品，说它是一个框架，不如说它是一个Testing工具。JsTestDriver使用Java打造，所有的使用都是从<a href="http://code.google.com/p/js-test-driver/downloads/list" target="_blank" rel="external">JsTestDriver.jar</a>包开始的，使用它需要先启动一个server，需要进行Testing的浏览器先要连接到此server，然后运行testcase，所有浏览器都会响应。每次修改代码之后就不用每个浏览器都刷新了，运行命令行就可以了，如果你使用了watch的话，那所有case都会自动在浏览器中运行了。</p>
+<p>JsTestDriver并没有什么优雅的语法，断言方式也普普通通，一切都显得非常实在。同时，JsTestDriver还提供了另外一个jar包可以使用它输入代码的行Testing覆盖率，和现有的项目集成使用是十分方便的。</p>
+<p>由于JsTestDriver先启用了Testing服务器，所以可以使用它来做远程Testing，比如可以利用它来做产品或者类产品环境的Testing。</p>
+<p>Google的MVC框架<a href="http://angularjs.org/" target="_blank" rel="external">AngularJS</a>就是使用JsTestDriver进行Testing的，而且在Testing中载入页面时确实是使用一个iframe载入Testing的UI和资源，让case运行在一个独立的环境，解决了我在Jasmine UI组件Testing中遇到的冲突问题。</p>
+<p>&nbsp;</p>
+<p>对前端UI组件Testing，我一直有个疑问，当我需要断言一个样式是否存在一个样式时，是去断言此元素是否含有一个实现此样式的class呢，还是直接断言元素的此样式是否存在。比如在Testingpopup弹出框时，在弹出状态下是验证display属性还是验证弹出框有没有一个名为show的class。因为我觉得有show这个class不一定能代表弹出框一定处于显示状态，所以偏向于直接断言display属性。有人说我关注点太奇怪，但我其实是在想如何能让Testing更能准确地起到验证的效果这个大问题。我承认世事无绝对，自动化Testing永远不能完全代替人工Testing，尤其颜色、视觉的部分更需要人眼去测。只希望在做类似的Testing时能多想想，尤其是UX设计人员一定要求实现的点。</p>
+<p>以上就是我对四种Testing框架或工具的简介，相互比较之后，如果选择在Nodejs环境中使用，首当其冲我推荐Mocha，如果需要在浏览器中运行，那么可以选择Jasmine或者JsTestDriver工具。但是工具的选择并不是提高软件质量的原因，你所编写的高质量Testing才是。要写出高质量的Testing，驱动出可被Testing的代码，必须懂得如何划分task，如何理解Testing技术给软件带来的好处，如何编写高质量的单元Testing等等。这些能力和前端后端无关，他们是需要在Testing领域长期摸索才能练就的本领。希望好学者能饱读书籍，熟能生巧。在下也才刚刚上路。</p>
+<p>&nbsp;</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>不晓得有多少人在做前端技术开发，问过在我之后加入公司的，或者面试过的前端工程师，几乎都没有在写前端技术。他们有的来自于百度，新浪，SAP等。当然，我在这不能以偏概全，写了Testing的不情愿来也说不一定。半年前，我还没受TW的影响，无聊中在看过jQuery的Testing]]>
+    </summary>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="Front-end Skills" scheme="http://slender-man.github.io/tags/Front-end-Skills/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[最冷一天]]></title>
+    <link href="http://slender-man.github.io/2012/07/13/old/2012-07-14-the-day-to-leave/"/>
+    <id>http://slender-man.github.io/2012/07/13/old/2012-07-14-the-day-to-leave/</id>
+    <published>2012-07-13T07:48:46.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<blockquote><p>唯愿在剩余光线面前 留下两眼为见你一面</p>
+<p>仍然能相拥才不怕骤变 但怕思念</p>
+<p>唯愿会及时拥抱入眠 留住这世上最暖一面</p>
+<p>茫茫人海取暖渡过 最冷一天</p>
+<p>—— 《最冷一天》</p></blockquote>
+<p>转眼间，半年已过，是时候回去了。</p>
+<p>工作刚好满三年，前两年半把大学没学的生活技能学到手了，最后这半年我误打误撞，赶英超美地已经在追求我的梦想。这半年对我来说意义很大，我想很多我之前认识的人都会觉得我变了，好和坏就不去定夺了。我也不想回想太多半年前的自己，回想那只没见识的井底之蛙，因为我现在也才是跳到开始有一点点有皎洁月光的地方。</p>
+<p>我想我需要暂时离开这个我梦想启程的城市，离开半年前我来到这个陌生城市时就开始鼓励我，支持我的TWer了。今天，必定是“最冷的一天”。在这要感谢你们，感谢你们创造了这么好的工作环境，感谢你们每天灿烂的笑容，感谢你们的每一句言语。从你们身上我学到了很多。虽然才和大家共处半年，但是你们对我来说都已经十分亲切，只能悔恨努力得太晚，不然可能可以更早认识大家。虽说我只是暂时的离开，以后应该会有机会再来的，但心中难免会有伤感，因为美好的开始总是让人难忘。</p>
+<p>我是个感性的人，这个优良品质来源于从小就很喜欢听情歌，同时我也是个传统保守的人，因为我非常喜欢80、90年代的经典歌曲，喜欢听院子里老人拉着二胡唱歌。我不懂什么是时尚，不太会给自己买衣服来装扮自己，用“高负衰”形容比较贴切；我脑子不是很灵光，照别人来说就是有点傻傻地，学东西总比别人慢半拍，唯有勤能补拙，熟能生巧；我口齿不伶俐，普通话有时大舌头，平翘舌前后鼻不分，英文也马马虎虎，讲不到重点；⋯⋯突然批评起自己，讲起我的人生，只是想用这种方式让大家觉得这活灵活现的人一直都在你们身边。</p>
+<p>不知道“有没有那么一首歌能让你想起我？”，我想应该会有。同时也奢望在你们工作的时候，讲前端技术的时候，K歌的时候，讲session的时候，讲冷笑话的时候，打羽毛球的时候，看电影的时候，TeamBuilding的时候都能想到这个花了你们很多时间的Sheldon，那将是我莫大的幸福。</p>
+<p>- 完 -</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<blockquote><p>唯愿在剩余光线面前 留下两眼为见你一面</p>
+<p>仍然能相拥才不怕骤变 但怕思念</p>
+<p>唯愿会及时拥抱入眠 留住这世上最暖一面</p>
+<p>茫茫人海取暖渡过 最冷一天</p>
+<p>—— 《最冷一天》</p></blockquote>
+]]>
+    </summary>
+    
+      <category term="Note" scheme="http://slender-man.github.io/tags/Note/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[迟到的Mr.Coverage]]></title>
+    <link href="http://slender-man.github.io/2012/07/06/old/2012-07-07-the-late-mr-coverage/"/>
+    <id>http://slender-man.github.io/2012/07/06/old/2012-07-07-the-late-mr-coverage/</id>
+    <published>2012-07-06T08:59:28.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>Mr.Coverage在一个月以前就有一个alpha版本了，一直没有时间发上来，这两天又抽时间小小更新了下，将就发到blog中记录下，顺便也说说我对Testing慢慢理解的过程。</p>
+<h3>前</h3>
+<p>先说说JavaScriptTesting那些事吧。头两年开发的项目中别说是Testing覆盖率，Testing都很少写，单元Testing几乎没有，对于自动化E2ETesting，之后那个项目才有一些，小项目大部分功能还得专职的Testing人员来Testing。试想一下，在一个不重视前端开发的公司里面，后端代码Testing都很少写，那更不用说前端JavaScript代码的单元Testing，partial页面Testing等等了。那个时候Testing覆盖率神马的都是浮云。</p>
+<p>之后我接触到了QUnit，不知道啥时候发布的，感觉挺好，断言方式也比较亲切，我便给我自己写的几个小东西加上了单元Testing，包括Mr.Async，Mr.Array这些无人问津的练习项目，感觉Testing的还挺全乎的，也渐渐对加Testing（注意是用的加）产生了好感。那时候也没人教Testing应该是什么样子的，现在回头看看，mock、stub、spy等技术完全没有涉及到。。。，这也侧面说明我那些Library微不足道。</p>
+<h3>后</h3>
+<p>TW是非常重视Testing的公司，Testing的重要性我不必说了。在这里的项目中让我了解到了Testing应该怎么做，我其实花了一些时间去让我的笨脑子去学习stub、spy、mock等等，尤其是前端开发的Testing。其中很有趣的是Testing覆盖率这个像是指标一样的东西，每提高一个百分点都会足以让人欣喜。ruby代码的Testing已经是100%了，没什么刺激点了，但是我发现JS的覆盖率才是可怜的30%（我刚到的时候），这意味这作为一个UI开发来说，应该focus到这些地方。澳洲那边有位之前做JS开发的QA，这半年的前几个月都是他一直在抓JS的Testing和重构，可谓呕心沥血，在他的带领下，覆盖率上升到了40+%。10多个百分点的提升已经非常让人兴奋不已，再说人都是喜欢干能让自己开心的事，那时我想一定在离开之前把覆盖率提升到70%。如果回头看看旁边的报表组的JS覆盖率，那是相当可怕的90%啊，更有使用Backbone的项目Testing率100%。</p>
+<p>提高JS覆盖率不是找一堆代码运行下就ok的，Testing需要有代码的可Testing性，也就是是否有划分模块。现在前端模块开发变得非常重要，模块化开发不单是面对Testing，在可维护性上都会有很大提升。我们项目在重写和重构之前这点做得确实不好，慢慢把老代码使用OO方式重写，然后加上Testing，覆盖率才有所上升的。现在的Testing覆盖率是61%吧，也是处于渐渐变更的状态。</p>
+<p>在提升覆盖率的同时也会研究下原理是什么。项目TestingJS是用jasmine，Testing覆盖率是用的整合到rails项目中的一个工具，没深度研究过，但发现实质上运行JS代码的还是需要jasmine配合，当然选用其他也可以。后来由于深度学习node，接触到了mocha，发现mocha比jasmine好用不止一点点，而且mocha中各种报表格式的显示也非常精致和有趣。这也是为什么Mr.Coverage第一个版本中使用了jasmine，后来被替换为mocha的主要原因。</p>
+<h3>原理</h3>
+<p>貌似所有Testing覆盖率的原理都大同小异，都是把源码利用工具生成为同等功能的目标代码，目标代码中含有每行执行次数的变量，当代码运行时刻，某一行被执行时，相对应的变量就会++，运行完成时，通过对这些变量的统计得出覆盖率。行覆盖率应该是这个原理。JS的目标代码生成工具是10年已经没有在更新的<a title="jscoverage" href="http://siliconforks.com/jscoverage/" target="_blank">jscoverage</a>，虽然没有在更新，但是几乎所有的JS覆盖率Testing都需要用到这个工具，它的牛X程度可见一斑。无例外，Mr.Coverage里面也整合了jscoverage这个工具，不过是github上的一个针对node的变体，叫做<a title="node-jscoverage" href="https://github.com/visionmedia/node-jscoverage" target="_blank">node-jscoverage</a>，不过使用起来毫无它的存在感。</p>
+<p>使用它可以对代码进行这样的处理：</p>
+
+<div class="wp_codebox"><table><tr id="p42011"><td class="code" id="p420code11"><pre class="javascript" style="font-family:consolas;"><span style="color: #003366; font-weight: bold;">var</span> _ <span style="color: #339933;">=</span> require<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'underscore'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+_.<span style="color: #660066;">extend</span><span style="color: #009900;">&#40;</span>exports<span style="color: #339933;">,</span> <span style="color: #009900;">&#123;</span>
+	add <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">+</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	minus <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">-</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	multiply <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">*</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	divide <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">/</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	increment <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a<span style="color: #339933;">++;</span>
+	<span style="color: #009900;">&#125;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>会被编译成含有一个_$jscoverage对象的代码，但其功能保持不变：</p>
+
+<div class="wp_codebox"><table><tr id="p42012"><td class="code" id="p420code12"><pre class="javascript" style="font-family:consolas;"><span style="color: #000066; font-weight: bold;">if</span> <span style="color: #009900;">&#40;</span><span style="color: #000066; font-weight: bold;">typeof</span> _$jscoverage <span style="color: #339933;">===</span> <span style="color: #3366CC;">'undefined'</span><span style="color: #009900;">&#41;</span> _$jscoverage <span style="color: #339933;">=</span> <span style="color: #009900;">&#123;</span><span style="color: #009900;">&#125;</span><span style="color: #339933;">;</span>
+<span style="color: #000066; font-weight: bold;">if</span> <span style="color: #009900;">&#40;</span><span style="color: #339933;">!</span> _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #009900;">&#91;</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">1</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">3</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">5</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">8</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">11</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">14</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">17</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span>
+_$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">1</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+<span style="color: #003366; font-weight: bold;">var</span> _ <span style="color: #339933;">=</span> require<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;underscore&quot;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+_$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">3</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+_.<span style="color: #660066;">extend</span><span style="color: #009900;">&#40;</span>exports<span style="color: #339933;">,</span> <span style="color: #009900;">&#123;</span>add<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">5</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">+</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> minus<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">8</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">-</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> multiply<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">11</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">*</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> divide<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">14</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">/</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> increment<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">17</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a<span style="color: #339933;">++;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+_$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span>.<span style="color: #660066;">source</span> <span style="color: #339933;">=</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">&quot;var _ = require('underscore');&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;_.extend(exports, {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>add : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a + b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>minus : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a - b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>multiply : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a * b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>divide : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a / b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>increment : function(a) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a++;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;});&quot;</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>代码运行之后可以通过分析全局变量_$jscoverage，计算出Testing覆盖率。</p>
+<h3>Mr.Coverage</h3>
+<p>使用Mr.Coverage是需要NodeJS环境的，所以在使用前还是去<a title="mr-coverage github" href="https://github.com/winsonwq/Mr.Coverage" target="_blank">github</a>看看如何安装先，4步搞定安装。Mr.Coverage的目的是整合JSTesting框架（mocha）和jscoverage工具，在TestingJS的同时也可以Testingcoverage是多少，不需要开发人员去开发如何混合使用而浪费时间。Mr.Coverage完美支持mocha的所有功能，也就是说mocha能跑的Testing，它一样能跑，并且还支持多个文件夹和多个文件路径作为参数进行Testing，算是点小增强吧。同时，原生mocha不支持的html-cov和json-cov两种report格式也在Mr.Coverage中支持，使用它可以直接设置mocha的报表类型为html-cov，直接导出Testing覆盖率的html代码，相当之爽快。BTW，html-cov到处的页面还是比较漂亮的。有兴趣的可以查看这个<a title="report demo" href="http://winsonwq.github.com/demo/report.html" target="_blank">report页面</a>。</p>
+<p>有了这个小工具，肯定是希望有更多人使用，在github上有5个人watch（包括我自己）感觉都很爽，希望会有更多。现在只是完成了小部分功能，要让更多人使用，肯定是需要和成熟的开发框架结合，能配置到自动化Testing中才是王道。另外，很没有写过console程序，提示信息的友好度有待提升，Testing文件的可配置型需要加强等等。</p>
+<h3>杂</h3>
+<p>昨天看到一个04年的帖子，里面讲到了04年时候有个比较火的jsvm的东西，<a title="jsvm评论" href="http://www.iteye.com/topic/7252" target="_blank">评论</a>很精彩，看评论的时候发现，国内那时对于前端开发已经了解得非常深了，当时人早已经把JS模块化开发，后端的JS等等现在我们都还很热门的问题了解的很透彻了，自愧不如啊。总结下就是，我能想到的，人家早已想到，我能做到的，人家已经做了无数的尝试。在一鸣惊人的创造力之前，更重要的是自己的执行力，成功并不是有了想法就可以的，它还需要长时间的平凡的坚持。（不知道为什么说到这个⋯⋯）</p>
+<p>今天听到老邢讲Design Thinking，我猛然发现自己是他讲到的那种经常问how而非why的人。写的blog也是关于如何做事的内容较多。不是对号入座吧，如果想朝UX方面发展，凡是还得多问问为什么。</p>
+<p>希望Mr.Coverage能带给你lots of fun。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Mr.Coverage在一个月以前就有一个alpha版本了，一直没有时间发上来，这两天又抽时间小小更新了下，将就发到blog中记录下，顺便也说说我对Testing慢慢理解的过程。</p>
+<h3>前</h3>
+<p>先说说JavaScriptTesting那些事吧。头两年开]]>
+    </summary>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="Web Development" scheme="http://slender-man.github.io/tags/Web-Development/"/>
+    
+      <category term="Frond-end Skills" scheme="http://slender-man.github.io/tags/Frond-end-Skills/"/>
+    
+      <category term="Mr" scheme="http://slender-man.github.io/tags/Mr/"/>
+    
+      <category term="Web Development" scheme="http://slender-man.github.io/tags/Web-Development/"/>
+    
+      <category term="Testing" scheme="http://slender-man.github.io/tags/Testing/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[我所坚持的渐进增强]]></title>
+    <link href="http://slender-man.github.io/2012/06/11/old/2012-06-12-my-progressive-enhancement/"/>
+    <id>http://slender-man.github.io/2012/06/11/old/2012-06-12-my-progressive-enhancement/</id>
+    <published>2012-06-11T07:40:42.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>这周四要在百度者开发大会上做一个技术分享，题目是《移动Web Development中的渐进增强》，说真的，没有想到这种机会会落到我身上，我激动也十分地紧张。在公司讲过几次session，都不如这个给我带来的影响大，为了不丢人，我认真的花了一周时间去做这个演讲的PPT。</p>
+<p>上周四在公司内部预先讲了一次，我觉得效果不好。主要遇到两个问题，演讲时间安排不合理，和例子不足够吸引人，对我来说，我感觉是“众口难调”的同时，我自己的演讲能力也需要加强，尤其最近老发现，我说话说不到重点，无论中文英文；思维变得跳跃，容易开小差，有点语言障碍的意思。所以我打算在博客中再讲一遍，如果你没听懂我讲的，或许可以从我的字里行间体会点东西。PPT为初稿版本，请自行下载，<a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/06/移动Web Development中的渐进增强.pptx" target="_blank" rel="external">《移动Web Development中的渐进增强》</a>。</p>
+<h1 style="text-align: left;">《移动Web Development中的渐进增强》</h1>
+<p>本次演讲的主要内容会分为三个部分：</p>
+<ol>
+<li>渐进增强开发思想介绍</li>
+<li>移动Web Development中的关注点</li>
+<li>渐进增强的Testing</li>
+</ol>
+<h2>Progressive Enhancement</h2>
+<p>随着互联网的发展，浏览器的发展也突飞猛进，在原来的多浏览器厂商并分天下的局面下，现在还出现了多平台的划分。开发人员面对原来五大浏览器IE、火狐、Opera、Safari、Chrome的局面已经有些不知所措，何况现在我们还需要处理iphone、ipad、android的mobile浏览器、其他智能手机中带有的非现代浏览器（对浏览器标准支持不完整的）。在这种情况下，如果你想要让你的网站变得广为人知，那么必须从新思考兼容性的问题。</p>
+<p>渐进增强PE可以帮助大家较好的解决这个问题。PE是以内容为核心的开发方式，在内容的基础上，开发人员使用css加工样式，利用javascript添加行为来提升用户的使用体验，由于是以内容为核心，所以使用PE的同时，亦解决的兼容性问题。</p>
+<p>那么，PE中提到的内容核心是什么？对于用户、BA、UX来说，内容可以是网站给访问的用户带来的内容和功能，具体可以单纯到只是网站中的文字，也包括网站带给用户的交互功能，比如说发送邮件，填写表单，甚至还可能为给用户带来的视觉效果、颜色搭配、排版、阅读体验等等。但是，对于我们开发者来说，PE核心内容就是我们的HTML代码，简洁易懂的标记们。HTML是我们制作页面功能的基础，也是几乎所有浏览器呈现页面功能的基础，开发人员通过添加css样式和js代码使内容在更强的浏览器上工作得更好，提升用户体验。</p>
+<p>在这边举一个例子，80后可能都会有印象，家里的电视机是又90年代初的黑白电视机换到00年初的CRT彩色电视机，接着随着科技发展，到现在LED高清电视机，甚至都出现了3D电视机。对于用户来说，电视机给他们带来的是电视节目，看中央一台也看了这么多年了，但是先进的电视机给用户带来了新的观赏体验，不仅带来了色彩，还带来了高清的画质，丰富的观影体验。反过来看，同样内容的电视节目同样可以在旧的电视机上播出，内容一样能被用户获取到，这一切都是向后兼容的，PE给我们带来的好处就在于此。浏览器的发展，从Netscape到现在的Chrome也是类似的一个发展过程。那么，我们的网站给用户带来的是尽可能一样的体验，而并非是完全一样的。你也不能奢望一个kindle的silk浏览器能像chrome表现得那么出色。</p>
+<p>由此看来，我们需要从新审视解决浏览器兼容性这个问题，我们的开发需要从一直一来的以兼容性为目标的开发转化为以可用性为目标的开发，可用性指的是网站带给用户的功能从一开始就是跨浏览器的。</p>
+<h2>移动Web Development中的关注点</h2>
+<p>对于开发者来说，移动Web Development和传统桌面Web Development的流程是一样的，但是页面设计和信息架构会有很大改变：1、表单样式机会都会被重置。2、列表页面普遍会是大块面积的可点区域、左上角会出现back按钮，右上角可能会出现下一步或者搜索按钮。这种设计都是来源于Native App的设计方式，目的是为了让web程序工作得更像原生应用一样，给用户带来一致的体验。</p>
+<p>新的设计含有很多复杂的交互，使得HTML结构更混乱一些，但是开发时也需要从最基本的有语义的标签着手，因为简单有语义的标签可以让开发人员更容易去制作交互，所有好的设计都是从简单出发的，而且，我们开发的时候考虑的应该是我们需要什么样的控件去收集用户的有效信息，而不应该只关注于样子。比如一个on/off的开关，它想获取的是一个互斥的数据值，我们可以使用一组同名的radio按钮去完成，也可以使用含有on和off选项的下拉款完成。另外，我们使用简单语义的标签，让阅读器也能很好的加载我们的内容。</p>
+<p>其次，现在iphone当道，android横行，它们所搭载的浏览器都是基于webkit核心的，很好的支持HTML5和CSS3。这两项基础能给我们带来更多的语义的标签、本地存储的能力、更多更强的样式支持、强大的DOM API等等，我们可以在这些平台上大展手脚，如果由于先进的技术忘记了PE的本质，那么你的网站也就只能限制在这些平台上被访问到。如果你的客户使用不支持以上技术的浏览器、或者禁用到js或者css、又或者网络比较慢时访问你的网站，你什么都不能提供给他们，没有用户访问便没有了价值。话句话说，先进的技术给用户带来更好更多的获取核心内容的使用体验。比如说一个图片查看，在普通浏览器上，可以使用一个单独的页面打开图片，利用浏览器特性进行缩放，而如果是支持touch的手机浏览器上，我便可以支持在有图片显示的地方直接缩放。</p>
+<p>另外，我们在使用PE的过程中，并不是针对某个平台进行增强，而是判断当前运行的平台是否支持某种能力，比如多点触摸能力、是否支持canvas。如果坚持判断浏览器是否是IE，那么当IE更新后，用户依然也使用不了高级功能。</p>
+<p>PE在当前这个环境下，已经不仅仅是HTML+CSS+JS三层了。在复杂的环境下，PE的模型已经变为多层结构。在基础功能完整的情况下，利用CSS进行增强，再利用js进行增强，甚至在多层的基础上，还会产生增强依赖，比如在某一个增强存在的基础上，去检测另一个浏览器能力，支持某一特定的功能。例如，Google Galaxy手机主站上的展示页面，在仅仅支持js的浏览器上，可以进行左右，上下的拖动查看手机外观。但是如果浏览器支持WebGL，那么可以进入到WebGL模式，3D+360度旋转观察手机外观。</p>
+<p>如果想要很好的开发PE，那么框架是不可缺少的部分，EnhanceJS和Modernizr都是比较好的渐进增强库，它们都支持：1、浏览器能力检测 2、动态加载样式和脚本 3、可扩展新的浏览器能力检测方法。相比之下，Modernizr要比前者更强大一些，尤其在HTML5和CSS3的能力检测方面。</p>
+<p>如果需要支持样式reset，那么jQuery Mobile是一个不错的UI库，使用它可以制作出精美的类Native App的Web程序UI，支持多平台浏览器。</p>
+<h2>渐进增强的Testing</h2>
+<p>PE确实给用户带来了更好的使用体验，但是，如果用户在网络比较慢，或者通过不支持增强的浏览器上访问网站，或者用户处于安全性考虑禁用掉脚本时，我们需要提供给他们一个完整可用的版本。而且我们需要用过Testing来保证我们每个增强前后的版本都是工作的。我提出几个想法：</p>
+<ol>
+<li>面向对象的开发各个增强，每个增强都可以进行开关。这样做的好处是，可以方便的管理增强，每个独立增强不影响之前的功能；通过开关增强，不仅可以Testing增强前后的版本是否都可以正常工作，而且还可以通过同一级别的增强可以相互组合进行Testing，查看是否相互影响；如果对象化的管理增强，可以很方便的开发“回到基础版本”这样的功能，让用户在低带宽情况下主动切换版本，像Gmail移动web版本一样。有人质疑过这样做会不会带来更多开发成本，我的答案是不，良好的结构可以带给程序健壮性和扩张性，就像面向对象开发一样。另外，模块化的前端开发并不会给代码造成混乱而会更容易的管理前端代码。</li>
+<li>自动化Testing选择适当的驱动。要做到解决兼容性，不可能把所有平台都Testing一遍，一些和特定能力无关的Testing可以在同一浏览器上进行Testing，和特定能力相关的Testing便需要选择适当的自动化浏览器驱动。比如，如果是需要Testingmobile safari上Testing特有功能，那么可以选择直接驱动mobile safari浏览器，但是一般的链接跳转，form提交之类的功能可以在chrome上进行Testing。</li>
+<li>如果是Testingmobile上的touch功能，也可以通过在chrome或者firefox上进行Testing，因为在mobile中的touch增强，实质上是绑定了touchstart、touchmove、touchend事件，那么这些事件在不支持touch的浏览器上是被视为自定义事件，通过出发自定义事件便可以进行Testing。</li>
+</ol>
+<p>-PPT内容完-</p>
+<p>最近我在思考，由于前端模块化开发和Testing技术日趋成熟，前端MVC框架和模板技术已经有很多，HTML富客户端模式的开发和PE产生了一个矛盾，“我们现在还需要兼容那些不支持js的浏览器么？”这个问题一直会在我耳边回荡。相比之下，我能想到PE的好处是：1、PE通过HTML带给用户核心功能得以保障，即使不支持js 2、阅读器依赖有语义的HTML 3、不用维护过多的页面状态，开发复杂度不高。4、扩张性好，维护成本，对前端开发技能要求低。</p>
+<p>但是富媒体客户端在各种强力前端框架的支持下，可以有保证的通过各种前端技术带给用户最好的用户体验，我想富媒体客户端和web游戏开发将会成为重要的开发方向，值得继续研究。不过，实际问题实际出发，不同的技术都有自己的优势，重要的是在项目中怎么使用这些优势来解决问题。不说某个技术绝对好，但求灵活地游刃有余的运用它们。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>这周四要在百度者开发大会上做一个技术分享，题目是《移动Web Development中的渐进增强》，说真的，没有想到这种机会会落到我身上，我激动也十分地紧张。在公司讲过几次session，都不如这个给我带来的影响大，为了不丢人，我认真的花了一周时间去做这个演讲的PPT。</]]>
+    </summary>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="progressive enhancement" scheme="http://slender-man.github.io/tags/progressive-enhancement/"/>
+    
+      <category term="Web Development" scheme="http://slender-man.github.io/tags/Web-Development/"/>
+    
+      <category term="Note" scheme="http://slender-man.github.io/tags/Note/"/>
+    
+      <category term="session" scheme="http://slender-man.github.io/tags/session/"/>
+    
+      <category term="Web Development" scheme="http://slender-man.github.io/tags/Web-Development/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[《Dive Into JavaScript》Session3之脚本与样式]]></title>
+    <link href="http://slender-man.github.io/2012/05/19/old/2012-05-20-dive-into-javascript-session3-script-style/"/>
+    <id>http://slender-man.github.io/2012/05/19/old/2012-05-20-dive-into-javascript-session3-script-style/</id>
+    <published>2012-05-19T06:54:02.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>赶紧把第三次的session ppt发上来，本以为每个月讲两期，结果变成平均一个月一次了。。。让人心灰意冷啊。</p>
+<p>这次讲的脚本与样式主要是介绍了样式在HTML文档中的存在形式，比如说样式对象CSSStyleSheet，规则对象CSSRule，还有我们经常接触的CSSStyleDeclaration对象，还有如何使用JavaScript对其进行访问和控制，其中当然要介绍大家经常使用的element.style属性。</p>
+<p>显而易见，session的目的就是为了让大家能更加了解我们经常使用的样式赋值和取值的怎么回事，也能对像jQuery这样的库进行猜想其内部是怎么实现的，比如说使用频率很高的$(selector).css({&#8230;}) 方法。另外，由于大家对这些类库产生了依赖，很少专注于其实现，但是如果当使用库发现问题时，往往需要从基础的东西里面寻找答案，比如说在先Testing的时候，css方法返回的样式在各个浏览器中也是不一样的，它并没有进行结果的同意merge，只是做了简单封装，而且它也没有必要做merge，错误是浏览器造成的，考虑过多的包容错误会使得开发人员自己很苦恼，但是对于一个前端工程师来说，我们应该知道它是怎么产生的。</p>
+<p>PPT的地址在这里：<a title="dive into javascript 3" href="http://winsonwq.github.com/ppt/JavaScript-Session3-Style-Script.html#/cover" target="_blank" rel="external">http://winsonwq.github.com/ppt/JavaScript-Session3-Style-Script.html#/cover</a> ，你也可以通过短地址访问<a title="dive into javascript 3" href="http://bit.ly/diveintojavascript3" target="_blank" rel="external">http://bit.ly/diveintojavascript3</a>访问，短连接同时支持前面两讲，改下最后的数字即可。</p>
+<p>这次session内容不多，但是呢还是把大家给讲lost了，一句话，口才问题，Zation同志也给了feedback说我需要换一下讲的方式，据他观察我在讲的过程中，我讲话的间断性让大家乏味了，讲半句，停，继续讲。。。口长确实确实需要加强，我session前想的一些套路，或者说为了让大家更加有兴趣的语言在session过程里面都表现的不很好，这个应该归结于演讲技巧里面的，是时候找点书来琢磨琢磨了。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>赶紧把第三次的session ppt发上来，本以为每个月讲两期，结果变成平均一个月一次了。。。让人心灰意冷啊。</p>
+<p>这次讲的脚本与样式主要是介绍了样式在HTML文档中的存在形式，比如说样式对象CSSStyleSheet，规则对象CSSRule，还有我们经常接触的C]]>
+    </summary>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="Session" scheme="http://slender-man.github.io/tags/Session/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[《Dive Into JavaScript》 Session 2之BOM和DOM简介]]></title>
+    <link href="http://slender-man.github.io/2012/04/26/old/2012-04-27-dive-into-javascript-session2-bom-dom/"/>
+    <id>http://slender-man.github.io/2012/04/26/old/2012-04-27-dive-into-javascript-session2-bom-dom/</id>
+    <published>2012-04-26T06:51:37.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>上周五，我给大家分享了《Dive Into JavaScript》 之BOM和DOM简介。PPT传送门在<a title="《Dive Into JavaScript》BOM&amp;DOM" href="http://winsonwq.github.com/ppt/JavaScript-Session2-DOM-BOM.html" target="_blank" rel="external">http://winsonwq.github.com/ppt/JavaScript-Session2-DOM-BOM.html</a>。</p>
+<p>&#8211; 搞了2个月了，才是第二讲，太掉链子了。</p>
+<p>讲的过程中，有积极问问题的，有补充讲解的，有可能是完全lost了离场的，有犯困的，有闷闷的不吭声的，形形色色的童鞋都有，最后还包括讲着讲着发现PPT内容不合理的我。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>上周五，我给大家分享了《Dive Into JavaScript》 之BOM和DOM简介。PPT传送门在<a title="《Dive Into JavaScript》BOM&amp;DOM" href="http://winsonwq.github.com/ppt/Jav]]>
+    </summary>
+    
+      <category term="Dive Into JavaScript" scheme="http://slender-man.github.io/tags/Dive-Into-JavaScript/"/>
+    
+      <category term="Uncategorized" scheme="http://slender-man.github.io/tags/Uncategorized/"/>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="session" scheme="http://slender-man.github.io/tags/session/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[关于Progressive Enhancement的思考]]></title>
+    <link href="http://slender-man.github.io/2012/04/21/old/2012-04-21-thinking-in-progressive-enhancement/"/>
+    <id>http://slender-man.github.io/2012/04/21/old/2012-04-21-thinking-in-progressive-enhancement/</id>
+    <published>2012-04-21T01:06:26.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>Progressive Enhancement（下文称为PE），渐进式增强是现在Web Development中一个很流行的开发思想，目的是在以内容为核心的同时，可以渐进地提升体验，为用户提供更好的服务，随之而来的好处是，其网站或者web程序的最核心内容并没有改变，用户接受到的信息是完整的，而且能达到浏览器兼容的目的，这里提到的兼容并不是说网站的体验必须是一样的，这里的兼容指的是提供给用户的内容和功能是完整的，甚至在不兼容CSS和JS的浏览器上内容和功能也是完好的。</p>
+<p>这里是两个比较好的了解PE的资源，<a title="understand progressive enhancement" href="http://www.alistapart.com/articles/understandingprogressiveenhancement/" target="_blank">《Understanding Progressive Enhancement》</a>和<a title="Nicholas Zakas : Progressive Enhancement 2.0" href="http://www.youtube.com/watch?v=hdTxeR90_1E&amp;feature=colike" target="_blank">Nicholas Zakas: Progressive Enhancement 2.0</a>（需要翻墙）。</p>
+<p>最能体现PE思想的还是这个图：</p>
+<p><img class="alignnone" title="PE" src="http://www.alistapart.com/d/understandingprogressiveenhancement/m-m.jpg" alt="渐进增强" width="324" height="150"></p>
+<p>说到这可能有人会问，为什么体验不一样也算兼容呢？那么我会反问你，谁说的一定要在每个浏览器上一模一样才算是兼容呢？我们的目标是尽可能的保持一样的体验。</p>
+<p>以内容为核心，在保证内容的基础上，添加样式添加行为是最基础的开发思路，在其之上还会有更多的样式+行为添加上，增强开关是我用来控制增强的一种方式，我利用它可以控制应该针对那些浏览器或者哪些内容进行增强。对于PE，我有这样的思考。</p>
+<p>现在的PE模型已经变成了这个样子了：</p>
+<pre>├─Level 4 ─ ...
+├─Level 3 ─ JavaScript
+├─Level 2 ─ CSS
+├─Level 1 ─ JavaScript + CSS
+└─ Basic  ─ Content</pre>
+<p>首先，所有问题的解决需要建立在持续性的沟通和改进上。</p>
+<p><strong>问题1：对于网站来说是谁来决定核心内容文字可能来自于BA和产品经理，进一步想，那么一个web程序，带有更强用户交互的网站功能的核心内容是什么呢？，比如UX会给于最终的界面效果，往往会是一个CSS+JS的混合体，而被掩盖的最基本的功能应该是我们思考的。</strong></p>
+<p style="padding-left: 30px;">这是每一个UI开发都考虑的问题，我们开发一个功能是以功能效果作为导向呢还是以内容作为导向，如果是前者那么往往会忽略基本的HTML文档结构，语义，虽然效果是完成了，但是可扩展性变差了，当遇到体验变化时，需要推到从来，整个功能失效直到你的新体验完成，浏览器兼容性会变得很麻烦，因为有可能要hack很多浏览器已保证体验一样。而后者就不一样，在考虑内容的同时，HTML文档的结构简单，语义健全，而且还能保证基础功能是具备的，满足各种浏览器的基础功能，兼容性也是随之而来的，不必特意去考虑跨平台，因为出发点已经跨平台了，但是开发者首次需要做更多的effort不但要保持原有功能前后台功能，也要保证增强后的前后台功能以及增强的开关控制。</p>
+<p style="padding-left: 30px;">我们往往都会选择后者，什么是一个功能的核心内容，比如一个查询功能来说，不论其最终效果有多么绚丽多彩，那么开发者应该保持一个纯净的心灵，把它归结为一次form的get请求，查询的选项需要根据具体的查询内容而定具有语义的标签，比如是文字那么就选择input，甚至还可以选择type是search的input，如果是二者选择一那么选择下拉框select或者radio，如果是开关那么可以选择checkbox，这些都是最基本的元素，form提交那么可以选择submit按钮，而且能自动带上回车提交的功能。在最基础的get请求完成之后，再来考虑加上样式，我们的输入是否需要autocomplete，checkbox需不需要做成iphone样式等等才是正确的道路。</p>
+<p><strong>问题2：随着渐进增强的开发，体验甚至会形成一个从下到上的链式结构，那么如果最底层的内容改变的时候应该怎么处理建立在其上的所有增强呢？</strong></p>
+<p style="padding-left: 30px;">当最初的基础内容改变的时候，怎么处理之后的所有增强呢，我想说这种情况是比较糟糕的一种，有点像需求改变了的重构。我还在寻找这个问题的答案，我能想到的是应该加强对每个增强的条件，每个增强的位置和条件，如果能知道这两个点，这个问题也迎刃而解，而且还能很好的控制增强的开关。除了这点，还需要加强对增强的Testing，因为Testing是保证重构的基本要素，也是程序功能质量的见证。最近遇到一个内容改变的需求，需求很简单，就是在新的页面显示中不需要看到没页面的title了，它是一个h2标签。我看到这个需求时候第一个想要问的这个title是不是核心内容一部分，我觉得是，但是需求是需要看不到它，我只好隐藏它，但是又没有新的体验去替代或者增强它，那它还属于核心内容的一部分么，我应该问谁，问BA和产品经理，他们要的是最终效果，就是看不到，我说可以让阅读器看到所以应该把它隐藏，和同事的讨论中，他们觉得既然没有替代品的话，说明已经不属于核心内容一部分了。最终，我很是纠结，不情愿的直接删除了。看到这个问题，我觉得我才刚上路呢，理解PE才是皮毛。</p>
+<p><strong>问题3：在增强过程中，选择适合的增强方式也是一个问题</strong></p>
+<p style="padding-left: 30px;">选择适合的增强方式，我的原则是优先用CSS解决这个问题，然后在考虑JS解决，但是有趣的是，这里有了动态添加具有更多功能的CSS和JS的问题，针对不同的增强开关动态的加载样式和行为，而且要保证相互不影响，对于动态加载JS可以考虑使用AMD加载。另外，增强往往隐藏一些之前有的view，所以隐藏应该属于增强的一部分，在移除增强后原有view应该显示。动态加载js行为可能会引入更多的view，这些新的界面会有新的css，首先所有东西都应该是动态加载上的，然后view的DOM结构可以使用现在有的模板技术来处理，如果是简单的dom结构的话，也可以用DOM API生成。像jQuery UI/jQuery Mobile就是这样做的。</p>
+<p><strong>问题4：由于功能是渐进增强上去的，那么Testing需要cover的点就会变多，被增强的部分可能增强后功能是好的但不见得增强之前的功能也是好的，即使增强前的版本没有人用到。这些多余的effort是值得做的么？</strong></p>
+<p style="padding-left: 30px;">这个问题可以分两个部分，一个是我们发现PE对我们用处不大，反而带来了更多的effort，还值得不值得这么做，我的答案是应该要这么做，PE的好处不是局部的，而是随着项目的变大，长时间的坚持才能看到的，它在跨平台上给我们带来的好处是显而易见的，因为我们没有那么刻意的去追求它，它就是个附属品。另外PE以内容为核心，可以让我们的焦点永远都集中在应该给用户提供的内容上，内容才是业务的重中之重。第二个部分是关于我们需要花很大的effort来用Testing保证增强前和增强后的功能么，我的想法是对于我们现在支持的所有功能，包括增强前后的功能，但是会有侧重，如果80%人都可以使用上chrome这样的浏览器，那么我们会加大最增强后的Testing，它是用户使用驱动的。而我们可以花一部分精力去Testing那些我们能想到的功能，但是不是主要功能，比如说阅读器、搜索引擎加载等等，我想这也是卓越软件追求的一个方面吧。</p>
+<p>啰嗦说了很多我的想法，也表示我对PE也在学习研究中，还没有总结出来一套方法论。现在项目里面也要加强PE的引入，随时随地都要敏感的想到PE理论，最近还在看<a title="Designing with Progressive Enhancement" href="http://book.douban.com/subject/4299540/" target="_blank">《Designing with Progressive Enhancement》</a>，里面提到了很多各种增强的方法应该会帮到我。</p>
+<p>感谢在工作中和我耐心讨论的同事们。</p>
+<p>-完-</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>Progressive Enhancement（下文称为PE），渐进式增强是现在Web Development中一个很流行的开发思想，目的是在以内容为核心的同时，可以渐进地提升体验，为用户提供更好的服务，随之而来的好处是，其网站或者web程序的最核心内容并没有改变，用户接受]]>
+    </summary>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="progressive enhancement" scheme="http://slender-man.github.io/tags/progressive-enhancement/"/>
+    
+      <category term="Web Development" scheme="http://slender-man.github.io/tags/Web-Development/"/>
+    
+      <category term="css" scheme="http://slender-man.github.io/tags/css/"/>
+    
+      <category term="Web Development" scheme="http://slender-man.github.io/tags/Web-Development/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[调用expressjs中compiler方法的问题]]></title>
+    <link href="http://slender-man.github.io/2012/04/15/old/2012-04-15-expressjs-compiler-issue/"/>
+    <id>http://slender-man.github.io/2012/04/15/old/2012-04-15-expressjs-compiler-issue/</id>
+    <published>2012-04-14T23:51:19.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>express.compiler方法是expressjs框架提供的一个动态编译源文件到目标文件的方法，每次GET请求相同名字的目标文件时，会去查找同名源文件来生成，这样对于整合sass、less、coffeescript十分有用。但昨天在整合sass到expressjs时候，发现了个配置sass的路径的问题。该方法调用方式如下：</p>
+
+<div class="wp_codebox"><table><tr id="p32318"><td class="code" id="p323code18"><pre class="javascript" style="font-family:consolas;">app.<span style="color: #003366; font-weight: bold;">use</span><span style="color: #009900;">&#40;</span>express.<span style="color: #660066;">compiler</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#123;</span>
+    enable <span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'sass'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span>
+    src <span style="color: #339933;">:</span> sourceUrl<span style="color: #339933;">,</span>
+    dest <span style="color: #339933;">:</span> destinationUrl
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>compiler方法接受3个参数，enable的编译器数组，src代表源文件路径，这里代表sass文件的路径，最后一个dest指的是目标路径，就是生成为css文件的路径。</p>
+<p>现在我的项目结构如下：</p>
+
+<div class="wp_codebox"><table><tr id="p32319"><td class="code" id="p323code19"><pre class="html" style="font-family:consolas;">myapp
+├── app.js
+├── public
+│   └── stylesheets
+│       └── main.css
+├── sass
+│   └── main.sass 
+└── ...</pre></td></tr></table></div>
+
+<p>想把myapp目录下的sass文件夹中的所有sass文件能动态的生成到public/stylesheets文件夹下，本以为看把compiler调用时的src路径设置为__dirname + &#8216;/sass&#8217;，然后dest的值设置为__dirname + &#8216;/public/stylesheets&#8217; 便可以了，这是多么理想的状态啊。</p>
+
+<div class="wp_codebox"><table><tr id="p32320"><td class="code" id="p323code20"><pre class="javascript" style="font-family:consolas;"><span style="color: #006600; font-style: italic;">// 理想情况，但是不work</span>
+app.<span style="color: #003366; font-weight: bold;">use</span><span style="color: #009900;">&#40;</span>express.<span style="color: #660066;">compiler</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#123;</span>
+    enable <span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'sass'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span>
+    src <span style="color: #339933;">:</span> __dirname <span style="color: #339933;">+</span> <span style="color: #3366CC;">'/sass'</span><span style="color: #339933;">,</span>
+    dest <span style="color: #339933;">:</span> __dirname <span style="color: #339933;">+</span> <span style="color: #3366CC;">'/public/stylesheets'</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>结果不行，换不同的路径试了很多次，有些时候能生成，还去stackoverflow上查询了很久，结果都没有想要的答案。我便看了下compiler方法的源码，原来生成原理是这样的。</p>
+<p>每次GET请求一个文件的时候，例如http://localhost:3000/stylesheets/main.css时，此方法会生成两个路径，源文件路径和目标文件路径，根据代码来看，会根据当前的url来找到pathname，追加到调用方法时指定的src和dest的值上，此时找到的pathname就是/stylesheets/main.css，那么源文件路径就会是我指定的__dirname + &#8216;/sass/stylesheets/main.sass&#8217;，目标路径就成为__dirname + &#8216;/public/stylesheets/stylesheets/main.css&#8217;，很明显两个路径都错误了。怪就怪它是用pathname去追加，而不是只用/main.css追加。</p>
+<p>现在搞清楚状况了，无奈的事情发生了，如果我真想在code里面使用http://localhost:3000/stylesheets/main.css这样的路径去请求css文件，那么原路径中需要包含stylesheets这个子文件夹。通过我有想过把它的方法修改了，但是它是个get方法，不能被修改。唯有委曲求全了。</p>
+<p>现在把文件目录改成了：</p>
+
+<div class="wp_codebox"><table><tr id="p32321"><td class="code" id="p323code21"><pre class="html" style="font-family:consolas;">myapp
+├── app.js
+├── public
+│   ├── stylesheets
+│   │   └── main.css
+│   └── scripts
+│       └── main.js
+├── stylesheets // 不得已把sass变为stylesheets
+│   └── main.sass 
+└── scripts
+    └── main.coffee</pre></td></tr></table></div>
+
+<p>调用方式变成了：</p>
+
+<div class="wp_codebox"><table><tr id="p32322"><td class="code" id="p323code22"><pre class="javascript" style="font-family:consolas;"><span style="color: #006600; font-style: italic;">// work，但是src和dest看上去都是很奇怪的配置</span>
+app.<span style="color: #003366; font-weight: bold;">use</span><span style="color: #009900;">&#40;</span>express.<span style="color: #660066;">compiler</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#123;</span>
+    enable <span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'sass'</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">,</span>
+    src <span style="color: #339933;">:</span> __dirname<span style="color: #339933;">,</span>
+    dest <span style="color: #339933;">:</span> __dirname <span style="color: #339933;">+</span> <span style="color: #3366CC;">'/public'</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>同样的方式也可以来配置coffeescript。虽然现在可以加载到目标文件，但是看起来不是那么舒服，还是有些遗憾，如果大家看了之后有其他更好的加载方式可以告诉我。Btw，如果你不想使用原生的compiler方法去生成css文件，那么你可以尝试下<a title="Stylus Middleware" href="http://learnboost.github.com/stylus/docs/middleware.html" target="_blank" rel="external">Stylus Middleware</a> 貌似没有这个问题。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>express.compiler方法是expressjs框架提供的一个动态编译源文件到目标文件的方法，每次GET请求相同名字的目标文件时，会去查找同名源文件来生成，这样对于整合sass、less、coffeescript十分有用。但昨天在整合sass到expressjs时候]]>
+    </summary>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="Uncategorized" scheme="http://slender-man.github.io/tags/Uncategorized/"/>
+    
+      <category term="nodejs" scheme="http://slender-man.github.io/tags/nodejs/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[忙碌的一星期]]></title>
+    <link href="http://slender-man.github.io/2012/03/24/old/2012-03-24-busy-week/"/>
+    <id>http://slender-man.github.io/2012/03/24/old/2012-03-24-busy-week/</id>
+    <published>2012-03-23T20:09:56.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>上个星期主要就是两个活动，OOBC和TWI，前者是Programming培训，后者是TW针对社招的培训。</p>
+<p>先来谈下OOBC吧，是个跨两个星期的training，大概六天，主要是pair利用TDD方式写程序，这次主要是包括头两天的长度计算程序和之后的停车场管理程序。每天都会有新需求，每个小需求给个15分钟的时间来实现，几乎每次都需要重构现有代码，目标是不breakTesting的前提下来重构。用大神@徐昊的话来说，手法是其中至关重要的，我们用的IDE是IntelliJ，对快捷键的掌握的同时，更重要的是重构思路，每当看到大神在重构时候，都会有膜拜的眼神，所以@Gavin，OOBC这个培训务必积极参加。当然，这个方面我还很欠缺，在这里还要对我的pair说声抱歉，我速度还真是有点慢。</p>
+<p>OOBC这个星期的上课事件是周二到周四，其中两天和TWI有交集，TWI周三培训到周五，白天早上9点培训到下午5点左右，晚上又去参加OOBC，却是感觉到有些忙，OOBC布置的重构作业也只能做一半。一般来说，回到住的地方应该是9点半以后了，然后周四晚上和成都base的同事们去唱了K，周五晚上我们TEAM的release庆祝，也就是昨天，去了周董开的依然范特西KTV，耍到了11点半，那是相当的high了。</p>
+<p>这是KTV包厢里面的微博墙，由于强哥明天要去澳洲出差，我发了条祝福。</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/03/WP_000103.jpg" rel="external" target="_blank"><img class="alignnone size-thumbnail wp-image-312" title="祝福" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/03/WP_000103-150x150.jpg" alt="" width="150" height="150"></a></p>
+<p>TWI培训的三天内，主要包含了TW的历史、Agile内容、OP和PS的角色和责任、迭代计划、用户故事、XP极限编程、自动化Testing。以上内容都是围绕着TW日常工作中的内容展开，效果可见一斑。</p>
+<p>其中我感觉比较深的是TW的历史，在TW19年的历史中，有着辉煌的一面，比如selenium等的开源自动化Testing工具的贡献（别的有点忘了，汗）。一直在使用行业内最先进的技术，比如第一个ROR的商业系统就是TW开发的，当然，还有敏捷软件开发的提出，敏捷宣言的制定都是由TW主导的，这还是比较振奋人心的。补充下，之前的Spring的IOC控制反转为什么之后会改名叫做DI呢，因为Martin Fowler觉得IOC是个很烂的名字，DI依赖注入更贴切，接着这个行业都用了新的称呼，可见当时TW和老马在行业内的影响力。</p>
+<p>当时也有让人担心的一面，TW现在还欠外债4300万刀，关于这比债务，差点让TW关门，不过最高法院的判决让我们松了一口气，也让TW的所有员工真正能理解TW的价值观是什么，大概内容是“ThoughtWorks公司是由一群被叫做ThoughtWorker的人组成，整个公司最大的价值也是这群有志向的人，其公司本身并没有更大价值如果这群人走了的话”。</p>
+<p>尤其现在这个行业竞争愈演愈烈，TW面对技术选择周期也变得越来越短，创新能力显得格外重要，面对的对手越来越多，我们必须要更加努力才能继续保持在行业的前列。敏捷开发的咨询工作是TW在中国的一个大方向，我们希望把这种新型的，好的开发思想传播出去，共同来为软件业做贡献。</p>
+<p>还有一个有趣的故事，当初TW有个规定，就是每当你离开自己的笔记本电脑时，都需要锁屏，但是有一次一个COO忘记了锁屏，另外两个员工就把他的电脑密码改了，并提醒他离开时需要锁屏。当那位高高在上的COO发现之后，一怒之下把这两个人开除了，但是有趣的是，这位COO在第二天就被公司开了，并且把之前两个人请了回来，成为了两位TW史上最有面子的两位员工。COO被开，也体现了公司的价值取向，我们没有那么严格的上下级，我们员工之间重要的是合作关系。</p>
+<p>我的记录比较零碎，现在想到的是公司的三大支柱。1、sustaining business（可持续的业务） 2、software excellence（追求软件卓越） 3、social justice（社会正义，但是主要指为社会做贡献）</p>
+<p>TWI的三天培训非常有用，很多都是通过游戏的分组讨论的方式进行，感同身受，体会比较深。其中敏捷宣言学习、乐高怪兽模拟项目、你来画我来猜古诗词（我的古文水平太烂了）、分布式项目管理、retro的各种方式都是很有意思的。让我和TW之间又更近一步。BTW，来培训的各种讲师都是自愿来分享的，谢谢他们的付出，希望有一天我能参与到讲师行列中。除了这种理解之外，这次是首次和OP的人一起进行TWI培训，也然我更多的了解到了OP人们的工作内容，怎么样和我们配合的，能更多的相互理解。</p>
+<p>好吧，就记录到这吧，附上我们的乐高怪兽和它的baby。哈哈。</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/03/WP_000097.jpg" rel="external" target="_blank"><img class="alignnone size-thumbnail wp-image-314" title="乐高怪物" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/03/WP_000097-150x150.jpg" alt="" width="150" height="150"></a></p>
+<p>还有那cosplay的雷锋照《那些年看过的Testing驱动开发》</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/03/8f09ccf7jw1dr9tunano4j.jpg" rel="external" target="_blank"><img class="alignnone size-medium wp-image-317" title="那些年看过的《Testing驱动开发》" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/03/8f09ccf7jw1dr9tunano4j-300x180.jpg" alt="" width="300" height="180"></a></p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>上个星期主要就是两个活动，OOBC和TWI，前者是Programming培训，后者是TW针对社招的培训。</p>
+<p>先来谈下OOBC吧，是个跨两个星期的training，大概六天，主要是pair利用TDD方式写程序，这次主要是包括头两天的长度计算程序和之后的停车场管理程]]>
+    </summary>
+    
+      <category term="Note" scheme="http://slender-man.github.io/tags/Note/"/>
+    
+      <category term="OOBC" scheme="http://slender-man.github.io/tags/OOBC/"/>
+    
+      <category term="TWI" scheme="http://slender-man.github.io/tags/TWI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[《Dive Into JavaScript》Session 1]]></title>
+    <link href="http://slender-man.github.io/2012/03/09/old/2012-03-10-dive-into-javascript-session1-prototype/"/>
+    <id>http://slender-man.github.io/2012/03/09/old/2012-03-10-dive-into-javascript-session1-prototype/</id>
+    <published>2012-03-09T07:37:54.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>《Dive Into JavaScript》Session系列是我组织的一个JavaScript技术分享讨论会，属于我和给力的前端开发@Zation组织的前端分享平台的一部分，这个平台主旨是想把前端开发知识传播给更多人知道，希望有更多人加入前端开发来和我们一起探讨问题，追求最佳实践。</p>
+<p>今天是第一次分享，ppt传送门在此，<a title="《Dive Into JavaScript Session 1》" href="http://winsonwq.github.com/ppt/JavaScript-Session1.html#/cover" target="_blank">http://winsonwq.github.com/ppt/JavaScript-Session1.html#/cover</a>。本来想按照语言介绍流程，先讲语法，接着讲下结构，比如if/else，switch，for/while怎么写之类的。讲这些有意思么？没有。在我看来，很多人都对JavaScript中prototype-based部分理解的不够深刻，甚至完全摸不着头脑，那我们今天就啃这块硬骨头，这样对之后的课程理解也有很大帮助。</p>
+<p>在session，我的目的是让大家回答这么两个问题</p>
+<ol>
+<li>Object.prototype上扩展的属性和方法，为什么所有对象上都能感知到？</li>
+<li>Function.prototype上扩张的属性和方法，为什么只有方法对象能感知到？<br>
+例如：Function.prototype.isAFunc = true; Array.isAFunc === true; // true</li>
+</ol>
+<p>这次讲的主要内容：</p>
+<ol>
+<li>JavaScript/ECMAScript 简介</li>
+<li>JavaScript 对象Function, Object</li>
+<li>三个重要属性介绍，constructor、prototype、__proto__</li>
+<li>对象关系（包括方法对象）</li>
+</ol>
+<p>有可能是直接第一次分享就讲较为复杂的部分，大家听下来都有点晕。但我觉得，晕了才能有不晕的一天，而且这次直接讲原型继承真是我用心良苦啊，希望大家在之后的讨论中能更快的理解。也非常欢迎大家给我feedback，期待中。（已经收到一些，下次会改进）</p>
+<p>下次讨论将会在下下个星期，那天还不定，《Dive Into JavaScript》Session 2的内容可能是对象API的介绍、类式继承的介绍、随之而来的将会是BOM、DOM的介绍。之后还会有更多的惊喜，只愿给我一个平台我分享我所学。</p>
+<p>上次会成都，徐昊（TW中国首席咨询师）问了我一个问题，你现在是UI开发，如果有一天，假如3年，大家自学或者受你影响，他们的UI水平和你差不多了，你会怎么办？我想了想，回答说，我希望有那么一天，他们来帮我一起做现在做的事情，提高效率的同时，我可以有更多的时间专研我想学的东西。</p>
+<p>-完-</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>《Dive Into JavaScript》Session系列是我组织的一个JavaScript技术分享讨论会，属于我和给力的前端开发@Zation组织的前端分享平台的一部分，这个平台主旨是想把前端开发知识传播给更多人知道，希望有更多人加入前端开发来和我们一起探讨问题，追求]]>
+    </summary>
+    
+      <category term="Dive Into JavaScript" scheme="http://slender-man.github.io/tags/Dive-Into-JavaScript/"/>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="Session" scheme="http://slender-man.github.io/tags/Session/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[Mr.Async PPT 和两个例子]]></title>
+    <link href="http://slender-man.github.io/2012/02/19/old/2012-02-20-my-async-ppt-and-two-example/"/>
+    <id>http://slender-man.github.io/2012/02/19/old/2012-02-20-my-async-ppt-and-two-example/</id>
+    <published>2012-02-19T07:49:25.000Z</published>
+    <updated>2014-04-29T14:05:53.000Z</updated>
+    <content type="html"><![CDATA[<p>做了几个试验品，是丑是美也要拿出来溜溜，我准备先给小组内的几个人做个session，内容就是介绍Mr.Async.js对于异步问题的处理方式，大概就是传承老赵的Jecex的意志。我分两个阶段介绍Mr.Async.js，第一次就是介绍，并没有包含技术实现，如果效果好的话，再做技术实现的分析。</p>
+<p>介绍的PPT我已经完成了，花了两天时间，很注重细节，用的是impress.js，因为我正在做一个方便大家使用impress.js的一个页面工具。可以在这里访问到：<a title="Why not using Async in this way ?" href="http://winsonwq.github.com/ppt/Mr.Async.html" target="_blank">Why not using Async in this way ?</a>。技术细节的PPT可能会在此文件上继续修改，不过内容只会很浅，我觉得一个PPT上没有必要讲得非常细，还不如花时间更新使用文档，因为我都还没有更新github上的README，关于解释器的部分。呃。。。</p>
+<p>PPT主要围绕什么是异步，结构上有什么缺陷，我们希望的代码方式是什么，Mr.Async.js的组成部分等等来讲述的。内容通过两个小例子来组织，第一个例子是带有动画的冒泡排序问题，第二个是老赵提到的当鼠标点击时输出下一个Fibonacci数字。通过这两个例子的传统写法和使用Mr.Async.js的写法说明异步方式是可以更加优雅得实现的。既然更好，为何不使用呢？：）</p>
+<p>另外，在写例子的时候，无意间还发现了个bug，只能在Firefox上重现，Testing用例也加上了，这下大家满意了吧。</p>
+<p>两个例子的Mr.Async.js的实现可以在以下地址访问到：<a title="冒泡排序" href="http://winsonwq.github.com/demo/bubblesort.html" target="_blank">冒泡排序</a>，<a title="fibonacci" href="http://winsonwq.github.com/demo/fibonacci.html" target="_blank">Fibonacci数列</a>。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>做了几个试验品，是丑是美也要拿出来溜溜，我准备先给小组内的几个人做个session，内容就是介绍Mr.Async.js对于异步问题的处理方式，大概就是传承老赵的Jecex的意志。我分两个阶段介绍Mr.Async.js，第一次就是介绍，并没有包含技术实现，如果效果好的话，再做]]>
+    </summary>
+    
+      <category term="html5" scheme="http://slender-man.github.io/tags/html5/"/>
+    
+      <category term="javascript" scheme="http://slender-man.github.io/tags/javascript/"/>
+    
+      <category term="Mr.Async" scheme="http://slender-man.github.io/tags/Mr-Async/"/>
+    
+      <category term="impress.js" scheme="http://slender-man.github.io/tags/impress-js/"/>
+    
+      <category term="Mr.Deferred" scheme="http://slender-man.github.io/tags/Mr-Deferred/"/>
+    
+  </entry>
+  
+</feed>
