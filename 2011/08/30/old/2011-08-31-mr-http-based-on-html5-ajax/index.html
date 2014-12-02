@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Mr.Http based on Ajax | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2011-08-30T08:10:00.000Z" itemprop="datePublished">
+          Aug 30 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/ajax/'>ajax</a>,
+    
+    <a href='/tags/html5/'>html5</a>,
+    
+    <a href='/tags/Mr/'>Mr</a>,
+    
+    <a href='/tags/Mr-http/'>Mr.http</a>
+    
+    
+</span>
+    <h1 class="post-title">Mr.Http based on Ajax</h1>
+    <section class="post-content">
+      <p>Mr&amp;Ms lab一直没有用到项目里面的原因除了希望更多的Testing之外，另一个很重要的原因就是没有ajax的支持（由于本人比较懒造成的）。现在，我把对Ajax的支持加入到了Mr&amp;Ms.js里面，并把这个模块命名为Mr.Http。</p>
+<p>Mr.Http模块包含两个方法，一个是传统的ajax封装叫做Mr.http，另一个是对multipart/form-data内容提交的扩展叫做Mr.mhttp，m就是multipart的意思。</p>
+<h2>Mr.http</h2>
+<p>这个方法的使用基本上和jquery中$.ajax一模一样，只是调用的属性换了另一个名字，比如type : &#8216;GET&#8217;，我用的是method : &#8216;GET&#8217;如此而已，目的是更接近http协议的语义。所以不用担心此方法的复杂性。API会在稍后我整理的Mr库的API文档中介绍，敬请期待。</p>
+<h2>Mr.mhttp</h2>
+<p>当然，如果你想用multipart/form-data的方式提交数据，尤其是想上传文件的时候，可以使用mhttp这个方法了。</p>
+<p>看了很多人写过对ajax对象扩展，但是没见过封装的，对form提交或者HTTP协议熟悉的人都应该知道原理，我在这里就不做理论说明了。除了对multipart/form-data方式的支持，我还做了一些特别的处理：</p>
+<ol>
+<li>File Base64编码提交，mhttp方法现在是默认接受file的base64编码，ajax对象提交也是提交file的base64编码，为什么要这样，是因为ajax的send方法发送的是字符串，如果文件利用二进制格式的话，数据会丢失。所以如果利用HTML5的File API或者FileReader对象读取文件数据时，默认情况下请使用Base64读取方式。当然，在服务器端就不得不反解析base64再去保存文件，不得已而为之呀。</li>
+<li>sendAsBinary方式的支持，如果你的浏览器XMLHttpRequest对象支持这个方法，你可以在使用mhttp方法时设置useBinary属性为true，整个HTTP包将会以二进制方式发送，在这种情况下，浏览器读取文件时可以使用读取二进制方式，而且服务器端也不用做任何处理，相当之爽。但是目前只有FF支持这个方法，只有期待以后对XMLHttpRequest对象的更新。</li>
+<li>之前我聊过进度条，所以我让http和mhttp方法都支持了onuploadprogress事件，使用时传入的第一个参数是进度：percent（e.g 0.4），第二个参数是事件对象evt，evt.position和evt.totalSize是它的两个重要属性，看一下名字也能YY出它的意义了，爽是很爽，但是现在也只有FF支持。</li>
+<li>上述中，如果要使用Mr.mhttp的一些特性，可以从Mr.http上得到兼容性结果，Mr.http.supportBinary检测是否支持binary发送数据，Mr.http.supportUploadProgress检测是否支持进度事件，以后也会有更多。但是我个人希望这种兼容性检测的方法我以后少写才好，随着浏览器的功能进步，慢慢都会支持的。=。=！</li>
+</ol>
+<p>之前利用drag and drop写了一个图片的展示示例，现在我进一步加强写了一个文件上传的sample，本人不才不会写php，写了一个ASP.NET MVC的版本，是VS2010工程。有兴趣的可以到svn地址下载：</p>
+<p><a title="Mr.Http file upload sample svn address" href="https://mr-and-ms.googlecode.com/svn/trunk/DotNetProject/Mr.Http" target="_blank">Mr.Http file upload sample svn address</a>，注意，是SVN地址。</p>
+<p>&nbsp;</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2011/09/18/old/2011-09-19-linq-to-weibo/">
+        ← LINQ To Weibo
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/">
+        Drag And Drop(DND) Sample →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Drupal开发体验 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-11-19T16:00:00.000Z" itemprop="datePublished">
+          Nov 20 2012
+      </time>
+    
+</span>
+    <h1 class="post-title">Drupal开发体验</h1>
+    <section class="post-content">
+      <h2 id="“新的”用户">“新的”用户</h2>
+<p>CMS给开发人员带来了新的用户角色—编辑Editor。使得开发人员需要提供强大的编辑功能给他们来创建内容，比如一个公用博客程序，Editor需要的是简单快捷的方式能把他掌握的内容录入系统，并且让最终用户看到。Editor是CMS的使用最多的用户，用户体验对终端查看者和Editor都很重要，设计时必须同等对待。</p>
+<p>有时候为了达到页面内容都是可配置的，那么就需要Editor懂得他创建的内容的每一个字段在页面上是怎么显示的，比如说，每个文章都有一个缩略图和一个放在页面最上方的大图片，一个主页面需要显示文章列表并且要求只显示出缩略图，标题和内容的前140个字，那么开发人员就必须考虑Editor是怎么编辑的。</p>
+<p>面对上述要求，开发人员（如果BA没这么干的话）应该问：</p>
+<ol>
+<li>缩略图是由主图片通过系统缩小处理还是由Editor上传，如果是上传，那么规格是什么？</li>
+<li>显示的140个字是来自于存于另一个字段的简介，还是文章内容的头140字？</li>
+</ol>
+<p>很多种方式都可以实现功能，但是我们应该以用户体验为主导，反复推敲追求最佳实践的方式进行开发。对细致的追求一个靠谱的前端工程师的基础。</p>
+<h2 id="更侧重页面视觉和信息结构设计">更侧重页面视觉和信息结构设计</h2>
+<p>CMS的核心是内容的操作和显示，相比其他项目，我们更加重视起视觉设计和信息结构设计。</p>
+<p>UX人员想往前端开发走，前端开发想往UX方向发展。在一个“UX”被神话，写过几篇文章就能称作“体验设计师”的年代，我觉得想要成为UX的人必须专注在一个重视视觉设计和信息结构的平台上，没有必要一定要向前端开发方向发展，因为我觉得UX更需要实践，需要分析，研究已有的内容，用数据来支持你的设计比天赋和品味更加重要。Drupal就是这么一个平台，可以让UX发挥特长，可以把信息结构设计发挥到极致的一个平台。</p>
+<p>Drupal拥有强大的建站能力，能够快速的组织内容，而且通过Drupal方式创建出来的功能十分稳定，那么一个站点的成功之处就在于页面布局，视觉效果，页面加载速度，信息结构，阅读和编辑体验。</p>
+<p>目前观察来看，客户公司已经开始重视起来UX的作用，并且还专门成立了一个UXTeam专门做所有站点的页面设计，这也是其中一个我们可以合作的地方，把我们公司的UX放到项目中来锻炼，通过实战累计经验，不做网络上各种浮夸的设计师。（PS：目前客户公司好像没有这种需求）</p>
+<h2 id="大量前端开发任务">大量前端开发任务</h2>
+<p>成都Drupal Team目前是TW中国唯一一个几乎所有任务都是前端开发的，目前客户有很多前端工作，主要分成两种：BAU维护工作和功能开发。</p>
+<p>客户公司有20多个品牌，所有品牌的网站都是Drupal做的，每个品牌有一些人维护，修复bug，解决IE兼容性问题什么的。也会有添加新的功能，比如创建一个新的内容类型，创建一个View之类的。这些都和HTML，CSS，JavaScript息息相关。Drupal开发和纯前端开发很类似，实现目标的方式非常多，难在对最佳实践的追求，在Drupal中选择最佳的module来实现就是一种最佳实践。</p>
+<p>另外，还有一种任务是创建活动页面，在搞一个活动之前创建一些临时页面，做一些表单存储用户注册信息，每次都感觉业务人员到发布前才来关心这个事情，都要到最后赶出一个页面来，搞得大家都很累。我们在推敏捷，可是由于身份十分卑微，正在影响但是还不是很深。</p>
+<p>由于有大量的前端任务，在Team里培养前端开发人员是可行的，也是一个难得的机会专注到前端领域，又可以和设计师一起工作，这不就是我一年前的向往么，所以管它php还是ruby了，都是浮云，现在都不惧。何况Drupal对我们来说是挑战和机会并存。</p>
+<h2 id="强调功能测试">强调功能测试</h2>
+<p>刚开始使用Drupal的时候十分不习惯，没有人写测试的，大家都是在Drupal系统里面配置来配置去的，但是总体功能上没有我想象得那么糟糕。渐渐才发现，我们如果只是通过Drupal系统配置来开发，那么我们本身就是Drupal的使用者，没有必要花费大量经历去测试创建了一个新的文章类型之后，能不能创建相应的文章，这些点都不是我们的产出物。</p>
+<p>而且，如果不编写module，作为Drupal的使用者来看，开发人员根本没有机会写单元测试。那么，首先我们要测试的是什么，有这么几个方面：</p>
+<ol>
+<li>样式是否正确</li>
+<li>内容（意义）显示是否正确</li>
+<li>兼容性问题</li>
+<li>性能问题，比如在Drupal里面推荐使用drupal_add_css添加css文件，它将会创建一个<code>@import</code>语句，如果你直接使用link进行修改，那会破坏了性能。</li>
+<li>页面跳转是否正确</li>
+<li>如果有自定义module，需要通过Simpletest编写单元测试</li>
+</ol>
+<p>你会发现，很多东西都是功能性的，单元测试都只是集中到自定义的代码上，而且我觉得没有必要要求100%测试覆盖率，主要逻辑cover到就可以了。</p>
+<p>关于样式的测试最好还是人工来测，眼见为实的道理谁都明白，当然我们也可以来做自动化测试，主要检测页面跳转，301、302跳转是否正确，form提交是否成功等等。有了测试我们才知道系统状态是什么，也是我们做持续集成的重要组成部分。</p>
+<h2 id="持续集成">持续集成</h2>
+<p>我们目前也在推广Drupal的C·I，这个在Drupal业界都是一个比较困难的问题，通过4天的培训之后，有一个很重要的转变，就是遇到需求的时候，能从一个Drupal开发的角度来看解决方案。我们学了很多有用的Module，也和培训师聊了下C·I的问题，更加发现我们做的C·I Demo有很多地方可以改进。</p>
+<p>如果要推广Drupal的C·I，那么最重要的还是提高开发人员的技能水平，而且问题不出在能力上，客户这边的开发人员总是在说着想改变，但是连Drush都不用，大部分人都关心自己的工作是否完成，而且还积极地在上司面前表现他完成了多么多么重要的工作，Fu…u…u…n…k，瞬间感到技术问题在人性面前都弱爆了。咨询工作最难的地方莫过于此。</p>
+<p>-就乱写这么多，完-</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/11/20/2012-11-20-what-i-found-form-drupal/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/11/20/2012-11-20-what-i-found-form-drupal/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/11/20/2012-11-20-what-i-found-form-drupal/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/11/20/2012-11-20-what-i-found-form-drupal/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2013/05/31/2013-05-31-cross-origin-request/">
+        ← 跨了个域
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/11/16/2012-11-16-what-we-can-get-from-drupal/">
+        Drupal初体验 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

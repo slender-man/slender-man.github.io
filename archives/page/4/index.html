@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Archives | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="home-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+<main class="content" role="main">
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-10-03T07:35:39.000Z" itemprop="datePublished">
+          Oct 3 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/asyn/'>asyn</a>,
+    
+    <a href='/tags/Mr/'>Mr</a>,
+    
+    <a href='/tags/Mr-Deferred/'>Mr.Deferred</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/10/03/old/2011-10-04-mr-deferred-deferred-object-in-mr/">Mr.Deferred (Deferred Object in Mr)</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        进入正题之前想先聊点别的。最近我好像找到了一种学习的感觉是关于研究方向的，估计是来源于“生态圈”这个词。对的，我第一次看到别人说到什么什么生态圈时，我那时一个无头苍蝇不知道是神马东西，比如，Android系统更新了，Java升级了，HTML5 vs Silverlight等等，这些话题都会引起人们关于“生态圈”的讨论。那么我理解的生态圈是什么呢？我把它理解为生态圈就是你想了解的东西发展的环境，相互影响的事物集合。像我喜欢JS，我将会看看
+      
+      </p>
+      
+      <p>
+          <a href="/2011/10/03/old/2011-10-04-mr-deferred-deferred-object-in-mr/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-09-19T21:41:41.000Z" itemprop="datePublished">
+          Sep 20 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/-NET/'>.NET</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/09/20/old/2011-09-20-linq-to-weibo-simple-recode/">LINQ To Weibo 小重构</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        入魔了。
+LINQ To Weibo代码小幅重构，在Derek的帮助下精简了许多代码，看上去更加简洁而强大。
+另外，为了加强语意，添加两个新方法PageIndex和PageSize替换原有的Skip和Take方法（原来的分页信息设置），如今的分页信息代码可以这样写：
+
+// 使用Skip和Take，现在依然支持
+data.Where(w =&gt; w.BaseApp).Skip(0).Take(5);
+
+// 使用新的PageInde
+      
+      </p>
+      
+      <p>
+          <a href="/2011/09/20/old/2011-09-20-linq-to-weibo-simple-recode/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-09-19T07:43:07.000Z" itemprop="datePublished">
+          Sep 19 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/-NET/'>.NET</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/09/19/old/2011-09-20-linq-to-weibo-object-filter/">LINQ To Weibo 支持对象过滤</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        在LINQ To Weibo上添加一功能，就是查询后的二次过滤，主要是弥补新浪API查询条件有限，而又想增强查询结果集的过滤。主要是在IQueryable查询之后提供的LINQ To Object的二次过滤，可以使用完整的LINQ API(Enumerable class)，甚至可以进行分组操作。
+使用方式很简单，在创建查询对象之后，设置它的Provider对象上的UseObjectFilter属性，Boolean类型。
+IQuerya
+      
+      </p>
+      
+      <p>
+          <a href="/2011/09/19/old/2011-09-20-linq-to-weibo-object-filter/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-09-18T06:10:59.000Z" itemprop="datePublished">
+          Sep 18 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/-NET/'>.NET</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/09/18/old/2011-09-19-linq-to-weibo/">LINQ To Weibo</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        介绍个新浪微博的查询实现，LINQ To Weibo，属于Mr开发范围之内，我取了很骚包的名字，Mr.LinqToWeibo。
+很早就用C#实现了OAuth 1.0（不过现在2.0都出了，正在做2.0版本的实现），也一直想把微博的获取变得简便，不用传统的api封装，我选择了LINQ，只为调用者利用LINQ语法，让代码更加语义化。（前端过敏，语义化居然用到这里）。
+LINQ To Weibo支持的新浪微博API：
+微博查询
+
+PUBLIC
+      
+      </p>
+      
+      <p>
+          <a href="/2011/09/18/old/2011-09-19-linq-to-weibo/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-08-30T08:10:00.000Z" itemprop="datePublished">
+          Aug 30 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/ajax/'>ajax</a>,
+    
+    <a href='/tags/html5/'>html5</a>,
+    
+    <a href='/tags/Mr/'>Mr</a>,
+    
+    <a href='/tags/Mr-http/'>Mr.http</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/">Mr.Http based on Ajax</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        Mr&amp;Ms lab一直没有用到项目里面的原因除了希望更多的Testing之外，另一个很重要的原因就是没有ajax的支持（由于本人比较懒造成的）。现在，我把对Ajax的支持加入到了Mr&amp;Ms.js里面，并把这个模块命名为Mr.Http。
+Mr.Http模块包含两个方法，一个是传统的ajax封装叫做Mr.http，另一个是对multipart/form-data内容提交的扩展叫做Mr.mhttp，m就是multipart的意
+      
+      </p>
+      
+      <p>
+          <a href="/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-08-27T06:57:11.000Z" itemprop="datePublished">
+          Aug 27 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/">Drag And Drop(DND) Sample</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        Drag and drop感觉是当前比较火的页面功能之一，最开始只有Gmail里面上传文件用到，现如今G+，QQ Mail都用得是爽之又爽。当然，这玩意儿现在只有FF3.6+和Chrome 10+支持。详细请看http://www.caniuse.com/ 搜索关于Drag and drop, File API, FileReader的支持情况。
+说起来我也是比较2的了，看HTML5这么久，总以为大概的东西知道就可以了，实际上要做的时候
+      
+      </p>
+      
+      <p>
+          <a href="/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-08-24T06:28:46.000Z" itemprop="datePublished">
+          Aug 24 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/SVG/'>SVG</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/">Sample8 – ProgressBar in Flash update</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        前两天才发了一个柱状图，今天又来了。不用怀疑，这个sample那是相当的水，就是flash update时候出现的那个进度条。一直都觉得这个进度条制作得很有质感，所以就模范了一个，唉，都是公司里面太闲造成的呀，这也导致了最近觉得个人在公司的表现感觉不是很好。
+进度条很多地方都会用到，比起旋转的菊花来说，进度条更能增强用户体验，当然，在Web Development中，用到进度条的可能行很少的，因为真正的进度条和下载总量和媒体当前下载量有
+      
+      </p>
+      
+      <p>
+          <a href="/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-08-22T06:53:38.000Z" itemprop="datePublished">
+          Aug 22 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/SVG/'>SVG</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/08/22/old/2011-08-23-sample7-simple-column-chart/">Sample7 – Simple Column Chart</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        之前做了个简单Pie Chart，今天上个简单Column Chart，也是筹Sample数量的同时，看看在真正开发ColumnChart类的时候需要注意的问题，做的过程里面确实发现不少。（小东西大智慧呀）。
+Column Chart 设计需要注意的几个地方，
+
+column的颜色
+颜色这个问题是比较敏感的，多种颜色的搭配直接影响了看图人的心情，我试过亮色直接的搭配，奇丑无比。结果尝试了集中深色配合白色背景，算是一种简单风格，还过得去。
+      
+      </p>
+      
+      <p>
+          <a href="/2011/08/22/old/2011-08-23-sample7-simple-column-chart/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-08-13T09:16:49.000Z" itemprop="datePublished">
+          Aug 13 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/SVG/'>SVG</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/08/13/old/2011-08-14-sample-animate-motion/">Sample – Animate Motion</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        不写这个Sample还不知道，原来在Testing的时候写的jsAnimateMotion方法在safari上有个小bug，不过现在暂时解决了，还存在一些多transform属性同时设置时的复合变化兼容性没做好。
+jsAnimateMotion其实是个多余的方法，因为在SVG里面是直接可以用animateMotion标签直接定义出动画的，但是现在浏览器的对此标签的兼容性真是够差（主要是针对js生成的animateMotion标签各个浏览
+      
+      </p>
+      
+      <p>
+          <a href="/2011/08/13/old/2011-08-14-sample-animate-motion/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <article class="post">
+    <header class="post-header">
+      <span class="post-meta">
+      <time datetime="2011-08-11T06:26:20.000Z" itemprop="datePublished">
+          Aug 11 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/windows-live-writer/'>windows live writer</a>
+    
+    
+</span>
+      <h2 class="post-title"><a href="/2011/08/11/old/2011-08-12-post-from-windows-live-writer/">Post from Windows Live Writer</a></h2>
+    </header>
+    <section class="post-excerpt">
+      <p>
+      
+        这篇文章来自于我的Windows Live Writer 客户端。
+
+      
+      </p>
+      
+      <p>
+          <a href="/2011/08/11/old/2011-08-12-post-from-windows-live-writer/" class="excerpt-link">Read More...</a>
+      </p>
+      
+    </section>
+  </article>
+  
+  <nav class="pagination" role="pagination">
+    <a class="newer-posts" href="/archives/page/3/">← Newer Posts</a>
+    <span class="page-number">Page 4 of 5</span>
+    <a class="older-posts" href="/archives/page/5/">Older Posts →</a>
+  </nav>
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

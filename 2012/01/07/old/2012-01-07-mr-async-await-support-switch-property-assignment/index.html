@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Mr.Async中$await支持switch、property赋值 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-01-07T00:03:47.000Z" itemprop="datePublished">
+          Jan 7 2012
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/Mr/'>Mr</a>,
+    
+    <a href='/tags/Mr-Async/'>Mr.Async</a>
+    
+    
+</span>
+    <h1 class="post-title">Mr.Async中$await支持switch、property赋值</h1>
+    <section class="post-content">
+      <p>Mr.Async更新支持在<strong>switch</strong>，和property赋值语句中的$await等待语句，而且目前来说不打算支持try-catch-finally，因为还没有找到比较好的实现方式，麻烦如果哪位大虾知道怎样捕获异步异常的方式或者模型，多多赐教。</p>
+<h3>switch的case中使用</h3>
+
+<div class="wp_codebox"><table><tr id="p29025"><td class="code" id="p290code25"><pre class="javascript" style="font-family:consolas;"><span style="color: #003366; font-weight: bold;">var</span> i <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">,</span> ret<span style="color: #339933;">;</span>
+<span style="color: #000066; font-weight: bold;">switch</span><span style="color: #009900;">&#40;</span>i<span style="color: #009900;">&#41;</span><span style="color: #009900;">&#123;</span>
+    <span style="color: #000066; font-weight: bold;">case</span> <span style="color: #CC0000;">0</span> <span style="color: #339933;">:</span>
+        console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'waiting for 1 second.'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        $await<span style="color: #009900;">&#40;</span>delay<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        ret <span style="color: #339933;">=</span> <span style="color: #CC0000;">1</span><span style="color: #339933;">;</span>
+        console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'done.'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+    <span style="color: #003366; font-weight: bold;">default</span> <span style="color: #339933;">:</span>
+        console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'waiting for 1 second.'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        $await<span style="color: #009900;">&#40;</span>delay<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        ret <span style="color: #339933;">=</span> <span style="color: #CC0000;">2</span><span style="color: #339933;">;</span>
+        console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'done'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        <span style="color: #000066; font-weight: bold;">break</span><span style="color: #339933;">;</span>
+    <span style="color: #000066; font-weight: bold;">case</span> <span style="color: #CC0000;">1</span> <span style="color: #339933;">:</span>
+        console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'waiting for 1 second.'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        $await<span style="color: #009900;">&#40;</span>delay<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        ret <span style="color: #339933;">=</span> <span style="color: #CC0000;">3</span><span style="color: #339933;">;</span>
+        console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'done'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+        <span style="color: #000066; font-weight: bold;">break</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span>
+console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span>ret<span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+<span style="color: #006600; font-style: italic;">// output</span>
+<span style="color: #006600; font-style: italic;">// waiting for 1 second.</span>
+<span style="color: #006600; font-style: italic;">// done.</span>
+<span style="color: #006600; font-style: italic;">// waiting for 1 second.</span>
+<span style="color: #006600; font-style: italic;">// done.</span>
+<span style="color: #006600; font-style: italic;">// 2</span></pre></td></tr></table></div>
+
+<p>我挑选了switch testcase中一个特殊的例子，default块在中间，第一个case没有break并且匹配到变量i的值0。虽然在每个case里面都含有等待的$await，但是最终的console.log输出是在switch块执行完成之后才输出了，并且得到正确的值。</p>
+<h3>property（属性方式）赋值</h3>
+<p>之前只实现了var a = $await(delay()); 和 var a; a = $await(delay());方式的$await赋值语句，现在就支持属性赋值。如下：</p>
+
+<div class="wp_codebox"><table><tr id="p29026"><td class="code" id="p290code26"><pre class="javascript" style="font-family:consolas;"><span style="color: #003366; font-weight: bold;">var</span> obj <span style="color: #339933;">=</span> <span style="color: #009900;">&#123;</span> inner <span style="color: #339933;">:</span> <span style="color: #009900;">&#123;</span><span style="color: #009900;">&#125;</span> <span style="color: #009900;">&#125;</span><span style="color: #339933;">;</span>
+<span style="color: #006600; font-style: italic;">// 等待delay操作，返回值为1</span>
+obj.<span style="color: #660066;">inner</span>.<span style="color: #660066;">a</span> <span style="color: #339933;">=</span> $await<span style="color: #009900;">&#40;</span>delay<span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+console.<span style="color: #660066;">log</span><span style="color: #009900;">&#40;</span>obj.<span style="color: #660066;">inner</span>.<span style="color: #660066;">a</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+<span style="color: #006600; font-style: italic;">// output</span>
+<span style="color: #006600; font-style: italic;">// 1</span></pre></td></tr></table></div>
+
+<p>以上加上的新功能都已经更新了testcase，可能还不足够，bug常常有，让它来得更加猛烈些吧。Mr.Async托管地址：<a href="https://github.com/winsonwq/Mr.Async" target="_blank" rel="external">https://github.com/winsonwq/Mr.Async</a></p>
+<h3>NEXT</h3>
+<p>下一步打算着手于基于NodeJS的AOT编译器，一步一步来。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/01/07/old/2012-01-07-mr-async-await-support-switch-property-assignment/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/01/07/old/2012-01-07-mr-async-await-support-switch-property-assignment/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/01/07/old/2012-01-07-mr-async-await-support-switch-property-assignment/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/01/07/old/2012-01-07-mr-async-await-support-switch-property-assignment/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2012/01/29/old/2012-01-30-good-or-bad/">
+        ← 才与材
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/01/03/old/2012-01-03-promote-mr-async/">
+        二手货—加强Mr.Async →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>前端技术共享和传递 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-09-22T06:08:12.000Z" itemprop="datePublished">
+          Sep 22 2012
+      </time>
+    
+    
+    | 
+    <a href='/tags/Session/'>Session</a>,
+    
+    <a href='/tags/Frond-end-Skills/'>Frond-end Skills</a>
+    
+    
+</span>
+    <h1 class="post-title">前端技术共享和传递</h1>
+    <section class="post-content">
+      <h3>进入探索大门</h3>
+<p>在西安搞session知识分享的时候，就发现前端技术分享有些难，一个是因为前端技术不像Java, C++那样超主流技术被业界广泛使用，导致群众基础差，有兴趣的人只能选择自学；另一个因为前端生态圈里内容太多，太散，又为那部分想自学的人形成障碍。</p>
+<p>开始做session的时候，就把前端技术分成了HTML + CSS + JavaScript三个部分，分别为每个部分准备分享的内容。我主要负责JavaScript部分。为了让大家从最基础的开始学，我选择把原型继承放在第一讲。之前的文章<a title="《Dive Into JavaScript》Session 1" href="http://sheldonw.sinaapp.com/?p=307" target="_blank" rel="external">《Dive Into JavaScript Session 1》</a>说的就是这事，结果把大家讲的云里雾里，反馈都说偏难，实际意义不大。</p>
+<p>第二次和第三次选择了<a title="《Dive Into JavaScript》 Session 2之BOM和DOM简介" href="http://sheldonw.sinaapp.com/?p=357" target="_blank" rel="external">《DOM和BOM》</a>和<a title="《Dive Into JavaScript》Session3之脚本与样式" href="http://sheldonw.sinaapp.com/?p=393" target="_blank" rel="external">《脚本和样式操作》</a>，效果有变好但也没达到预期。反馈说需要更多实际的练习。</p>
+<h3>前端Skills简单分类</h3>
+<p>回成都之后组内大部分都是新人，而且整组人都要面对大量的前端工作，尤其HTML + CSS，前端技术共享和传递显得尤为重要。如何找到一个可重复实践，时间在两个月内，让新人快速提升到可为项目做贡献的分享方案迫在眉睫，我依然还是选择原来的分类方式HTML + CSS + JavaScript。</p>
+<p>在这两个月内组内做了很多次培训，就是在摸索的路上前进。最近这两次给了我很多体会，我需要从新整理需要分享的知识的范围，深度，分享方式。并强调每种技术的要点是什么。</p>
+<p>从HTML开始，可以深度讲解盒模型，布局，表单元素，强调HTML文档的语意，简单清晰的结构和渐进增强。</p>
+<p>CSS方面，深度讲解CSS组织应用方式，盒模型，选择器，浮动和清浮动，优先级计算，属性的继承，常用布局方式的style（左右布局，圣杯布局等），Twitter Bootstrap，LESS和SASS，常见bug处理方式（非hack技术）。强调如何命名id和class，CSS文档结构，复用性。我们现在把CSS称为类<strong>黑魔法</strong>的技术，这个那个材料混在一起效果就出来了，所以更需要我们总结最佳实践。</p>
+<p>JavaScript作为一门语言，学习它和学习其它语言一样，如Java，或者可以说不应该有JavaScript和其它这种划分。JavaScript的出现是为了操作DOM，那最基础的DOM API是一定要讲的，接着是DOM和BOM，事件冒泡捕获，脚本和样式的操作，jQuery API，Ajax基础，Tritter Bootstrap，原型继承（对象模型），闭包，前端MVC及框架介绍。除了强调对语言的熟练，写代码的基本功外，还需时刻注意代码的模块化，命名空间，脚本的加载，压缩等问题。</p>
+<p>我想如果你了解以上知识点的话，那你可以胜任前端工作了。在做分享时候，如何能把这么多知识共享和专递呢？之前纯理论的分享方式只能起到一种引导别人的作用，给有兴趣的人一个方向，但知识传递并不只想达到这个级别。</p>
+<p>我现在在做的是以练习为内容的技术分享，内容是上述的每个知识点，这样的话，我们的知识传递就是追踪的，就像我们在学校里学习课程需要遵循教学大纲一样。同时，练习也是学习者发现自身差距，并且在实践中寻找规律，循序渐进提高的有效方式。并且每次培训完成之后让学习者说一条他在此次分享中学到的东西，只能说一条，这个方式是从徐大师的OO Bootstrap里面学来的，当时参加这个课的时候就被问到，虽然只是说出一条学到的东西，但是脑子里过了一遍培训过程，感觉很好。当然，为了节省时间和提高学习者交流，推荐pair进行实现。</p>
+<h3>一次尝试和实践</h3>
+<p>最近一次知识分享的内容是实现一个WP7的列表界面：</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/09/1.png" rel="external" target="_blank"><img class="size-medium wp-image-486 alignnone" title="WP7列表界面" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/09/1-180x300.png" alt="" width="180" height="300"></a></p>
+<p>要求大家用静态页面实现，把它当作webapp开发，内容比较简单但是考察了语意的标签，文档结构和信息划分，浮动和清浮动，CSS class的命名等等细节。因为是第一次这种形式，大家的完成程度不是很好，所以我才推荐下次pair来做。下次的界面将会选择同样是WP7界面的表单界面，让大家学习下UI开发和后台交互时需要考虑的细节。完成之后还有人反馈说意识到自己的差距了，我很欣慰。</p>
+<h3>开放课程</h3>
+<p>公司有可能开放课程让我司外的各路好友来参加这样的培训，到时候也可以多多给予反馈。刚好在做一个SIP项目，是帮助<a title="教育大发现论坛" href="http://sociallearnlab.org/" target="_blank" rel="external">教育大发现</a>老师们制作的一个老师共享idea，分享教案的平台，目的是可以提出教案让各位老师进行讨论，总结。我这样的培训想法也可以放到这个平台上，让各位前端开发讨论，一起把前端的生态圈完善那么一点点。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2012/11/12/2012-11-12-front-end-in-xi-an/">
+        ← ThoughtWorks西安前端那些事
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/08/25/old/2012-08-25-several-front-end-frameworks/">
+        几个前端技术框架（工具）分享 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

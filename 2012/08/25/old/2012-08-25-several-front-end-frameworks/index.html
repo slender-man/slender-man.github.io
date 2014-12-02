@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>几个前端技术框架（工具）分享 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-08-25T01:15:23.000Z" itemprop="datePublished">
+          Aug 25 2012
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Front-end-Skills/'>Front-end Skills</a>
+    
+    
+</span>
+    <h1 class="post-title">几个前端技术框架（工具）分享</h1>
+    <section class="post-content">
+      <p>不晓得有多少人在做前端技术开发，问过在我之后加入公司的，或者面试过的前端工程师，几乎都没有在写前端技术。他们有的来自于百度，新浪，SAP等。当然，我在这不能以偏概全，写了Testing的不情愿来也说不一定。半年前，我还没受TW的影响，无聊中在看过jQuery的Testing之后有了一些Testing方面的思考，开始尝试地去为我的各种库加单元Testing。那时候接触到的唯一一个Testing框架就是<a title="QUnit" href="http://qunitjs.com/" target="_blank">QUnit</a>。</p>
+<p>QUnit不但是我接触到的第一个前端框架，也是那时候<strong>了解</strong>的最全面的单元Testing框架，超越了对JUnit和NUnit（后两个只是蜻蜓点水般玩了下）。在完成功能之后加上Testing，然后看Testing通过，然后开心地又加几个功能，再写几个Testing，那种感觉说不出的爽。</p>
+<p>我把前端技术分成两个大类，一类是使用js开发的模块，偏向逻辑的单元Testing，比如前端MVC中的Controller的Testing，JS类库（underscore、jQuery、Wind.js）的Testing。另一类是UI组件的Testing，因为UI一般包含了标记、事件处理、动画、样式等元素，Testing将会变成功能Testing，甚至是集成Testing。而且因为含有标记，样式和复杂的事件处理，不能使用自动化Testing百分百模拟人工操作，所以做这一类的Testing比较难一些。据我所知，现在的前端开发Testing框架数<strong>QUnit、Jasmine、Mocha、JsTestDriver</strong>这四个比较出名，用来写Testing都是很上手的。</p>
+<p><span id="more-439"></span></p>
+<h3>QUnit</h3>
+<p>QUnit是XUnit系列在前端技术领域中的后继者，提供了单一的testcase的写法和assert断言方式，结构十分简单。详细的介绍可以在<a href="http://qunitjs.com/intro/" target="_blank" rel="external">官网介绍页面</a>找到，其所有的assert断言方式也可以<a href="http://qunitjs.com/cookbook/#asserting_results" target="_blank" rel="external">断言列表</a>中查看。</p>
+<p>QUnit编写的单元Testing可以在浏览器和Nodejs进行Testing，由于QUnit提供了非常华丽的浏览器报表样式，个人还是推荐QUnit用例放在浏览器中跑。</p>
+<p>QUnit自身没有提供任何Spy，Stub和mock的技术，所以在集成Testing方面比其他框架要弱，可以使用第三方的Testing类库帮助，比如<a href="http://sinonjs.org/" target="_blank" rel="external">Sinon.js</a>，是一个独立的Testing帮助类库，以后写文章详细介绍。</p>
+<h3>Jasmine</h3>
+<p><a href="http://pivotal.github.com/jasmine/" target="_blank" rel="external">Jasmine</a>号称自己是行为驱动Testing（BDD）框架，语法和RSpec几乎一样，用describe描述Suites，用it描述一个Testing用例。在单元Testing中，一般一个Suite用来描述一个类，或者一个含有多个Testing用例的方法。Jasmine中提供了有语义的断言方式，使用expect和not的链式调用。看看下面这个case就能了解到Testing写起来也可以很优雅。</p>
+
+<div class="wp_codebox"><table><tr id="p4395"><td class="code" id="p439code5"><pre class="javascript" style="font-family:consolas;">it<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;and can have a negative case&quot;</span><span style="color: #339933;">,</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  expect<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">false</span><span style="color: #009900;">&#41;</span>.<span style="color: #660066;">not</span>.<span style="color: #660066;">toBe</span><span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">true</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Jasmine和QUnit一样，可以在Nodejs环境和浏览器中执行，在Nodejs环境中有很多NPM包可以使用，比如<a href="https://github.com/mhevery/jasmine-node" target="_blank" rel="external">jasmine-node</a>。在公司接触到的Rails项目，基本上都是集成jasmine来做前端技术，传统运行界面比较丑，可以试试有所改善<a href="https://github.com/pivotal/jasmine/downloads" target="_blank" rel="external">standalone版本</a>。如果想在jasmine中TestingUI操作，可以使用<a href="https://github.com/velesin/jasmine-jquery" target="_blank" rel="external">jasmine-jquery</a>，它提供了载入fixture的功能，并且自定义了很多断言中使用到的matchers，比如断言一个元素是否有某个样式可以这么写：</p>
+
+<div class="wp_codebox"><table><tr id="p4396"><td class="code" id="p439code6"><pre class="javascript" style="font-family:consolas;">expect<span style="color: #009900;">&#40;</span>$<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'#target'</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#41;</span>.<span style="color: #660066;">toHaveCss</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#123;</span>margin<span style="color: #339933;">:</span> <span style="color: #3366CC;">&quot;10px&quot;</span><span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Jasmine提供了spy方法，可以通过它创建fake方法调用，从而断言方法是否被调用，被调用多少次，或者验证接受的参数是否正确等等。另外，使用spy对象的andCallFake方法也能发挥一些stub的作用。之前提到的Sinon.js同样可以和Jasmine配合使用。</p>
+<p>一切都看上还挺顺利的，不过有两个地方我对jasmine不是很爽，一个就是非常ugly的异步Testing，如果在代码Testing中间遇到了异步调用，就需要用到waitsFor方法，此方法接受一个方法，当方法返回true时运行异步调用之后部分，因为异步调用不会阻塞代码运行，所以必须使用一个runs方法把之后部分包住，超过两次的异步调用会导致写出来的代码各种让人看不懂，这一点还不如QUnit的stop和start方法易懂好用，在Mocha中的<a href="http://visionmedia.github.com/mocha/#asynchronous-code" target="_blank" rel="external">异步Testing</a>也优雅得多。另一个是发生在TestingUI组件时，因为所有Testing都会在同一个文件中运行，而且需要预先把Testing的样式和脚本资源都载入到页面中，先不说样式之间会相互影响导致断言失败的问题，在Testing过程中如果存在动态创建元素到页面的情况可能会导致回收fixture时忽略掉新创建的元素导致错误。我期望的UITesting是为每case提供独立的运行环境，首先解决了样式冲突问题，每个UI组件Testing运行的环境只含有为case准备的样式和脚本，我有想过用父子页面实现，脚本在父窗口中运行，操作子窗口中的UI组件。而且，新元素的回收问题在每次子窗口重载UI组件的时候也得到解决。</p>
+<p>这是我觉得ugly的一个Testing</p>
+
+<div class="wp_codebox"><table><tr id="p4397"><td class="code" id="p439code7"><pre class="javascript" style="font-family:consolas;">describe<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;Asynchronous specs&quot;</span><span style="color: #339933;">,</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  <span style="color: #003366; font-weight: bold;">var</span> value<span style="color: #339933;">,</span> flag<span style="color: #339933;">;</span>
+&nbsp;
+  it<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;should support async execution of test preparation and exepectations&quot;</span><span style="color: #339933;">,</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+&nbsp;
+    runs<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+      flag <span style="color: #339933;">=</span> <span style="color: #003366; font-weight: bold;">false</span><span style="color: #339933;">;</span>
+      value <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+&nbsp;
+      setTimeout<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+        flag <span style="color: #339933;">=</span> <span style="color: #003366; font-weight: bold;">true</span><span style="color: #339933;">;</span>
+      <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">500</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+    waitsFor<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+      value<span style="color: #339933;">++;</span>
+      <span style="color: #000066; font-weight: bold;">return</span> flag<span style="color: #339933;">;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">&quot;The Value should be incremented&quot;</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">750</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+    runs<span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+      expect<span style="color: #009900;">&#40;</span>value<span style="color: #009900;">&#41;</span>.<span style="color: #660066;">toBeGreaterThan</span><span style="color: #009900;">&#40;</span><span style="color: #CC0000;">0</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+    <span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+  <span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<h3>Mocha</h3>
+<p><a href="http://visionmedia.github.com/mocha/" target="_blank" rel="external">摩卡</a>coffee，香飘四溢。当我第一次接触到它的时候，我果断放弃了Jasmine，我说放弃是心里上放弃了，因为Mocha主打Nodejs环境，虽也弱弱地支持浏览器运行，但在浏览器端运行和Jasmine比较没有多大优势，但Mocha在Nodejs上的运行比Jasmine-node好出很多，而且支持多种报表的输出，不仅有优秀的字体着色和报错显示，还有些非常有趣，比如飞机从左飞行到右的进度条提示。特别有用的还有json和html格式的jscoverage报表。我的<a href="http://sheldonw.sinaapp.com/?p=420" target="_blank" rel="external">Mr.Coverage</a>就是使用的html格式的报表。</p>
+<p>Mocha的语法和Jasmine几乎一样，有时甚至支持直接跑Jasmine的Testing。它支持三种断言方式，包括QUnit的assert方式、Jasmine的expect方式，另一种是更具语义的方式should.js，最后一种也是我最喜欢的一种，它的<a href="https://github.com/visionmedia/should.js/blob/master/lib/should.js" target="_blank" rel="external">实现</a>强烈推荐去看看。使用should可以看到一些DSL的影子。写法十分优雅呢，使我爱不释手。在这里需要提到一个非常优秀的断言类库<a href="http://chaijs.com/" target="_blank" rel="external">Chaijs</a>，使用它可以让Testing框架支持assert、expect、should三种断言方式。并没试过在QUnit里面使用Chaijs，从文档上看应该是支持的。</p>
+
+<div class="wp_codebox"><table><tr id="p4398"><td class="code" id="p439code8"><pre class="javascript" style="font-family:consolas;"><span style="color: #003366; font-weight: bold;">var</span> user <span style="color: #339933;">=</span> <span style="color: #009900;">&#123;</span>
+    <span style="color: #000066;">name</span><span style="color: #339933;">:</span> <span style="color: #3366CC;">'tj'</span>
+  <span style="color: #339933;">,</span> pets<span style="color: #339933;">:</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'tobi'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'loki'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'jane'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'bandit'</span><span style="color: #009900;">&#93;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #339933;">;</span>
+&nbsp;
+user.<span style="color: #660066;">should</span>.<span style="color: #660066;">have</span>.<span style="color: #660066;">property</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'name'</span><span style="color: #339933;">,</span> <span style="color: #3366CC;">'tj'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+user.<span style="color: #660066;">should</span>.<span style="color: #660066;">have</span>.<span style="color: #660066;">property</span><span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'pets'</span><span style="color: #009900;">&#41;</span>.<span style="color: #000066; font-weight: bold;">with</span>.<span style="color: #660066;">lengthOf</span><span style="color: #009900;">&#40;</span><span style="color: #CC0000;">4</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>Mocha并没有自己提供什么spy，stub，mockTesting技术，官方也推荐直接使用sinon.js。</p>
+<p>在Nodejs中运行Testing时候都需要运行命令，每次修改代码后都需要重新运行命令，Mocha里面提供了watch的功能，当文件修改之后都会自动运行Testing。</p>
+<p>如果是在浏览器中运行，那么会遇上一个更大的麻烦之处，就是浏览器兼容性Testing，在每次修改代码之后，为了保证每个浏览器都能运行通过，所以需要每个浏览器都刷新一下。想想都觉得程序员浪费时间在这些地方太不值得了。JsTestDriver可以帮我们解决这个问题。</p>
+<h3>JsTestDriver</h3>
+<p><a href="http://code.google.com/p/js-test-driver/" target="_blank" rel="external">JsTestDriver</a>是Google大神的作品，说它是一个框架，不如说它是一个Testing工具。JsTestDriver使用Java打造，所有的使用都是从<a href="http://code.google.com/p/js-test-driver/downloads/list" target="_blank" rel="external">JsTestDriver.jar</a>包开始的，使用它需要先启动一个server，需要进行Testing的浏览器先要连接到此server，然后运行testcase，所有浏览器都会响应。每次修改代码之后就不用每个浏览器都刷新了，运行命令行就可以了，如果你使用了watch的话，那所有case都会自动在浏览器中运行了。</p>
+<p>JsTestDriver并没有什么优雅的语法，断言方式也普普通通，一切都显得非常实在。同时，JsTestDriver还提供了另外一个jar包可以使用它输入代码的行Testing覆盖率，和现有的项目集成使用是十分方便的。</p>
+<p>由于JsTestDriver先启用了Testing服务器，所以可以使用它来做远程Testing，比如可以利用它来做产品或者类产品环境的Testing。</p>
+<p>Google的MVC框架<a href="http://angularjs.org/" target="_blank" rel="external">AngularJS</a>就是使用JsTestDriver进行Testing的，而且在Testing中载入页面时确实是使用一个iframe载入Testing的UI和资源，让case运行在一个独立的环境，解决了我在Jasmine UI组件Testing中遇到的冲突问题。</p>
+<p>&nbsp;</p>
+<p>对前端UI组件Testing，我一直有个疑问，当我需要断言一个样式是否存在一个样式时，是去断言此元素是否含有一个实现此样式的class呢，还是直接断言元素的此样式是否存在。比如在Testingpopup弹出框时，在弹出状态下是验证display属性还是验证弹出框有没有一个名为show的class。因为我觉得有show这个class不一定能代表弹出框一定处于显示状态，所以偏向于直接断言display属性。有人说我关注点太奇怪，但我其实是在想如何能让Testing更能准确地起到验证的效果这个大问题。我承认世事无绝对，自动化Testing永远不能完全代替人工Testing，尤其颜色、视觉的部分更需要人眼去测。只希望在做类似的Testing时能多想想，尤其是UX设计人员一定要求实现的点。</p>
+<p>以上就是我对四种Testing框架或工具的简介，相互比较之后，如果选择在Nodejs环境中使用，首当其冲我推荐Mocha，如果需要在浏览器中运行，那么可以选择Jasmine或者JsTestDriver工具。但是工具的选择并不是提高软件质量的原因，你所编写的高质量Testing才是。要写出高质量的Testing，驱动出可被Testing的代码，必须懂得如何划分task，如何理解Testing技术给软件带来的好处，如何编写高质量的单元Testing等等。这些能力和前端后端无关，他们是需要在Testing领域长期摸索才能练就的本领。希望好学者能饱读书籍，熟能生巧。在下也才刚刚上路。</p>
+<p>&nbsp;</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/08/25/old/2012-08-25-several-front-end-frameworks/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/08/25/old/2012-08-25-several-front-end-frameworks/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/08/25/old/2012-08-25-several-front-end-frameworks/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/08/25/old/2012-08-25-several-front-end-frameworks/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2012/09/22/old/2012-09-23-front-end-skill-sharing-and-transfer/">
+        ← 前端技术共享和传递
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/07/13/old/2012-07-14-the-day-to-leave/">
+        最冷一天 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

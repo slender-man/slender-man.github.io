@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Sample8 – ProgressBar in Flash update | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2011-08-24T06:28:46.000Z" itemprop="datePublished">
+          Aug 24 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/SVG/'>SVG</a>
+    
+    
+</span>
+    <h1 class="post-title">Sample8 – ProgressBar in Flash update</h1>
+    <section class="post-content">
+      <p>前两天才发了一个柱状图，今天又来了。不用怀疑，这个sample那是相当的水，就是flash update时候出现的那个进度条。一直都觉得这个进度条制作得很有质感，所以就模范了一个，唉，都是公司里面太闲造成的呀，这也导致了最近觉得个人在公司的表现感觉不是很好。</p>
+<p>进度条很多地方都会用到，比起旋转的菊花来说，进度条更能增强用户体验，当然，在Web Development中，用到进度条的可能行很少的，因为真正的进度条和下载总量和媒体当前下载量有关系的，HTTP协议从根本上杜绝了它的存在。</p>
+<p>所以一般我们都是使用菊花，或者loading字样的gif图像代替。如果强制要用进度条，可以使用flash，silverlight等来按字节加载资源来代替，例如gmail中的文件上传，还有我的<a title="buzzzzble" href="http://buzzzzble.appspot.com" target="_blank" rel="external">buzzzzble</a>里面的图片加载。</p>
+<p>废话一箩筐，还是来看看做这个progressbar用到了那个技术点吧，它就是linearGradient，线性渐变，相关详细说明可以到</p>
+<p><a title="linearGradient" href="http://www.w3.org/TR/SVG/pservers.html#LinearGradients" target="_blank">http://www.w3.org/TR/SVG/pservers.html#LinearGradients</a></p>
+<p>当然还有radial gradient的说明，这个在第2个sample中用到过:</p>
+<p><a title="radialgradient" href="http://www.w3.org/TR/SVG/pservers.html#RadialGradients" target="_blank">http://www.w3.org/TR/SVG/pservers.html#RadialGradients</a></p>
+<p>最后放上这个简单的PrograssBar的地址，千万别讥笑，嘿嘿：</p>
+<p><a title="progressbar" href="http://sheldonw.sinaapp.com/mr-and-ms/Mr.Graph/samples/progressbar.html" target="_blank">http://sheldonw.sinaapp.com/mr-and-ms/Mr.Graph/samples/progressbar.html</a></p>
+<p>还有它的截图：</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2011/08/progressbar.jpg" rel="external" target="_blank"><img class="alignnone size-full wp-image-81" title="progressbar" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2011/08/progressbar.jpg" alt="" width="455" height="102"></a></p>
+<p>希望各位Web Development者，或者是WEB项目的客户，都重视前端开发，有品质的产品应该是面面俱到，即使是每个按钮的位置都应该考虑的。我想，外包公司也应该把这方面重视起来，把外包项目的品质提高，要知道良好的客户用户体验也是项目成功的一个关键因素。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/">
+        ← Drag And Drop(DND) Sample
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2011/08/22/old/2011-08-23-sample7-simple-column-chart/">
+        Sample7 – Simple Column Chart →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Drupal初体验 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-11-15T16:00:00.000Z" itemprop="datePublished">
+          Nov 16 2012
+      </time>
+    
+</span>
+    <h1 class="post-title">Drupal初体验</h1>
+    <section class="post-content">
+      <p>开发Drupal都接近4个月了，从当时的非常排斥到现在变成有点喜欢，找到了些开发的感觉。之前在普特的那段时间虽知道有CMS（Content Management System）这个东西，但是都没有仔细用过，唯一映像比较深的就是国内的CMS都长得差不多。。。</p>
+<p>加入到Drupal Team之前根本不知道Drupal是啥玩意儿，听说是php的，感觉好像技术倒退了好几年，不愿意学，但是现在了解了Drupal生态圈的很多事情之后发现Drupal真是个好东西，虽已经是10多年前就有的东西了，随着版本的不断升级，很多理念到现在都是比较流行的，尤其在前端开发领域。</p>
+<p>加入到Drupal Team的人都说是来做前端开发的，谢谢HTML+CSS，修修BUG就了事了，实则不是，Drupal入门很容易，但Drupal也有高级的功能，而且这些高级功能也大大可以提高我们开发效率。Drupal对TW来说算是个空白，成都Drupal Team对Drupal的研究无疑将会填充这块空白。</p>
+<p>Drupal作为一个CMS系统，在国外被广泛使用，很多站点都是Drupal制作的，像白宫<a href="http://www.whitehouse.gov/" target="_blank" rel="external">whitehouse</a>，Sydney动物园<a href="http://taronga.org.au/taronga-zoo" target="_blank" rel="external">Taronga Zoo</a>，澳洲最大保险品牌<a href="http://www.aami.com.au/" target="_blank" rel="external">AAMI</a>，还有<a href="http://www.nasa.gov/" target="_blank" rel="external">NASA</a>，<a href="http://www.ubuntu.com/" target="_blank" rel="external">ubuntu</a>等等。通过对Drupal的了解的加深，渐渐悟出了些心得。</p>
+<h2 id="Drupal建站">Drupal建站</h2>
+<p>作为CMS系统，最强劲的就是各种内容的编辑功能，组织和显示内容的功能。非常适合把Drupal拿来做门户，新闻，品牌，校园信息，商品销售等网站。国内好像大多用自主品牌的CMS比较多，但是发现公家、很多公司的网站都还是重金打造的“豆腐渣”，没有一个统一。</p>
+<h3 id="模板">模板</h3>
+<p>页面显示离不开前端模板，Drupal7使用的依然是传统php模板。Drupal内建了一套模板加载机制，从顶层的HTML到Page页面，再到每个内容都有自己的模板，可以进行重载。从另一个侧面，每个功能点，比如每个内容类型，每个显示的View，甚至到View上显示的每个Field都有很多重载方式，并有优先级的概念，重载方式之多之灵活。虽然不能一味的进行模板重载，但也可见Drupal的模板重载之强大。</p>
+<h3 id="大量的Modules">大量的Modules</h3>
+<p>刚接触Drupal的时候，就发现要安装很多很多module，渐渐地发现Drupal整个生态圈最重要的就是module，module几乎就是Drupal的最大组成部分。</p>
+<p>Drupal作为开源程序，拥有强大的社区力量，设计累计到现在的module数量多达<em>19169</em>个，rubygem.org上也只有<em>3025</em>个而已。在开发过程中发现，只要你能想到的功能，一般module都已经提供了，怕就怕你找不到相应的module，当一个人对Drupal基础熟悉之后，那么拼的就是懂的module数量，或者可以说高级的Drupal工程师强是强在module上。</p>
+<p>众多的module之中，做样式的，做页面结构的，做数据库操作的应有尽有，而且Drupal提供了一套hook机制，开发人员可以使用hook机制编写很多hook方法，当Drupal程序运行时，一个操作可能产生一个workflow，在这个工作流上的所有hook都会被调用，想想和JavaScript事件一样一样的。</p>
+<h3 id="Views">Views</h3>
+<p>内容的显示离不开各种各样组成方式的View（视图），Drupal有一个Module叫做Views，通过它我们可以定义各种类型的视图，比如说RSS、单个页面Page、一个Block、Views的组合等。Views可以对内容进行排序，过滤，甚至可以加载与当前内容相关的内容，有点想ORM关系加载一样，当你确定后，Views会生产SQL对数据库进行查询，得到你想要的结果。</p>
+<p>结果并不是每行字符串数据，你可以选择是显示Node对象还是各个相关的字段，组成方式自由多变。除了得到数据之外，还能够修改Views的显示模板，自由组织标签和属性来显示结果，最终配置好view之后，还可以进行preview，看看显示是否正确。</p>
+<p>CMS页面上有各种各样的内容组织显示方式，Views就是最好的工具，创建出来的Views看作为block放到页面的任何位置。而且Views如果遇到分页的话，可以选择ajax分页方式，前端开发人员关注的就只有样式了。</p>
+<h3 id="Drush">Drush</h3>
+<p>Drush是Drupal的命令行工具，除了可以干一些日常下载，安装，卸载module的事情之外，我们还可以通过drush创建用户，创建内容，修改权限，还可以创建数据库，删除内容，dump数据等等。通过使用drush的<code>drush make</code>和<code>drush si [profile]</code>命令可以快速建立站点，帮你安装好所有module依赖，达到安装之后就和买了一个产品给你一样，拿过来就能用了。</p>
+<p>Drush还提供了api扩张开发方式，可以扩张自己想要的命令，通过drush去运行。这对Drupal站点的自动化提供了基础，我们已经使用drush搭建了一个C·I（持续集成）的演示程序，可以自动化建站，运行单元测试，提供反馈。</p>
+<p>使用Drupal的人只会觉得Drupal越来越强大，从官方文档到issues的评论，到处都显示出来了Drupal的GEEK范。作为前端工程师，也发现在使用Drupal建站的时候，更能关注到前端的任务，内容的展示，不像之前ROR时期的感觉，什么功能都得从头来。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/11/16/2012-11-16-what-we-can-get-from-drupal/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/11/16/2012-11-16-what-we-can-get-from-drupal/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/11/16/2012-11-16-what-we-can-get-from-drupal/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/11/16/2012-11-16-what-we-can-get-from-drupal/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2012/11/20/2012-11-20-what-i-found-form-drupal/">
+        ← Drupal开发体验
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/11/12/2012-11-12-front-end-in-xi-an/">
+        ThoughtWorks西安前端那些事 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

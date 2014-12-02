@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>迟到的Mr.Coverage | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-07-06T08:59:28.000Z" itemprop="datePublished">
+          Jul 6 2012
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Web-Development/'>Web Development</a>,
+    
+    <a href='/tags/Frond-end-Skills/'>Frond-end Skills</a>,
+    
+    <a href='/tags/Mr/'>Mr</a>,
+    
+    <a href='/tags/Web-Development/'>Web Development</a>,
+    
+    <a href='/tags/Testing/'>Testing</a>
+    
+    
+</span>
+    <h1 class="post-title">迟到的Mr.Coverage</h1>
+    <section class="post-content">
+      <p>Mr.Coverage在一个月以前就有一个alpha版本了，一直没有时间发上来，这两天又抽时间小小更新了下，将就发到blog中记录下，顺便也说说我对Testing慢慢理解的过程。</p>
+<h3>前</h3>
+<p>先说说JavaScriptTesting那些事吧。头两年开发的项目中别说是Testing覆盖率，Testing都很少写，单元Testing几乎没有，对于自动化E2ETesting，之后那个项目才有一些，小项目大部分功能还得专职的Testing人员来Testing。试想一下，在一个不重视前端开发的公司里面，后端代码Testing都很少写，那更不用说前端JavaScript代码的单元Testing，partial页面Testing等等了。那个时候Testing覆盖率神马的都是浮云。</p>
+<p>之后我接触到了QUnit，不知道啥时候发布的，感觉挺好，断言方式也比较亲切，我便给我自己写的几个小东西加上了单元Testing，包括Mr.Async，Mr.Array这些无人问津的练习项目，感觉Testing的还挺全乎的，也渐渐对加Testing（注意是用的加）产生了好感。那时候也没人教Testing应该是什么样子的，现在回头看看，mock、stub、spy等技术完全没有涉及到。。。，这也侧面说明我那些Library微不足道。</p>
+<h3>后</h3>
+<p>TW是非常重视Testing的公司，Testing的重要性我不必说了。在这里的项目中让我了解到了Testing应该怎么做，我其实花了一些时间去让我的笨脑子去学习stub、spy、mock等等，尤其是前端开发的Testing。其中很有趣的是Testing覆盖率这个像是指标一样的东西，每提高一个百分点都会足以让人欣喜。ruby代码的Testing已经是100%了，没什么刺激点了，但是我发现JS的覆盖率才是可怜的30%（我刚到的时候），这意味这作为一个UI开发来说，应该focus到这些地方。澳洲那边有位之前做JS开发的QA，这半年的前几个月都是他一直在抓JS的Testing和重构，可谓呕心沥血，在他的带领下，覆盖率上升到了40+%。10多个百分点的提升已经非常让人兴奋不已，再说人都是喜欢干能让自己开心的事，那时我想一定在离开之前把覆盖率提升到70%。如果回头看看旁边的报表组的JS覆盖率，那是相当可怕的90%啊，更有使用Backbone的项目Testing率100%。</p>
+<p>提高JS覆盖率不是找一堆代码运行下就ok的，Testing需要有代码的可Testing性，也就是是否有划分模块。现在前端模块开发变得非常重要，模块化开发不单是面对Testing，在可维护性上都会有很大提升。我们项目在重写和重构之前这点做得确实不好，慢慢把老代码使用OO方式重写，然后加上Testing，覆盖率才有所上升的。现在的Testing覆盖率是61%吧，也是处于渐渐变更的状态。</p>
+<p>在提升覆盖率的同时也会研究下原理是什么。项目TestingJS是用jasmine，Testing覆盖率是用的整合到rails项目中的一个工具，没深度研究过，但发现实质上运行JS代码的还是需要jasmine配合，当然选用其他也可以。后来由于深度学习node，接触到了mocha，发现mocha比jasmine好用不止一点点，而且mocha中各种报表格式的显示也非常精致和有趣。这也是为什么Mr.Coverage第一个版本中使用了jasmine，后来被替换为mocha的主要原因。</p>
+<h3>原理</h3>
+<p>貌似所有Testing覆盖率的原理都大同小异，都是把源码利用工具生成为同等功能的目标代码，目标代码中含有每行执行次数的变量，当代码运行时刻，某一行被执行时，相对应的变量就会++，运行完成时，通过对这些变量的统计得出覆盖率。行覆盖率应该是这个原理。JS的目标代码生成工具是10年已经没有在更新的<a title="jscoverage" href="http://siliconforks.com/jscoverage/" target="_blank">jscoverage</a>，虽然没有在更新，但是几乎所有的JS覆盖率Testing都需要用到这个工具，它的牛X程度可见一斑。无例外，Mr.Coverage里面也整合了jscoverage这个工具，不过是github上的一个针对node的变体，叫做<a title="node-jscoverage" href="https://github.com/visionmedia/node-jscoverage" target="_blank">node-jscoverage</a>，不过使用起来毫无它的存在感。</p>
+<p>使用它可以对代码进行这样的处理：</p>
+
+<div class="wp_codebox"><table><tr id="p42011"><td class="code" id="p420code11"><pre class="javascript" style="font-family:consolas;"><span style="color: #003366; font-weight: bold;">var</span> _ <span style="color: #339933;">=</span> require<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">'underscore'</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+&nbsp;
+_.<span style="color: #660066;">extend</span><span style="color: #009900;">&#40;</span>exports<span style="color: #339933;">,</span> <span style="color: #009900;">&#123;</span>
+	add <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">+</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	minus <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">-</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	multiply <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">*</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	divide <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">/</span> b<span style="color: #339933;">;</span>
+	<span style="color: #009900;">&#125;</span><span style="color: #339933;">,</span>
+	increment <span style="color: #339933;">:</span> <span style="color: #003366; font-weight: bold;">function</span><span style="color: #009900;">&#40;</span>a<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+		<span style="color: #000066; font-weight: bold;">return</span> a<span style="color: #339933;">++;</span>
+	<span style="color: #009900;">&#125;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>会被编译成含有一个_$jscoverage对象的代码，但其功能保持不变：</p>
+
+<div class="wp_codebox"><table><tr id="p42012"><td class="code" id="p420code12"><pre class="javascript" style="font-family:consolas;"><span style="color: #000066; font-weight: bold;">if</span> <span style="color: #009900;">&#40;</span><span style="color: #000066; font-weight: bold;">typeof</span> _$jscoverage <span style="color: #339933;">===</span> <span style="color: #3366CC;">'undefined'</span><span style="color: #009900;">&#41;</span> _$jscoverage <span style="color: #339933;">=</span> <span style="color: #009900;">&#123;</span><span style="color: #009900;">&#125;</span><span style="color: #339933;">;</span>
+<span style="color: #000066; font-weight: bold;">if</span> <span style="color: #009900;">&#40;</span><span style="color: #339933;">!</span> _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #009900;">&#91;</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">1</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">3</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">5</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">8</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">11</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">14</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">17</span><span style="color: #009900;">&#93;</span> <span style="color: #339933;">=</span> <span style="color: #CC0000;">0</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span>
+_$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">1</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+<span style="color: #003366; font-weight: bold;">var</span> _ <span style="color: #339933;">=</span> require<span style="color: #009900;">&#40;</span><span style="color: #3366CC;">&quot;underscore&quot;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+_$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">3</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+_.<span style="color: #660066;">extend</span><span style="color: #009900;">&#40;</span>exports<span style="color: #339933;">,</span> <span style="color: #009900;">&#123;</span>add<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">5</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">+</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> minus<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">8</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">-</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> multiply<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">11</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">*</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> divide<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #339933;">,</span> b<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">14</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a <span style="color: #339933;">/</span> b<span style="color: #339933;">;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">,</span> increment<span style="color: #339933;">:</span> <span style="color: #009900;">&#40;</span><span style="color: #003366; font-weight: bold;">function</span> <span style="color: #009900;">&#40;</span>a<span style="color: #009900;">&#41;</span> <span style="color: #009900;">&#123;</span>
+  _$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span><span style="color: #009900;">&#91;</span><span style="color: #CC0000;">17</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">++;</span>
+  <span style="color: #000066; font-weight: bold;">return</span> a<span style="color: #339933;">++;</span>
+<span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #009900;">&#125;</span><span style="color: #009900;">&#41;</span><span style="color: #339933;">;</span>
+_$jscoverage<span style="color: #009900;">&#91;</span><span style="color: #3366CC;">'script.js'</span><span style="color: #009900;">&#93;</span>.<span style="color: #660066;">source</span> <span style="color: #339933;">=</span> <span style="color: #009900;">&#91;</span><span style="color: #3366CC;">&quot;var _ = require('underscore');&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;_.extend(exports, {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>add : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a + b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>minus : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a - b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>multiply : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a * b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>divide : function(a, b) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a / b;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}, &quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>increment : function(a) {&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span><span style="color: #000099; font-weight: bold;">\t</span>return a++;&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;<span style="color: #000099; font-weight: bold;">\t</span>}&quot;</span><span style="color: #339933;">,</span><span style="color: #3366CC;">&quot;});&quot;</span><span style="color: #009900;">&#93;</span><span style="color: #339933;">;</span></pre></td></tr></table></div>
+
+<p>代码运行之后可以通过分析全局变量_$jscoverage，计算出Testing覆盖率。</p>
+<h3>Mr.Coverage</h3>
+<p>使用Mr.Coverage是需要NodeJS环境的，所以在使用前还是去<a title="mr-coverage github" href="https://github.com/winsonwq/Mr.Coverage" target="_blank">github</a>看看如何安装先，4步搞定安装。Mr.Coverage的目的是整合JSTesting框架（mocha）和jscoverage工具，在TestingJS的同时也可以Testingcoverage是多少，不需要开发人员去开发如何混合使用而浪费时间。Mr.Coverage完美支持mocha的所有功能，也就是说mocha能跑的Testing，它一样能跑，并且还支持多个文件夹和多个文件路径作为参数进行Testing，算是点小增强吧。同时，原生mocha不支持的html-cov和json-cov两种report格式也在Mr.Coverage中支持，使用它可以直接设置mocha的报表类型为html-cov，直接导出Testing覆盖率的html代码，相当之爽快。BTW，html-cov到处的页面还是比较漂亮的。有兴趣的可以查看这个<a title="report demo" href="http://winsonwq.github.com/demo/report.html" target="_blank">report页面</a>。</p>
+<p>有了这个小工具，肯定是希望有更多人使用，在github上有5个人watch（包括我自己）感觉都很爽，希望会有更多。现在只是完成了小部分功能，要让更多人使用，肯定是需要和成熟的开发框架结合，能配置到自动化Testing中才是王道。另外，很没有写过console程序，提示信息的友好度有待提升，Testing文件的可配置型需要加强等等。</p>
+<h3>杂</h3>
+<p>昨天看到一个04年的帖子，里面讲到了04年时候有个比较火的jsvm的东西，<a title="jsvm评论" href="http://www.iteye.com/topic/7252" target="_blank">评论</a>很精彩，看评论的时候发现，国内那时对于前端开发已经了解得非常深了，当时人早已经把JS模块化开发，后端的JS等等现在我们都还很热门的问题了解的很透彻了，自愧不如啊。总结下就是，我能想到的，人家早已想到，我能做到的，人家已经做了无数的尝试。在一鸣惊人的创造力之前，更重要的是自己的执行力，成功并不是有了想法就可以的，它还需要长时间的平凡的坚持。（不知道为什么说到这个⋯⋯）</p>
+<p>今天听到老邢讲Design Thinking，我猛然发现自己是他讲到的那种经常问how而非why的人。写的blog也是关于如何做事的内容较多。不是对号入座吧，如果想朝UX方面发展，凡是还得多问问为什么。</p>
+<p>希望Mr.Coverage能带给你lots of fun。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/07/06/old/2012-07-07-the-late-mr-coverage/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/07/06/old/2012-07-07-the-late-mr-coverage/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/07/06/old/2012-07-07-the-late-mr-coverage/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/07/06/old/2012-07-07-the-late-mr-coverage/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2012/07/13/old/2012-07-14-the-day-to-leave/">
+        ← 最冷一天
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/06/11/old/2012-06-12-my-progressive-enhancement/">
+        我所坚持的渐进增强 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

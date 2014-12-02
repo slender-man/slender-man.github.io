@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Viff，一种新的页面样式测试策略 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2013-09-08T16:00:00.000Z" itemprop="datePublished">
+          Sep 9 2013
+      </time>
+    
+    
+    | 
+    <a href='/tags/testing/'>testing</a>
+    
+    
+</span>
+    <h1 class="post-title">Viff，一种新的页面样式测试策略</h1>
+    <section class="post-content">
+      <h2 id="测试页面样式时遇到的问题">测试页面样式时遇到的问题</h2>
+<p>在我们测试Web页面的时候，往往需要面对如下几个问题</p>
+<h3 id="手工测试多个浏览器">手工测试多个浏览器</h3>
+<p><img src="http://ww2.sinaimg.cn/mw1024/64eae748gw1e8g7owrnx4j214w0aggnb.jpg" alt="多浏览器"><br>跨浏览器测试，测试页面在多个浏览器中的表现，浏览器可能包括Chrome，Firefox，Safari，IE和Opera。除了测试基本功能是否健全以外，还需要测试外观样式，因为当前的CSS技术在各个浏览器里的表现不完全一致。比如会看看IE和其他现代浏览器的差距有多大，从而判定之间的差别是否能被接受。</p>
+<p>除了测试多个浏览器之外，很可能需要进行多版本的测试，现在浏览器的更新速度是非常快的，这样就导致了用户群在浏览器版本之间的跨度变大，为了保证质量，多个版本的测试也是必要的。比如IE6到IE10的测试。</p>
+<p>其次，随着Mobile Webapp的发展，响应式设计的广泛应用，页面的测试还需要照顾到移动设备和多尺寸屏幕。</p>
+<p>可以看出，页面样式的测试情况是十分复杂的，更甚的是，我们现在都是用手工在测试，耽误很多时间。</p>
+<h3 id="可复用的样式代码容易影响现有样式">可复用的样式代码容易影响现有样式</h3>
+<p><img src="http://ww1.sinaimg.cn/mw1024/64eae748gw1e8g7tk8v2uj210k0jsgpd.jpg" alt="可复用的样式开发"></p>
+<p>我们推荐在开发样式的时候使用SASS或LESS的CSS预编译语言，这样可以更好的管理CSS代码，但是也会导致一个问题，一个可复用的样式的修改可能会影响很多个页面，比如一个颜色变量的改变。而我们往往是让页面引入所有样式，很难判断哪些页面会有影响。可能一个能力很强的QA能预见到一些并做了测试，可能有些影响到了回归测试的时候才发现，也可能到了生产环境上也没有发现。</p>
+<h3 id="现有CSS测试的问题">现有CSS测试的问题</h3>
+<p>样式不是不可以“测试”的，项目中可能会使用<br><!--break--></p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">expect($(<span class="string">'#my-target'</span>)).toHaveCss({margin: <span class="string">'10px'</span>});</div><div class="line">expect($(<span class="string">'#my-target'</span>)).toHaveClass(<span class="string">'box'</span>);</div></pre></td></tr></table></figure>
+
+<p>的方式去测试某个元素是否含有某种特定的属性并断言值是多少，但是每个元素在页面上的样式是由它的Computed Style决定的，这些属性是非常多的，几乎做不到通过这些属性值来表达某个元素是否显示得正确，而且这样代码维护成本是非常大的，频繁的UI修改你同时需要修改测试。同样地，如果你断言某个元素是否拥有某种样式，最终的页面显示难以预见。</p>
+<h3 id="依赖感觉的测试是不严谨的">依赖感觉的测试是不严谨的</h3>
+<p><img src="http://ww4.sinaimg.cn/mw1024/64eae748gw1e8g7oywm55j212m0j2ac8.jpg" alt="对比图"></p>
+<p>无论是谁来做页面样式的测试，都是基于看和感觉的，这种测试不能有效的发现细节问题，不能得出严谨的结果，每个测试者都会有自己的答案。虽然说眼见为实，但有时候看到了也不可信赖。例子中的两个对比图片，肉测很难发现细小的差异。</p>
+<h2 id="感知测试中的新成员_-_Viff">感知测试中的新成员 - Viff</h2>
+<p><a href="http://winsonwq.github.io/viff/" target="_blank" rel="external">在Github上查看Viff</a></p>
+<p>Viff的解决方式是，通过配置测试页面，对比在同一个浏览器下，同一个页面在不同环境（开发环境，生产环境）的截图差异来，发现最终样式的影响，从而提升交付质量和信心。</p>
+<p>Viff的出现不是用来解决“依赖感觉来测试困难”这个问题的。它作为感知测试领域中的一员，是一个<em>半自动</em>的测试框架，通过（整体或部分）的截图对比来帮助测试人员快速发现开发造成的样式改变和影响，提升页面样式的测试效率和软件交付信心。</p>
+<p>现在Viff支持的功能有</p>
+<ol>
+<li>基于CSS的部分页面截图对比</li>
+<li>支持Firefox、Chrome、Safari、Opera、PhantomJS、IE、iOS、Android。Firefox、PhantomJS、iOS表现完美</li>
+<li>命令行支持</li>
+<li>定义处理页面事件</li>
+<li>报表功能帮助差异Review</li>
+</ol>
+<h2 id="Viff测试策略">Viff测试策略</h2>
+<p>在使用Viff的过程中，几个基本的测试策略有</p>
+<ol>
+<li>尽量保持一样的页面内容，如果页面内容是动态生成的，尽量使用基于CSS的部分截图功能</li>
+<li>没有必要测试所有页面，尽量找到能够找到覆盖CSS样式的最小集合。推荐模块化的方式开发CSS的好处就在于此</li>
+<li>针对复用性的UI组件，推荐使用基于CSS的部分截图功能</li>
+<li>如果有style guide页面，直接测试它也可以</li>
+<li>期望建立一种使用Viff的机制，每天或者部署前查看Viff的报表，也可以把Viff继承到CI中，每天定时运行。但不推荐每次提交都运行，因为生成的图片文件会很快占满你的硬盘。</li>
+</ol>
+<h2 id="在PPT里了解更多">在PPT里了解更多</h2>
+<script async class="speakerdeck-embed" data-id="e47f4df0fb8a013095b13ad66989d671" data-ratio="2" src="//speakerdeck.com/assets/embed.js"></script>
+
+<h2 id="Viff才刚开始">Viff才刚开始</h2>
+<p>Viff从刚开始从想法到今天这个版本，开发周期只有不到4周的时间。Viff需要经历更多的项目验证才能走得更远，如果你对Viff还有那么点兴趣，打算尝试一下，欢迎在<a href="https://github.com/winsonwq/viff/issues" target="_blank" rel="external">Github Issue页面</a>提交反馈。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2013/09/09/2013-09-09-viff-introduction/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2013/09/09/2013-09-09-viff-introduction/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2013/09/09/2013-09-09-viff-introduction/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2013/09/09/2013-09-09-viff-introduction/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2014/03/06/2014-03-06-traveling-in-sync-and-async/">
+        ← 在JavaScript异步和同步之间穿梭
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2013/06/30/2013-06-30-e2e-testing-of-web-application/">
+        Web应用E2E测试框架 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

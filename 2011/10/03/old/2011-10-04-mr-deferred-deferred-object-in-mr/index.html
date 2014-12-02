@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Mr.Deferred (Deferred Object in Mr) | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2011-10-03T07:35:39.000Z" itemprop="datePublished">
+          Oct 3 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/asyn/'>asyn</a>,
+    
+    <a href='/tags/Mr/'>Mr</a>,
+    
+    <a href='/tags/Mr-Deferred/'>Mr.Deferred</a>
+    
+    
+</span>
+    <h1 class="post-title">Mr.Deferred (Deferred Object in Mr)</h1>
+    <section class="post-content">
+      <p>进入正题之前想先聊点别的。最近我好像找到了一种学习的感觉是关于研究方向的，估计是来源于“生态圈”这个词。对的，我第一次看到别人说到什么什么生态圈时，我那时一个无头苍蝇不知道是神马东西，比如，Android系统更新了，Java升级了，HTML5 vs Silverlight等等，这些话题都会引起人们关于“生态圈”的讨论。那么我理解的生态圈是什么呢？我把它理解为生态圈就是你想了解的东西发展的环境，相互影响的事物集合。像我喜欢JS，我将会看看JS现在的发展趋势是什么，JS解释器怎么实现的，JS的优势劣势是什么，劣势要怎么改善，Nodejs服务端开发核心是什么，CommonJS标准有些什么，V8引擎我可以去看看么类似这样的事情。</p>
+<p>我觉得我是比较能折腾的人，折腾也需要有个方向，我可能是Frank说的那种把东西试出来的花时间比较多的高手吧，最近他还评价我是招式很多但是内功不足。朋友们也说我是蛋疼君、强迫症。。。，我也虚心接受了:)。而我对自己的评价是：笨，笨得有理想。“生态圈”这个词最近突然间走进我的生活，搞得好像在学术研究方面提高了些，不过还是那句话，有很多人在我前面等着我去超越。</p>
+<p>OK，不扯了，今天分享的就是基于CommonJS promise/A 模型的一个延迟方法的链式调用实现，我取名叫做Mr.Deferred，名字是从jQuery那copy过来的，延期的意思，它是属于Mr库的一部分。当然，jQuery在1.5版本里面就改写代码实现了此标准，我的这个只能算是一个alpha<del>山寨</del>版本。另外，微软针对Metro UI的程序运行时WinRT针对JS的异步调用部分，也用到了Promise模型。既然它这么被重视，看来它应该是JS生态圈中的一部分，值得了解一下。</p>
+<h2><span id="more-142"></span>Deferred Object</h2>
+<p>Deferred对象是代表了一个延迟，可以由Mr.Deferred()创建，它支持的方法有：</p>
+<ol>
+<li>resolve() 表示延迟对象延迟动作完成</li>
+<li>reject() 表示延迟对象延迟东西失败</li>
+<li>done(fn) 传入的fn对象是延迟resolve时回调函数</li>
+<li>fail(fn) 传入的fn对象是延迟对象reject时回调函数</li>
+<li>then(doneFn, failFn) 传入两个参数分别是成功时回调函数和失败时回调函数</li>
+<li>always(fn) 传入的是延迟无论成功或失败的回调函数</li>
+<li>isRejected() 和 isResolved() 状态判断方法</li>
+</ol>
+<p>Deferred的实现是看了jQuery API和例子琢磨出来的，不过jQuery的实现考虑的事情要比我详细得多，比如jQuery的Deferred对象保存了一个promise对象，说真的，我还在想它是用来干嘛的。不说它也罢。Deferred对象是用来解决什么问题的呢？它提供异步操作一种链式地多回调方法注册的方式，方便地管理异步方法的状态（完成/未完成）和回调函数的执行。举个例子来说，大家在使用1.5之前版本的jQuery.ajax方法时，如何绑定多个成功事件呢？如何有效管理多个成功事件的执行顺序呢？除了指定success属性，还有别的更好的方式么？（因为指定属性的函数回调除了单一性这个缺点之外，代码可读性很差，更不说回调函数的嵌套了）。我们来看看jQuery中Deferred对象是怎么调用的。</p>
+<pre class="brush:javascript">// $.get 方法调用（只为展示给大家新的方式解决了什么）
+function fn1() {
+    console.log('fn 1');
+}
+function fn2() {
+    console.log('fn 2');
+}
+
+$.get("test.php").done(function() {
+  console.log("fn 3");  //
+}).done([fn1, fn2]);</pre>
+<p>ajax 的 get 请求完成后会在控制台顺序输出 fn3 fn1 fn2，和注册顺序一致，实现了多事件绑定，代码简洁明了。接下来介绍一个怎么样使用我的Mr.Deferred实现的例子。</p>
+<pre class="brush:javascript">// 创建异步方法
+function asynFn(){
+    // 创建Deferred对象
+    var dfd = Mr.Deferred();
+	setTimeout(function(){
+	    dfd.resolve(1, 1, 1, 1, 1);
+	}, Math.random(1) * 2000);
+	setTimeout(function(){
+	    dfd.reject(2, 2, 2, 2, 2);
+	}, Math.random(1) * 2500);
+    return dfd;
+}
+
+// 直接调用异步方法
+asynFn()
+.done(function(arg){
+	console.log('done');
+	console.log(arguments);
+})
+.fail(function(arg){
+	console.log('fail');
+	console.log(arguments);
+})
+.then(
+	function(){
+		console.log('then-&gt;done');
+		console.log(arguments);
+	},
+	function(){
+		console.log('then-&gt;fail');
+		console.log(arguments);
+	})
+.always(function(){
+	console.log('always');
+	console.log(arguments);
+})
+.then(
+	function(){
+		console.log('then2-&gt;done');
+		console.log(arguments);
+	},
+	function(){
+		console.log('then2-&gt;fail');
+		console.log(arguments);
+	});</pre>
+<p>输出结果是（成功时的结果）：<br>
+done<br>
+[1, 1, 1, 1, 1]<br>
+then-&gt;done<br>
+[1, 1, 1, 1, 1]<br>
+then2-&gt;done<br>
+[1, 1, 1, 1, 1]<br>
+always<br>
+[Object { _doneFns=[3], _failFns=[3], 更多&#8230;}]  // firebug下的console显示，代表always里面的传入参数是实例本身</p>
+<h2>Mr.when</h2>
+<p>Mr.when方法是一个辅助方法，目的是为了同时处理多个Deferred对象，API为</p>
+<ul>
+<li>Mr.when(dfd&#8230;)  参数为Deferred对象，可以传变参，如Mr.when(dfd1, dfd2, &#8230; )，when方法调用后可以使用Deferred对象拥有的所有事件注册方法done, fail, then, always和isRejected, isResolved状态判断方法。不具有resolve，reject方法。</li>
+</ul>
+<p>举个例子大家就知道是同时处理是什么意思。</p>
+<pre class="brush:javascript">var asynFn = .... // 同上
+
+function asynFn2(){
+	var dfd = Mr.Deferred();
+	setTimeout(function(){
+		dfd.resolve(33, 33, 33);
+	}, Math.random(1) * 3000);
+	return dfd;
+}
+
+Mr.when( asynFn(), asynFn2() )
+.done(function(){
+	console.log('when:done');
+	console.log(arguments);
+})
+.fail(function(){
+	console.log('when:fail');
+	console.log(arguments);
+})
+.always(function(){
+	console.log('when:always');
+	console.log(arguments);
+})
+.then(
+	function(){
+		console.log('when:then-&gt;done');
+		console.log(arguments);
+	},
+	function(){
+		console.log('when:then-&gt;fail');
+		console.log(arguments);
+	});</pre>
+<p>输出结果为：<br>
+when:done<br>
+[1, 1, 1, 1, 1, 33, 33, 33] // 多个deferred对象的参入参数数组，按顺序传入，如果没有就会跳过。<br>
+when:then-&gt;done<br>
+[1, 1, 1, 1, 1, 33, 33, 33] // 同上<br>
+when:always<br>
+[Object { _doneFns=[0], _failFns=[0], 更多&#8230;}, Object { _doneFns=[0], _failFns=[0], 更多&#8230;}] // firebug 显示为when方法中传入的deferred对象数组，按顺序传入。</p>
+<p>when方法就让多个deferred对象的异步结束到所有传入的对象都结束时才会同时执行。比如，如果一个操作依赖于多个请求的结果，你可以毫不犹豫的使用此方法，它会是你的不二之选。</p>
+<p>现在的Mr.Deferred还在雏形阶段，还有很多爽的调用方式没有加上，但是模型不会改变了，等到完善之后会merge到Mr的核心库Mr&amp;Ms.js中，希望有兴趣的继续关注。我希望它将会成为“JS生态圈”的一部分，当然我对C#也很感兴趣，F#也打算要看一下，唉，事情真多，再想到Mr.Graph还需要把API总结出来，晕睡过去的心都有了。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2011/10/03/old/2011-10-04-mr-deferred-deferred-object-in-mr/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2011/10/03/old/2011-10-04-mr-deferred-deferred-object-in-mr/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2011/10/03/old/2011-10-04-mr-deferred-deferred-object-in-mr/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2011/10/03/old/2011-10-04-mr-deferred-deferred-object-in-mr/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2011/10/11/old/2011-10-11-dart-or-javascript/">
+        ← DART or JavaScript
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2011/09/20/old/2011-09-20-linq-to-weibo-simple-recode/">
+        LINQ To Weibo 小重构 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>JavaScript严格模式 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2013-06-08T16:00:00.000Z" itemprop="datePublished">
+          Jun 9 2013
+      </time>
+    
+</span>
+    <h1 class="post-title">JavaScript严格模式</h1>
+    <section class="post-content">
+      <blockquote>
+<p>本文是我对<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions_and_function_scope/Strict_mode" target="_blank" rel="external">《Strict mode》</a>的翻译，文中的描述含我个人的理解，有可能和原文有所出入，望理解。</p>
+</blockquote>
+<p>使用ECMAScript 5的严格模式（“strict mode”）会进入受限制的JavaScript模式。严格模式下的JavaScript并不是标准模式的一个子集，而是直接使用了不同语意的代码。JavaScript在支持和不支持严格模式的浏览器之间会有着不同的表现，所以功能开发时不要依赖于严格模式。严格模式的代码和非严格模式的代码是可以共存的，在严格模式下，非严格模式代码会递增地想严格模式代码转化。</p>
+<p>严格模式下的JavaScript有很多处改变。首先要说说的是，严格模式下的JavaScript会表现得没那么多陷阱，该报错的时候就报错。另外，严格模式修复了JavaScript中的一些错误，使得JavaScript解释器更好地进行代码优化，也就是说严格模式下的代码运行地会快一些。同时，严格模式还阻止开发者使用一些可能会用于以后ECMAScript中的语法。</p>
+<h2 id="如何使用严格模式">如何使用严格模式</h2>
+<p>严格模式可以使用于全局所有脚本代码，也可以单独使用到一个方法中。它可以使用在<code>eval</code>中的代码、<code>Function</code>中的代码、事件处理属性和在<a href="https://developer.mozilla.org/en-US/DOM/window.setTimeout" target="_blank" rel="external">setTimeout</a>方法中传入的字符串和全局脚本中。如果在一个以<code>{}</code>括号包裹住的代码块中使用严格模式是没有作用的。</p>
+<h3 id="全局脚本中使用严格模式">全局脚本中使用严格模式</h3>
+<p>在全局脚本中使用严格模式其实很简单，只用在所有代码之前加入<code>&quot;use strict;&quot;</code>就可以了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Whole-script strict mode syntax</span></div><div class="line"><span class="pi">"use strict"</span>;</div><div class="line"><span class="keyword">var</span> v = <span class="string">"Hi! I'm a strict mode script!"</span>;</div></pre></td></tr></table></figure>
+
+<p>这种语法有个陷阱需要注意，它不能盲目地连接不冲突的脚本。用一段严格模式下的脚本去连接一段严格或非严格模式下的脚本，整段脚本看上去是严格的；用一段非严格模式下的脚本连接一段严格或非严格模式下脚本看上去是非严格的。但是问题就出在多段严格和非严格模式下的脚本混合组合在一起，最终无法判断整段脚本是严格的还是非严格的。所以我们推荐你把<code>&quot;use strict;&quot;</code>设置在方法级别<em>（function_by_function）</em>。</p>
+<p>你可以使用把整段脚本包含在一个<code>function</code>中，然后在方法外部使用严格模式。这可以帮助你避免混合连接脚本的问题，但是你必须把方法中的变量或方法暴露出来供外部使用。</p>
+<h3 id="在方法中使用严格模式">在方法中使用严格模式</h3>
+<p>同样的，如果想要在<code>function</code>上使用严格模式，只要在方法中其他语句之前写上<code>&quot;use strict;&quot;</code>就可以了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">function strict () {</div><div class="line">  // Function-level strict mode syntas</div><div class="line">  'use strict';</div><div class="line">  function nested() { return 'And so am I!'; }</div><div class="line">  return 'Hi! I'm a strict mode function!  ' + nested();</div><div class="line">}</div><div class="line"></div><div class="line">function notStrict () {</div><div class="line">  return 'I'm not strict.';</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p><!--break--></p>
+<h2 id="严格模式带来的改变">严格模式带来的改变</h2>
+<p>严格模式带来了语法和脚本运行时新的表现。这些改变大概可以分为两类：把设计上的缺陷转变为语法或者运行时报错，简化了一个特定变量是如何被计算的，简化了<code>eval</code>和<code>arguments</code>，同时，这些改变让开发者更容易编写“安全的”JavaScript，也使得下一代的ECMAScript来得更快一些。</p>
+<h3 id="把设计上的缺陷转变为报错">把设计上的缺陷转变为报错</h3>
+<p>严格模式把之前可接受的设计失误转变成了报错，JavaScript当时是为初学开发者设计的，所以有时本来需要报错的地方没有报错。这种做法有时能帮助开发者快速解决问题，但是久而久之会带来更严重的问题。严格模式下这些设计失误会变为报错，他们能被快速的发现并且修复掉。</p>
+<p>第一，严格模式不允许偶然的创建全局变量。在非严格模式下，如果赋值语句中变量拼写错误会导致创建了一个全局变量，而且整个程序依然运行（虽然之后会产生逻辑错误）。在严格模式下发生上述情况会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line">mistypedVariable = <span class="number">17</span>; <span class="comment">// throws a ReferenceError</span></div></pre></td></tr></table></figure>
+
+<p>第二，严格模式使得赋值语句当发生潜在错误时抛出异常。比如，<code>NaN</code>是一个全局的只读变量。非严格模式下，对<code>NaN</code>的赋值运算是没有意义的，而且不会报错；而在严格模式下则会抛出异常。严格模式下任何赋值语句如果有潜在错误（对只读的变量赋值，对只读属性赋值，对一个<a href="https://developer.mozilla.org/en-US/JavaScript/Reference/Global_Objects/Object/preventExtensions" target="_blank" rel="external">“不可扩展的”</a>的对象新属性进行赋值）都会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"></div><div class="line"><span class="comment">// Assignment to a non-writable property</span></div><div class="line"><span class="keyword">var</span> obj1 = {};</div><div class="line"><span class="built_in">Object</span>.defineProperty(obj1, <span class="string">'x'</span>, { value: <span class="number">42</span>, writable: <span class="literal">false</span> });</div><div class="line">obj1.x = <span class="number">9</span>; <span class="comment">// throw a TypeError</span></div><div class="line"></div><div class="line"><span class="comment">// Assignment to a getter-only property</span></div><div class="line"><span class="keyword">var</span> obj2 = { get x() { <span class="keyword">return</span> <span class="number">17</span>; } };</div><div class="line">obj2.x = <span class="number">5</span>; <span class="comment">// throws a TypeError</span></div><div class="line"></div><div class="line"><span class="comment">// Assignment to a new property on a non-extensible object</span></div><div class="line"><span class="keyword">var</span> fixed = {};</div><div class="line"><span class="built_in">Object</span>.preventExtensions(fixed);</div><div class="line">fixed.newProp = <span class="string">'ohai'</span>; <span class="comment">// throws a TypeError</span></div></pre></td></tr></table></figure>
+
+<p>第三，在严格模式下，如果尝试删除一个不可删除的属性也会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">delete</span> <span class="built_in">Object</span>.prototype; <span class="comment">// throws a TypeError;</span></div></pre></td></tr></table></figure>
+
+<p>第四，严格模式要求一个对象上的所有属性名都必须是唯一的。非严格模式下是允许重名变量的，而且是以最后一次声明的值作为此属性的值。因为只有最后一次声明才会起作用，所以在修改某属性值时，改的不时最后一个声明的属性，那么最终的值也没有被修改。在严格模式下，重复的属性名回报出语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> o = { p: <span class="number">1</span>, p: <span class="number">2</span> }; <span class="comment">// !!! syntax error</span></div></pre></td></tr></table></figure>
+
+<p>第五，严格模式要求一个方法的所有参数名都必须时唯一的。非严格模式下存在重名参数，在使用时也只有最后一个声明的参数会被调用。但是之前参数依然能通过<code>arguments[i]</code>的方式访问到，所以他们并不是完全不能被访问到。当然，这种设计可能不是我们想要的。在严格模式下重名的参数会报语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span><span class="params">(a, a, c)</span> </span>{ <span class="comment">// !!! syntax error</span></div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">return</span> a + b + c; <span class="comment">// wrong if this code ran</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>第六，严格模式禁止八进制的语法。八进制语法不属于ECMAScript，但是所有浏览器都支持八进制语法，只要在八进制数字之前加上一个<code>0</code>：<code>0644 === 420</code> 和 <code>&quot;\045&quot; === &quot;%&quot;</code>。初学开发者觉得数字之前的<code>0</code>没有语意，只是为了让数字对齐 —— 但是，这样做确实改变了数字的意义！八进制语法几乎没什么用并且还会被错误的使用，所以在严格模式下会抛出语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> sum = <span class="number">015</span> + <span class="comment">// !!! syntax error</span></div><div class="line">          <span class="number">197</span> + </div><div class="line">          <span class="number">142</span></div></pre></td></tr></table></figure>
+
+<h3 id="简化变量的使用">简化变量的使用</h3>
+<p>严格模式简化了变量名是如何映射到变量的定义的。很多解释器的优化依赖于解释器了解变量和变量的存储映射关系：这是全面优化JavaScript代码非常关键的一点。JavaScript代码有时在运行时才能找到变量名到变量定义之间的映射。严格模式下移除了大部分这样的情况，解释器也能发挥更好的优化作用。</p>
+<p>首先，严格模式下禁止使用<code>with</code>，原因是因为在调用<code>with</code>的代码块中的任何命名有可能指向一个对象的属性，或者指向一个外部的（甚至是全局的）变量，在运行时解释器很难知道该变量指代的对象是什么。这种情况在严格模式下会抛出语法错误，也就避免了在<code>with</code>的代码块中存在不确定指向的变量命名：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> x = <span class="number">17</span>;</div><div class="line"><span class="keyword">with</span>(obj) { <span class="comment">// !!! syntax error</span></div><div class="line">  <span class="comment">// if this weren't strict mode, would this be var x, or</span></div><div class="line">  <span class="comment">// would it instead be obj.x? It's impossible in general</span></div><div class="line">  <span class="comment">// to say without running the code, so the name can't be</span></div><div class="line">  <span class="comment">// optimized.</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>替代使用<code>with</code>的简单的方式可以选择直接访问变量上的对应属性进行赋值运算。</p>
+<p>另外，<a href="http://whereswalden.com/2011/01/10/new-es5-strict-mode-support-new-vars-created-by-strict-mode-eval-code-are-local-to-that-code-only/" target="_blank" rel="external">严格模式下的<code>eval</code>方法调用不会给当前作用域上添加新的变量</a>。在非严格模式下，<code>eval(&quot;var x;&quot;)</code>将会创建新的变量<code>x</code>在当前的方法作用域上或者全局作用域上。这就意味着，通常情况下如果一个方法包含了<code>eval</code>语句，并且<code>eval</code>语句创建了新的和方法中某个参数或变量同名的变量，有可能会影响到他它们的值。但是在严格模式下，<code>eval</code>创建出来的变量只属于<code>eval</code>中代码被执行时的作用域，所以<code>eval</code>并不会影响其他局部本两或者参数：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> x = <span class="number">17</span>;</div><div class="line"><span class="keyword">var</span> evalX = <span class="built_in">eval</span>(<span class="string">"'use strict'; var x = 42; x"</span>);</div><div class="line">assert(x === <span class="number">17</span>);</div><div class="line">aseert(evalX === <span class="number">42</span>);</div></pre></td></tr></table></figure>
+
+<p>如果<code>eval</code>方法被另一个严格模式下的<code>eval</code>方法调用，那么被调用的<code>eval</code>表达式运行时也会被当作在严格模式下运行，而且这段代码可以显示的设置上严格模式，但是不是必须的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">strict1</span> <span class="params">(str)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">return</span> <span class="built_in">eval</span>(str); <span class="comment">// str will be treated as strict mode code</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">strict2</span> <span class="params">(f, str)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">return</span> f(str); <span class="comment">// not eval(..): str is strict if and only if it invokes strict mode</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">nonstrict</span> <span class="params">(str)</span> </span>{</div><div class="line">  <span class="keyword">return</span> <span class="built_in">eval</span>(str); <span class="comment">// str is strict if and only if it invokes strict mode</span></div><div class="line">}</div><div class="line"></div><div class="line">strict1(<span class="string">"'Strict mode code!'"</span>);</div><div class="line">strict1(<span class="string">"'use strict'; 'Strict mode code!'"</span>);</div><div class="line">strict2(<span class="built_in">eval</span>, <span class="string">"'Non-strict code.'"</span>);</div><div class="line">strict2(<span class="built_in">eval</span>, <span class="string">"'use strict'; 'Strict mode code!'"</span>);</div><div class="line">nonstrict(<span class="string">"'Non-strict code.'"</span>);</div><div class="line">nonstrict(<span class="string">"'use strict'; 'Strict mode code!'"</span>);</div></pre></td></tr></table></figure>
+
+<p>最后，严格模式下禁止删除一个变量名称。<code>delete name</code>在严格模式下会抛出语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="built_in">eval</span>(<span class="string">'var x; delete x;'</span>); <span class="comment">// !!! syntax error</span></div></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">strict1</span> <span class="params">()</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">var</span> x = <span class="number">10</span>;</div><div class="line">  <span class="keyword">delete</span> x; <span class="comment">//  !!! syntax error</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<h3 id="让使用eval和arguments更加简单">让使用<code>eval</code>和<code>arguments</code>更加简单</h3>
+<p>严格模式让<code>arguments</code>和<code>eval</code>变得没那么神秘莫测。过去在非严格模式下它们都表现得比较诡异：<code>eval</code>有可能影响外部作用域的变量值，而<code>arguments</code>可以通过索引可以访问到参数，而且只是作为参数的一个别名而已。严格模式尽可能的把<code>eval</code>和<code>arguments</code>只是当成关键字来使用，完整的修复可能需要等到新版本的ECMAScript的出现。</p>
+<p>首先，从语法层面就限制了<code>eval</code>和<code>arguments</code>不能被使用到声明和赋值语句中。所有的尝试都会当成语法错误：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="built_in">eval</span> = <span class="number">17</span>;</div><div class="line"><span class="built_in">arguments</span>++;</div><div class="line">++<span class="built_in">eval</span>;</div><div class="line"><span class="keyword">var</span> obj = { set p(<span class="built_in">arguments</span>) {} };</div><div class="line"><span class="keyword">var</span> <span class="built_in">eval</span>;</div><div class="line"><span class="keyword">try</span> {} <span class="keyword">catch</span> (<span class="built_in">arguments</span>) {}</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">x</span> <span class="params">(eval)</span> </span>{}</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">arguments</span> <span class="params">()</span> </span>{}</div><div class="line"><span class="keyword">var</span> y = <span class="function"><span class="keyword">function</span> <span class="title">eval</span> <span class="params">()</span> </span>{};</div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">'arguments'</span>, <span class="string">'"use strict"; return 17;'</span>);</div></pre></td></tr></table></figure>
+
+<p>另外，严格模式下的<code>arguments</code>通过索引访问到的参数并不是参数的别名。在非严格模式下，假设有一个方法，方法的第一个参数叫做<code>arg</code>，对<code>arg</code>的修改同时也会修改了<code>arguments[0]</code>，反之亦然（除非没有设置参数或者<code>arguments[0]</code>被删除了）。在严格模式下，<code>arguments</code>只是保存了方法调用时候初始的参数值。<code>arguments[i]</code>不会跟踪对应的参数值，反过来一个参数的改变也不会影响对应的<code>arguments[i]</code>。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span> <span class="params">(a)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  a = <span class="number">42</span>;</div><div class="line">  <span class="keyword">return</span> [a, <span class="built_in">arguments</span>[<span class="number">0</span>]];</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">var</span> pair = f(<span class="number">17</span>);</div><div class="line">assert(pair[<span class="number">0</span>] === <span class="number">42</span>);</div><div class="line">assert(pair[<span class="number">1</span>] === <span class="number">17</span>);</div></pre></td></tr></table></figure>
+
+<p>还有，严格模式下不再支持<code>arguments.callee</code>。在非严格模式下<code>arguments.callee</code>指向了当前调用的方法。<code>arguments.callee</code>本质上阻碍的解释器的优化，因为它必须保持了一个指向当前方法的应用。在严格模式下，<code>arguments.callee</code>变成一个不能被删除的属性，当赋值和取值时都会抛出异常。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">var</span> f = <span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{ <span class="keyword">return</span> <span class="built_in">arguments</span>.callee; };</div><div class="line">f(); <span class="comment">// throws a TypeError</span></div></pre></td></tr></table></figure>
+
+<h3 id="“安全的”JavaScript">“安全的”JavaScript</h3>
+<p>严格模式让开发者更容易编写“安全的”JavaScript。有些网站可以让用户编写JavaScript，这些脚本会被其他用户的浏览器或网站运行。浏览器中的JavaScript将能够访问到用户的私密信息，所以这段JavaScript能被部分地在运行前转变，去连接被禁止的功能。为了做到“安全的”JavaScript，需要有多次的运行时检查灵活多变的JavaScript代码。但是多次的运行时检查可能带来大量的性能损失。在严格模式下的一些调整，用户提交的JavaScript代码会以某种方式执行，有效的减少了运行时检查的需要。</p>
+<p>首先，在严格模式下，当值作为<code>this</code>传入一个方法时（调用<code>call</code>, <code>apply</code>, <code>bind</code>方法时），不会被装箱成一个对象。非严格模式下，对于一个方法来说，如果作为<code>this</code>传入的值是一个对象，那么方法中的<code>this</code>就是一个对象；如果传入的是<code>Boolean</code>，<code>string</code>，<code>number</code>类型的话，方法中的<code>this</code>就是装箱之后的值；如果传入的值是<code>undefined</code>或者<code>null</code>，那么方法中的<code>this</code>就是全局对象。自动装箱会造成性能损失，而且暴露出来的浏览器全局对象又会造成安全隐患，因为全局对象可以连接功能“安全的”JavaScript环境，这是需要被限制的。因此，对于一个严格模式下的方法，指定的<code>this</code>被视为未改变的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span> <span class="params">()</span> </span>{ <span class="keyword">return</span> <span class="keyword">this</span>; }</div><div class="line">assert(fun() === <span class="literal">undefined</span>); <span class="comment">// this is unchanged, before is global variable</span></div><div class="line">assert(fun.call(<span class="number">2</span>) === <span class="number">2</span>);</div><div class="line">assert(fun.apply(<span class="literal">null</span>) === <span class="literal">null</span>);</div><div class="line">assert(fun.call(<span class="literal">undefined</span>) === <span class="literal">undefined</span>);</div><div class="line">assert(fun.bind(<span class="literal">true</span>)() === <span class="literal">true</span>);</div></pre></td></tr></table></figure>
+
+<p>另外，严格模式下不能使用ECMAScript的通用实现的扩展去“查看”JavaScript的堆栈。通常实现的扩展程序中，当方法<code>fun</code>被另一个方法调用时，<code>fun.caller</code>指向了最近调用<code>fun</code>的方法，<code>fun.arguments</code>指向了<code>fun</code>方法调用时候的参数。两个属性的访问都时被严格模式限制的，因为它们允许“安全的”代码访问“特权函数”及其（有隐患的）参数。如果<code>fun</code>处于严格模式下，<code>fun.caller</code>和<code>fun.arguments</code>都是不可删除的属性，在设值和取值的时候会抛出异常：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">restricted</span> <span class="params">()</span> </span>{</div><div class="line">  <span class="string">'use restrict'</span>;</div><div class="line">  restricted.caller; <span class="comment">// throws a TypeError</span></div><div class="line">  restricted.arguments; <span class="comment">// throws a TypeError</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">privilegedInvoker</span> <span class="params">()</span> </span>{</div><div class="line">  <span class="keyword">return</span> restricted();</div><div class="line">}</div><div class="line"></div><div class="line">privilegedInvoker();</div></pre></td></tr></table></figure>
+
+<p>还有，在严格模式下，方法的<code>arguments</code>不能访问到方法调用时的变量。在较老版本的ECMAScript实现的<code>arguments.caller</code>是一个对象，对象的属性是指向了该方法调用时参数的别名。这也是一个<a href="http://stuff.mit.edu/iap/2008/facebook/" target="_blank" rel="external">安全隐患</a>，因为它不能通过方法抽象来隐藏特权值；也会给解释器优化带来困难。目前来说，还没有近代浏览器实现它。因为一些历史原因，严格模式下的方法中<code>arguments.caller</code>是一个不可被删除的属性，并且设值和取值时都会抛出异常：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span> <span class="params">(a, b)</span> </span>{</div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">var</span> v = <span class="number">12</span>;</div><div class="line">  <span class="keyword">return</span> <span class="built_in">arguments</span>.caller; <span class="comment">// throws a TypeError</span></div><div class="line">}</div><div class="line"></div><div class="line">fun(<span class="number">1</span>, <span class="number">2</span>); <span class="comment">// doesn't expose v (or a or b)</span></div></pre></td></tr></table></figure>
+
+<h3 id="为未来的ECMAScript铺路">为未来的ECMAScript铺路</h3>
+<p>未来的ECMAScript版本将可能带来新的语法，ECMAScript5中的严格模式应用了多种限制来缓和即将来临的变化。严格模式限制了这些改变的核心部分，使得ECMAScript改变起来更加容易一些。</p>
+<p>首先，严格模式下一些标识变成了保留关键字：<code>implements</code>，<code>interface</code>，<code>let</code>，<code>package</code>，<code>private</code>，<code>protected</code>，<code>protected</code>，<code>public</code>，<code>static</code>和<code>yield</code>。所以你不能把它们用作变量名和参数名。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">package</span> <span class="params">(protected)</span> </span>{ <span class="comment">// !!!</span></div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">  <span class="keyword">var</span> implements; <span class="comment">// !!!</span></div><div class="line">  </div><div class="line">  interface: <span class="comment">// !!!</span></div><div class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) {</div><div class="line">    <span class="keyword">break</span> interface; <span class="comment">// !!!</span></div><div class="line">  }</div><div class="line">  </div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">private</span> <span class="params">()</span> </span>{} <span class="comment">// !!!</span></div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">fun</span> <span class="params">(static)</span> </span>{ <span class="comment">// !!!</span></div><div class="line"><span class="pi">  'use strict'</span>;</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>在Firefox下有两个特殊的地方：第一，如果你的代码使用的是JavaScript1.7或以上（你使用的时Chrome，或者你使用了正确的<code>&lt;script type=&quot;&quot;&gt;</code>），并且使用了严格模式，<code>let</code>和<code>yield</code>在它们第一次引入的时候就已经可以使用。但是如果脚本是使用<code>&lt;script src=&quot;&quot;&gt;</code>或<code>&lt;script&gt;…&lt;/script&gt;</code>加载的，那么你不可以使用<code>let</code>/<code>yield</code>作为标识符。第二，ES5还保留了更多的关键字：<code>class</code>，<code>enum</code>，<code>export</code>，<code>export</code>，<code>extend</code>，<code>import</code>和<code>super</code>，在Firefox5之前，它们只在严格模式下保留。</p>
+<p>另外，<a href="http://whereswalden.com/2011/01/24/new-es5-strict-mode-requirement-function-statements-not-at-top-level-of-a-program-or-function-are-prohibited/" target="_blank" rel="external">严格模式禁止在一段脚本或一个方法内有不标准的方法声明</a>。在非严格模式下，浏览器允许在任何地方声明方法。这种方式并不是来自ES5，甚至不是来自ES3！，它是不同浏览器不同的实现导致的。未来的ECMAScript版本将会为不标准的方法声明定义新的语意。严格模式下<a href="http://wiki.ecmascript.org/doku.php?id=conventions:no_non_standard_strict_decls" target="_blank" rel="external">禁止了这种方法申明</a>，为未来的ECMAScript标准的定制扫清障碍。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="pi">'use strict'</span>;</div><div class="line"><span class="keyword">if</span> (<span class="literal">true</span>) {</div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">f</span> <span class="params">()</span> </span>{ } <span class="comment">// !!! syntax error</span></div><div class="line">  f();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span> ; i &lt; <span class="number">5</span> ; i ++) {</div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">f2</span> <span class="params">()</span> </span>{} <span class="comment">// !!! syntax error</span></div><div class="line">  f2();</div><div class="line">}</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">baz</span> <span class="params">()</span></span>{ <span class="comment">// kosher, clear</span></div><div class="line">  <span class="function"><span class="keyword">function</span> <span class="title">eit</span> <span class="params">()</span> </span>{} <span class="comment">// also kosher, clear</span></div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这种限制不是严格模式特有的，因为这样的方法申明是基础的ES5的一个扩展。并且它已经成为ECMAScript委员会推荐的方式，浏览器在不久的将来会实现这种行为。</p>
+<h2 id="浏览器下的严格模式">浏览器下的严格模式</h2>
+<p>浏览起还没有完全实现严格模式，所以不要盲目的依赖它。<em>严格模式会改变脚本的语意</em>。如果浏览器还没有实现某种严格模式下的行为，依赖这些行为的地方将会导致错误。使用的时候需要保持练习的心态，通过功能测试来保证你使用的严格模式都被浏览器实现了。最后，确保你测试过你的代码在不支持严格模式的浏览器也是可以运行的，否则，你可能会遇到些问题，反之亦然。</p>
+<h2 id="更多阅读">更多阅读</h2>
+<ul>
+<li><a href="http://whereswalden.com/2010/09/08/new-es5-strict-mode-support-now-with-poison-pills/" target="_blank" rel="external">Where’s Walden? » New ES5 strict mode support: now with poison pills!</a></li>
+<li><a href="http://whereswalden.com/2011/01/24/new-es5-strict-mode-requirement-function-statements-not-at-top-level-of-a-program-or-function-are-prohibited/" target="_blank" rel="external">Where’s Walden? » New ES5 strict mode requirement: function statements not at top level of a program or function are prohibited</a></li>
+<li><a href="http://whereswalden.com/2011/01/10/new-es5-strict-mode-support-new-vars-created-by-strict-mode-eval-code-are-local-to-that-code-only/" target="_blank" rel="external">Where’s Walden? » New ES5 strict mode support: new vars created by strict mode eval code are local to that code only</a></li>
+<li><a href="http://ejohn.org/blog/ecmascript-5-strict-mode-json-and-more/" target="_blank" rel="external">John Resig - ECMAScript 5 Strict Mode, JSON, and More</a></li>
+<li><a href="http://dmitrysoshnikov.com/ecmascript/es5-chapter-2-strict-mode/" target="_blank" rel="external">ECMA-262-5 in detail. Chapter 2. Strict Mode.</a></li>
+<li><a href="http://kangax.github.com/es5-compat-table/strict-mode/" target="_blank" rel="external">Strict mode compatibility table</a></li>
+</ul>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2013/06/09/2013-06-09-strict-mode/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2013/06/09/2013-06-09-strict-mode/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2013/06/09/2013-06-09-strict-mode/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2013/06/09/2013-06-09-strict-mode/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2013/06/30/2013-06-30-e2e-testing-of-web-application/">
+        ← Web应用E2E测试框架
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2013/05/31/2013-05-31-cross-origin-request/">
+        跨了个域 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

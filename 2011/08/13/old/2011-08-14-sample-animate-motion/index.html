@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Sample – Animate Motion | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2011-08-13T09:16:49.000Z" itemprop="datePublished">
+          Aug 13 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>,
+    
+    <a href='/tags/SVG/'>SVG</a>
+    
+    
+</span>
+    <h1 class="post-title">Sample – Animate Motion</h1>
+    <section class="post-content">
+      <p>不写这个Sample还不知道，原来在Testing的时候写的jsAnimateMotion方法在safari上有个小bug，不过现在暂时解决了，还存在一些多transform属性同时设置时的复合变化兼容性没做好。</p>
+<p>jsAnimateMotion其实是个多余的方法，因为在SVG里面是直接可以用animateMotion标签直接定义出动画的，但是现在浏览器的对此标签的兼容性真是够差（主要是针对js生成的animateMotion标签各个浏览器支持不好，inline html svg却是各浏览器都支持。），除此之外，还要介绍的有animateColor和animateTransform标签，都是比较给力的，有兴趣的可以去下面的相关链接上看下。</p>
+<p>W3C animateXXX标签技术细节：</p>
+<ol>
+<li>animateMotion : <a title="animateMotion" href="http://www.w3.org/TR/SVG/animate.html#AnimateMotionElement" target="_blank">http://www.w3.org/TR/SVG/animate.html#AnimateMotionElement</a></li>
+<li>animateColor : <a title="animateColor" href="http://www.w3.org/TR/SVG/animate.html#AnimateColorElement" target="_blank">http://www.w3.org/TR/SVG/animate.html#AnimateColorElement</a></li>
+<li>animateTransform : <a title="animateTransform" href="http://www.w3.org/TR/SVG/animate.html#AnimateTransformElement" target="_blank">http://www.w3.org/TR/SVG/animate.html#AnimateTransformElement</a></li>
+</ol>
+<p>当然还要贴上此sample的地址：</p>
+<p><a title="animate-Motion" href="http://sheldonw.sinaapp.com/mr-and-ms/Mr.Graph/samples/animate-along.html" target="_blank">http://sheldonw.sinaapp.com/mr-and-ms/Mr.Graph/samples/animate-along.html</a></p>
+<p>(animateAlong感觉更贴切一些)。</p>
+<p>附上sample贴图：</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2011/08/Animate-along.jpg" rel="external" target="_blank"><img class="alignnone size-medium wp-image-67" title="Animate along" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2011/08/Animate-along-300x276.jpg" alt="" width="300" height="276"></a></p>
+<p>PS：时间有限，效果一般，望多体谅。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2011/08/13/old/2011-08-14-sample-animate-motion/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2011/08/13/old/2011-08-14-sample-animate-motion/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2011/08/13/old/2011-08-14-sample-animate-motion/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2011/08/13/old/2011-08-14-sample-animate-motion/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2011/08/22/old/2011-08-23-sample7-simple-column-chart/">
+        ← Sample7 – Simple Column Chart
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2011/08/11/old/2011-08-12-post-from-windows-live-writer/">
+        Post from Windows Live Writer →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

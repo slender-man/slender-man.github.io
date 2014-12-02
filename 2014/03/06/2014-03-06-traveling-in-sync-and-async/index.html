@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>在JavaScript异步和同步之间穿梭 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2014-03-05T16:00:00.000Z" itemprop="datePublished">
+          Mar 6 2014
+      </time>
+    
+</span>
+    <h1 class="post-title">在JavaScript异步和同步之间穿梭</h1>
+    <section class="post-content">
+      <h2 id="异步和同步">异步和同步</h2>
+<p>如果你正在使用JavaScript，那么你对异步和同步的代码并不会陌生。经常接触到的异步的用法很多，比如一个DOM事件的调用，一个Ajax请求或是NodeJS中读文件方法的调用等等都是在使用异步调用。当你遍历取到的数据并加上处理逻辑的时候，你就会使用上同步的代码。整个编码的过程里，其实你就是在同步和异步的方式之间穿梭。</p>
+<p>无需多说同步代码是怎么运行的，程序顺序执行的方式是学习编程的第一课，但它却先入为主地给我们的脑子里烙了个印，以至于很多开发者想学JS的时候，觉得JS是个调用方式特别的语言，需要时间去适应同步到异步的思维转换。所以我期望更多地介绍异步方式的调用，帮助大家打破那些<a href="http://blog.zhaojie.me/2011/12/the-stuck-mind-of-asynchronous-programming.html" target="_blank" rel="external">受禁锢的异步编程思维</a>。</p>
+<p>异步调用并不会阻止代码的顺序执行，而是在将来的某一个时刻触发设置好的逻辑，所以我们</p>
+<ol>
+<li>并不知道逻辑什么时候会被调用</li>
+<li>只能定义当触发的时候逻辑是什么</li>
+<li>只能等待，同时可以去处理其他的逻辑</li>
+</ol>
+<p><code>setTimeout</code>就是这样的一个异步调用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">setTimeout(<span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{</div><div class="line">  <span class="built_in">console</span>.log(<span class="number">1</span>);</div><div class="line">}, <span class="number">0</span>);</div><div class="line"><span class="built_in">console</span>.log(<span class="number">2</span>);</div><div class="line"><span class="comment">// output</span></div><div class="line"><span class="comment">// 2</span></div><div class="line"><span class="comment">// 1</span></div></pre></td></tr></table></figure>
+
+<h3 id="冒泡排序动画的例子">冒泡排序动画的例子</h3>
+<p>冒泡算法人人都会，但是如果需要加上动画效果，算法就会变得有趣得多。先看看冒泡逻辑是怎么写的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">bubbleSort</span><span class="params">(arr)</span> </span>{</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>, len = arr.length ; i &lt; len - <span class="number">1</span> ; i++){</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> ii = <span class="number">0</span>; ii &lt; len - i - <span class="number">1</span>; ii++){</div><div class="line">      <span class="keyword">if</span>(arr[ii] &gt; arr[ii + <span class="number">1</span>]){</div><div class="line">        swap(arr, ii, ii + <span class="number">1</span>);</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>需要改变的点就是<code>swap</code>方法需要是异步的，当两两交换的动画结束后，继续下一步比较，请参考<a href="http://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html" target="_blank" rel="external">Comparison Sorting Algorithms</a>里的动画。这个例子虽然简单，但其实在Web应用和页游中，需要在计算逻辑（同步）和可视化（异步）之间频繁切换的场景还很多。</p>
+<p>为达目的，于是把代码写成了这样。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">asyncBubbleSort</span><span class="params">(arr, i)</span></span>{</div><div class="line">  i = i || <span class="number">0</span>;</div><div class="line">  <span class="keyword">if</span>(i == arr.length - <span class="number">1</span>) <span class="keyword">return</span>;</div><div class="line">  (<span class="function"><span class="keyword">function</span> <span class="title">bubble</span><span class="params">(arr, ii)</span></span>{</div><div class="line">    <span class="keyword">if</span>(ii != arr.length - i - <span class="number">1</span>){</div><div class="line">      <span class="keyword">if</span>(arr[ii] &gt; arr[ii + <span class="number">1</span>]){</div><div class="line">        <span class="comment">/* 异步的swap */</span></div><div class="line">        asyncSwap(arr, ii, ii + <span class="number">1</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span></span>{</div><div class="line">          bubble(arr, ++ii);</div><div class="line">        });  </div><div class="line">      }<span class="keyword">else</span> bubble(arr, ++ii);</div><div class="line">    }<span class="keyword">else</span>{</div><div class="line">      bubble(arr, ++i);</div><div class="line">    }</div><div class="line">  })(arr, <span class="number">0</span>);</div><div class="line">}</div></pre></td></tr></table></figure>
+
+<p>这个冒泡的算法逻辑已经面目全非，和脑海中的冒泡排序天差地别，试想如果是遇到更加复杂的场景，那这个逻辑将会多么的复杂。带着问题，我们先看看目前在JS异步调用方面，我们都有些什么尝试。<br><!--break--></p>
+<h2 id="异步调用方式的进化">异步调用方式的进化</h2>
+<p>其实我们没有停止过对更好的异步调用方式的追求，目的就是让代码更易读，更接近我们最初认为的那个样子。多层嵌套是异步调用的一个特点，你的代码可能会是这样的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">step1(<span class="function"><span class="keyword">function</span> <span class="params">(value1)</span> </span>{</div><div class="line">  step2(value1, <span class="function"><span class="keyword">function</span><span class="params">(value2)</span> </span>{</div><div class="line">    step3(value2, <span class="function"><span class="keyword">function</span><span class="params">(value3)</span> </span>{</div><div class="line">      doSomething(value1, value2, value3);</div><div class="line">    });</div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>为了让代码可读，传统方式一般会定义一个新的方法让主体代码更整洁些，如下所示。但<code>step1</code>、<code>step2</code>、<code>step3</code>三个方法的组合方式会有很多种的，代码的结构会变得复杂，变得不好维护。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">steps</span><span class="params">(callback)</span> </span>{</div><div class="line">  step1(<span class="function"><span class="keyword">function</span> <span class="params">(value1)</span> </span>{</div><div class="line">    step2(<span class="function"><span class="keyword">function</span><span class="params">(value2)</span> </span>{</div><div class="line">      step3(<span class="function"><span class="keyword">function</span><span class="params">(value3)</span> </span>{</div><div class="line">        callback && callback(value1, value2, value3);</div><div class="line">      });</div><div class="line">    });</div><div class="line">  });</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line">steps(<span class="function"><span class="keyword">function</span> <span class="params">(value1, value2, value3)</span> </span>{</div><div class="line">  doSomething(value1, value2, value3);</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<h3 id="CommonJS_Promise">CommonJS Promise</h3>
+<p>当CommonJS的Promise出来之后，在异步调用的控制，可读性上有了很大的进步。代码变成了这个样子，并不用抽新的方法，三个方法的组合方式也可任意组织。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">$.when(step1(), step2(), step3(), <span class="function"><span class="keyword">function</span> <span class="params">(value1, value2, value3)</span> </span>{</div><div class="line">  doSomething(value1, value2, value3);</div><div class="line">});</div><div class="line"><span class="comment">//</span></div><div class="line"><span class="comment">// 和</span></div><div class="line"><span class="comment">//</span></div><div class="line">$.when(step1(), step3(), <span class="function"><span class="keyword">function</span> <span class="params">(value1, value3)</span> </span>{</div><div class="line">  doAnotherThing(value1, value3);</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>再如支持Promise的<code>$.ajax</code>API比之前配置的方式优雅了很多。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">$.ajax( <span class="string">"example.php"</span> )</div><div class="line">  .done(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert( <span class="string">"success"</span> );</div><div class="line">  })</div><div class="line">  .fail(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert( <span class="string">"error"</span> );</div><div class="line">  })</div><div class="line">  .always(<span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    alert( <span class="string">"complete"</span> );</div><div class="line">  });</div></pre></td></tr></table></figure>
+
+<p>但是稍微改一下，就会发现Promise也不是完美的。如果遇到多个函数之间是相互依赖的情况，还是会利用到多层<code>callback</code>的方式，相比起来并没有多大的改进。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">step1().done(<span class="function"><span class="keyword">function</span> <span class="params">(value1)</span> </span>{</div><div class="line">  step2(value1).done(<span class="function"><span class="keyword">function</span> <span class="params">(value2)</span> </span>{</div><div class="line">  	step3(value2).done(<span class="function"><span class="keyword">function</span> <span class="params">(value3)</span> </span>{</div><div class="line">  	  doSomething(value1, value2, value3);</div><div class="line">  	});</div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>如果你想要使用Promise，提供几个库给大家按照需求选择使用。jQuery的<a href="http://api.jquery.com/?s=deferred" target="_blank" rel="external">Deferred对象</a>, <a href="https://github.com/cujojs/when" target="_blank" rel="external">When</a>和强力推荐的<a href="https://github.com/kriskowal/q" target="_blank" rel="external">Q</a>。</p>
+<h3 id="控制异步运行队列">控制异步运行队列</h3>
+<p>最易读的方式当然是像同步一样去编写异步代码，让现有逻辑能够复用，降低异步的编程复杂度。虽然是异步方法，但期望依然可以串行调用。刚接触到这种想法的时候，我其实是很惊讶的，因为从没这么颠覆性的去思考解决这个问题。刚以为这完全是不可能的，但实际上已经接触到了很多这样的例子，比如<a href="https://github.com/karma-runner/karma-ng-scenario" target="_blank" rel="external"><code>karma-ng-scenario</code></a>, <a href="https://github.com/winsonwq/karma-e2e-dsl" target="_blank" rel="external"><code>karma-e2e-dsl</code></a>和<a href="https://code.google.com/p/selenium/" target="_blank" rel="external"><code>selenium-webdriver</code></a>实现的那样。</p>
+<p>这是一段ng-scenario的API调用，你会发现在输入框中填值，点击按钮，断言等操作都是异步调用，但是代码确是同步方式编写的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">describe(<span class="string">'Buzz Client'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">  it(<span class="string">'should filter results'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>{</div><div class="line">    input(<span class="string">'user'</span>).enter(<span class="string">'jacksparrow'</span>);</div><div class="line">    element(<span class="string">':button'</span>).click();</div><div class="line">    expect(repeater(<span class="string">'ul li'</span>).count()).toEqual(<span class="number">10</span>);</div><div class="line">    input(<span class="string">'filterText'</span>).enter(<span class="string">'Bees'</span>);</div><div class="line">    expect(repeater(<span class="string">'ul li'</span>).count()).toEqual(<span class="number">1</span>);</div><div class="line">  });</div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>非常神奇，不是么！你可以参考<a href="https://github.com/winsonwq/karma-e2e-dsl" target="_blank" rel="external"><code>karma-e2e-dsl</code></a>的代码是怎么利用promise对象做到的。</p>
+<p>这其实都是烟雾弹，这种顺序的写法在代码运行的时候，每一个语句其实并没有去执行相应的逻辑，而是把它真正的逻辑入队列delay运行了，等到某一个时刻，把队列里面的逻辑挨个串起来运行一遍。所以你会发现，这种设计它是不可能出现返回值的，如下的例子就是无法实现的，因为赋值表达式立即执行，不受运行队列控制。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> val = step1();</div><div class="line"><span class="comment">// step1() 让step1真正的逻辑进入队列</span></div><div class="line"><span class="comment">// step1() 的返回值赋给val变量 &lt;= 赋值逻辑未受队列控制</span></div><div class="line">step2();</div><div class="line"><span class="comment">// step2() 让step2的真正逻辑进入队列</span></div><div class="line"><span class="built_in">console</span>.log(val);</div><div class="line"><span class="comment">// 立即输出val的值，此时step1的逻辑在控制中还没有执行</span></div></pre></td></tr></table></figure>
+
+<p>所谓强扭的瓜不甜，硬要在现有JS调用方式下把异步写成同步方式肯定会有些不足，像之前提到的Promise和利用控制延迟的逻辑队列的方式，都是利用技巧和聪明才智的小步改进，并不能彻底达到目的。</p>
+<h3 id="把异步调用推向极致优雅">把异步调用推向极致优雅</h3>
+<p>早在2008年，<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/New_in_JavaScript/1.7" target="_blank" rel="external">JavaScript 1.7</a>中，Firefox和Opera就开始支持一种良好的，可用于代码控制的功能，它叫迭代器<strong>Iterator</strong>和<strong>Generator</strong>，详细的说明可以参考<a href="https://developer.mozilla.org/zh-CN/docs/JavaScript/Guide/Iterators_and_Generators" target="_blank" rel="external">MDN</a>的例子。（混乱的JS版本和功能衍进可以参考<a href="https://en.wikipedia.org/wiki/JavaScript" target="_blank" rel="external">Wiki</a>）</p>
+<p>我在这里要介绍的是Generator对异步调用方式的改变。先回到文章开始时的冒泡排序的例子，如果使用了<strong>Generator去控制代码运行队列的方式</strong>来编写冒泡动画的话，代码可以写成这样。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">swapAsync</span><span class="params">(arr, i, ii)</span> </span>{</div><div class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> <span class="params">(done)</span> </span>{</div><div class="line">    <span class="keyword">var</span> tmp = arr[i];</div><div class="line">    arr[i] = arr[ii];</div><div class="line">    arr[ii] = tmp;</div><div class="line">    <span class="comment">// 等待动画运行完</span></div><div class="line">    swapAnimation(i, ii, done);</div><div class="line">  };</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">run</span><span class="params">(generator)</span> </span>{</div><div class="line">  <span class="keyword">var</span> g = generator();</div><div class="line">  (<span class="function"><span class="keyword">function</span> <span class="title">move</span><span class="params">(val)</span> </span>{</div><div class="line">    <span class="keyword">var</span> next = g.next(val);</div><div class="line">    <span class="keyword">if</span> (!next.done) {</div><div class="line">      next.value(<span class="function"><span class="keyword">function</span> <span class="params">()</span> </span>{</div><div class="line">        move(next.value)</div><div class="line">      });</div><div class="line">    }</div><div class="line">  })();</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line"><span class="function"><span class="keyword">function</span>* <span class="title">bubbleSort</span><span class="params">(arr)</span> </span>{</div><div class="line">  <span class="keyword">for</span>(<span class="keyword">var</span> i = <span class="number">0</span>, len = arr.length ; i &lt; len - <span class="number">1</span> ; i++){</div><div class="line">    <span class="keyword">for</span>(<span class="keyword">var</span> ii = <span class="number">0</span>; ii &lt; len - i - <span class="number">1</span>; ii++){</div><div class="line">      <span class="keyword">if</span>(arr[ii] &gt; arr[ii + <span class="number">1</span>]){</div><div class="line">        <span class="keyword">yield</span> swapAsync(arr, ii, ii + <span class="number">1</span>);</div><div class="line">      }</div><div class="line">    }</div><div class="line">  }</div><div class="line">}</div><div class="line"><span class="comment">//</span></div><div class="line">run(bubbleSort([<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>]));</div></pre></td></tr></table></figure>
+
+<p>其中的run就是一个简单的利用Generator控制代码队列调用的实现，每次取到yield的对象时，得到的时一个异步的可运行的方法（<code>swapAsync()</code>调用的返回值是方法）。立即运行此方法，等待异步调用结束后又让代码继续运行（利用<code>move()</code>方法）。</p>
+<p>整个过程就时每当运行到yield的时候，<code>bubbleSort</code>代码就会停止运行，收到通知之后代码继续运行，完全模拟了同步的节奏。因为这种代码控制的方式时JS原生支持的，所以赋值运算也是可以被控制的。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> val = <span class="keyword">yield</span> randomNumAsync();</div></pre></td></tr></table></figure>
+
+<p>变得可行。同时，可以把<code>yield</code>语法后面的对象称为<code>yieldable</code>对象。这里就有一个<a href="https://gist.github.com/winsonwq/9319377" target="_blank" rel="external">异步随机数赋值运算实现</a>的例子，里面可以看到如何定义赋值运算和不同种类的<code>yieldable</code>对象的。</p>
+<p>Iterator和Generator并不是新鲜的事物，JS1.7的这个功能因为当时浏览器的兼容性问题，没有大范围被使用，在.NET Framework 4.5里也出现了<code>await</code>关键字的语法，支持了这种异步方式。那么为什么现在要“新瓶装老酒”呢，是因为<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/ECMAScript_6_support_in_Mozilla" target="_blank" rel="external">EcmaScript 6</a>将要登上舞台，在NodeJS和浏览器端都会有更多强大的功能和优雅的语法出现，之前阻止其发展的屏障也会被慢慢打破。目前github上很多library都可以开始使用上了ES6的特性，TJ大神的<a href="https://github.com/koajs/koa" target="_blank" rel="external">Koa</a>和<a href="https://github.com/visionmedia/co" target="_blank" rel="external">co</a>就是其中的典范。</p>
+<p>从最基础的callback调用方式到generator的比较完美的异步调用方式的过程里，我们这些在异步和同步之间游走的开发者不断得到新的开发体验，提升开发效率，更重要的是，我们也作为这门语言的使用者和贡献者，见证了一个语言的进步。希望会有更多的好的异步调用方式出现和应用，相信最近这几年里这些编程方式和思维会在游戏开发和数据可视化等领域被大量使用。</p>
+<p>最后还是忍不住放出2012年在我自己的<a href="https://github.com/winsonwq/Mr.Async" target="_blank" rel="external">Mr.Async</a>里面实现的<a href="http://winsonwq.github.io/demo/bubblesort.html" target="_blank" rel="external">冒泡排序动画</a>，纪念下我就是从那个时候开始思考怎么让异步变得更优雅的，当时受到很多老赵的影响。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2014/03/06/2014-03-06-traveling-in-sync-and-async/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2014/03/06/2014-03-06-traveling-in-sync-and-async/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2014/03/06/2014-03-06-traveling-in-sync-and-async/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2014/03/06/2014-03-06-traveling-in-sync-and-async/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2013/09/09/2013-09-09-viff-introduction/">
+        Viff，一种新的页面样式测试策略 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

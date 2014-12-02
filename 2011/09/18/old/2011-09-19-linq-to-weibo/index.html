@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>LINQ To Weibo | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2011-09-18T06:10:59.000Z" itemprop="datePublished">
+          Sep 18 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/-NET/'>.NET</a>
+    
+    
+</span>
+    <h1 class="post-title">LINQ To Weibo</h1>
+    <section class="post-content">
+      <p>介绍个新浪微博的查询实现，LINQ To Weibo，属于Mr开发范围之内，我取了很骚包的名字，Mr.LinqToWeibo。</p>
+<p>很早就用C#实现了OAuth 1.0（不过现在2.0都出了，正在做2.0版本的实现），也一直想把微博的获取变得简便，不用传统的api封装，我选择了LINQ，只为调用者利用LINQ语法，让代码更加语义化。（前端过敏，语义化居然用到这里）。</p>
+<p>LINQ To Weibo支持的新浪微博API：</p>
+<h3><strong>微博查询</strong></h3>
+<ul>
+<li>PUBLIC_TIMELINE，获取最新的公共微博消息,</li>
+<li>FRIENDS_TIMELINE，获取当前登录用户及其所关注用户的最新微博消息</li>
+<li>USER_TIMELINE，获取用户发布的微博消息列表</li>
+<li>MENTIONS，获取@当前用户的微博列表</li>
+<li>REPOST_TIMELINE，返回一条原创微博的最新n条转发微博信息</li>
+<li>REPOST_BY_ME，返回用户转发的最新n条微博信息</li>
+<li>WEIBO_FOR_ONE_TRENDS，获取某一话题下的微博</li>
+</ul>
+<h3><strong>评论查询</strong></h3>
+<ul>
+<li>COMMENTS_TIMELINE，获取当前用户发送及收到的评论列表</li>
+<li>COMMENTS_BY_ME，获取当前用户发出的评论</li>
+<li>COMMENTS_TO_ME，获取当前用户收到的评论，</li>
+<li>COMMENTS_FOR_ONE_WEIBO，根据微博消息ID返回某条微博消息的评论列表</li>
+</ul>
+<p>这些API的实现主要是微博对象和评论对象的获取，对于查询来说，应该够用了。现在我简单说下库的调用。</p>
+<h3>调用准备</h3>
+<p>整个调用过程很简单，创建一个查询对象</p>
+<pre class="brush: csharp">IQueryableWeiboData&lt;Weibo&gt; data = new QueryableWeiboData&lt;Weibo&gt;();</pre>
+<p>当然，如果你想查询评论的话，泛型参数传 Comment。接着需要导入用户的accessToken和accessTokenSecret来源于OAuth1.0，设置调用方法：</p>
+<pre class="brush: csharp">data.SetAccessTokenAndSecret(
+       "2b86af73326d980864d27",  // accessToken
+       "bee7898872f88095a151d"); // accessTokenSecret</pre>
+<p>除了创建查询对象和载入用户token之外，还需要指定查询API是什么，我把它定义为域Scope。Scope是枚举类型，指就是之前列出的API的值。设置Scope的值，调用</p>
+<pre class="brush: csharp">data.SetWeiBoScope (Scope.WEIBO_FOR_ONE_TRENDS);</pre>
+<p>现在就可以很爽的查询了。举两个例子。</p>
+<p><span id="more-106"></span></p>
+<h3>FRIENDS_TIMELINE</h3>
+<p>获取当前登录用户及其所关注用户的最新微博消息，整个查询是所有微博程序都有了，看用了LINQ语法的调用。</p>
+<pre class="brush: csharp">data.Where (weibo =&gt; weibo.Id &gt; 3100000).Skip(1).Take(20);</pre>
+<p>意思是查询微博对象的id大于3100000的微博，并且取分页信息：第2页（Skip(1)本来是指调用一条记录，为了语义更完善，我暂时用Skip代表跳过的页数），每页取20条。</p>
+<pre class="brush: csharp">data.Where (weibo =&gt; weibo.Id &gt; 3100000 &amp;&amp; weibo.Feature == Feature.PIC)</pre>
+<p>意思是查询微博对象的id大于3100000，类型是含有图片的微博，分也方式是默认（如下）。</p>
+<p>如果不设置Skip和Take的话，默认是第一页的20条。那时你也可以这么写：</p>
+<pre class="brush: csharp">from weibo in data where weibo.Id &gt; 3100000 select weibo;</pre>
+<p>和</p>
+<pre class="brush: csharp">from weibo in data
+where weibo.Id &gt; 3100000 &amp;&amp; weibo.Feature == Feature.PIC
+select weibo;</pre>
+<p>看上去感觉都很棒。另外，我实现的是IQueryable&lt;T&gt;接口，所有的查询都会延迟到便利的时候。</p>
+<h3>COMMENTS_FOR_ONE_WEIBO</h3>
+<p>很多时候，会根据指定微博查询其评论，此时就应该用到COMMENTS_FOR_ONE_WEIBO API，首先我们创建查询的上下文对象和设置查询的API。</p>
+<pre class="brush: csharp">var comments = new QueryableWeiboData&lt;Comment&gt;();
+comments.SetWeiBoScope (Scope.COMMENTS_FOR_ONE_WEIBO);</pre>
+<p>完成之后，Code查询表达式查询ID为3100000的微博的前五条评论：</p>
+<pre class="brush: csharp">comments.Where (cmt =&gt; cmt.Weibo.Id == 3100000).Take(5)</pre>
+<p>如果在写程序时不知道确切ID，先得到微博对象weibo，那么可以这么写：</p>
+<pre class="brush: csharp">comments.Where (cmt =&gt; cmt.Weibo.Id == weibo.Id).Take(5)</pre>
+<p>所有API的调用规则都和上面两个例子一样，在这里我列出新浪微博API文档上出现的字段和调用方式：</p>
+<ol>
+<li>since_id 和 max_id 可以通过lambda表达式中weibo.Id的大于小于操作完成</li>
+<li>count 通过Take方法</li>
+<li>page 通过Skip方法，注意Skip(1)代表跳过一页，指第二页</li>
+<li>base_app 和 feature 可以利用weibo.Feature 和 weibo.BaseApp设置查询条件。这两个字段很特殊，因为新浪API不给力，在微博对象上找不到对应字段，get方法也就失去了意义，如果你调用get方法获取它的值，会抛出NotSupportedException，希望有一天能改进。</li>
+<li>id 字段，此字段有多种意思，这个完全是新浪设计API时不给力，混乱。<br>
+表示微博对象的Id，用weibo.Id<br>
+表示微博对象上发微博者得Id，可以用weibo.User.Id<br>
+表示评论上发评论者得Id，可以用comment.User.Id</li>
+<li> user_id 和 screen_name，此两个字段设计的更加傻逼，在文档中说明这两个字段主要是用来区分用户ID跟微博昵称，然后调用方式是REST方式，表面上Id必填，但是文档里面又说Id不必填。。。那我怎么办，所以不支持，如果要查询USER_TIMELINE API，请使用weibo.User.Id，指定特定的Int64类型Id值。</li>
+<li>trend_name，代表话题的名称，可以使用weibo.Trend.KeyWord，此字段依旧是个鸡肋，和之前的feature和base_app如出一辙，在查询返回的微博对象上没有“话题”这一字段，所以此字段的实现只是用于查询，千万别在查询出来的结果集中访问weibo.Trend，因为它总是抛出NotSupportedException，这个是我不希望出现的，可悲。</li>
+</ol>
+<p>希望大家喜欢Mr.LinqToWeibo，如果想要看代码的话，可以联系我，暂时不提供下载，不是怕大家笑话代码如何差，而是还有一些关于我自己的token，我申请的app的consumerKey和consumerSecret的东西没有像到好的方法和代码分离起来，想到了之后就会让大家down下来看看，给点意见。</p>
+<p>目前发现需要改进或者缺少的功能有：</p>
+<ol>
+<li>非表达式的支持，目前只支持weibo.BaseApp == false / true，而不是!weibo.BaseApp</li>
+<li>或关系支持，目前在Where方法里面只支持逻辑与&amp;&amp;关系，甚至还需要考虑括号()优先级的问题，这个目前还没有好的解决方案，新浪的API貌似也还不支持这种方式。而且参数只支持 == 等于操作，如果是微博的ID还支持 &gt;= 或 &lt;= 操作。</li>
+<li>二次过滤的实现，二次过滤指API查询条件之外的过滤，主要是利用LinqToObject方式实现，如果开启二次过滤，分页信息将会不准确</li>
+</ol>
+<p>&nbsp;</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2011/09/18/old/2011-09-19-linq-to-weibo/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2011/09/18/old/2011-09-19-linq-to-weibo/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2011/09/18/old/2011-09-19-linq-to-weibo/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2011/09/18/old/2011-09-19-linq-to-weibo/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2011/09/19/old/2011-09-20-linq-to-weibo-object-filter/">
+        ← LINQ To Weibo 支持对象过滤
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/">
+        Mr.Http based on Ajax →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

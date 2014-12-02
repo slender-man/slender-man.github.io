@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Drag And Drop(DND) Sample | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2011-08-27T06:57:11.000Z" itemprop="datePublished">
+          Aug 27 2011
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/Mr-Ms/'>Mr&amp;Ms</a>
+    
+    
+</span>
+    <h1 class="post-title">Drag And Drop(DND) Sample</h1>
+    <section class="post-content">
+      <p>Drag and drop感觉是当前比较火的页面功能之一，最开始只有Gmail里面上传文件用到，现如今G+，QQ Mail都用得是爽之又爽。当然，这玩意儿现在只有FF3.6+和Chrome 10+支持。详细请看<a href="http://www.caniuse.com/" target="_blank" rel="external">http://www.caniuse.com/</a> 搜索关于Drag and drop, File API, FileReader的支持情况。</p>
+<p>说起来我也是比较2的了，看HTML5这么久，总以为大概的东西知道就可以了，实际上要做的时候又啥都不明白了。</p>
+<p>我用这个功能做了个小玩意儿，你可以把你的本地图片拖动到页面上，然后页面帮你加载图片，其中还做了个机器简单的loading状态（可别小看它），这个东西是不是很傻逼呢，至少我是这么觉得，一般的Sample都是比较傻逼的，但是还是希望你能赏个脸，看看这些基础的小玩意儿。</p>
+<p>此Sample和Mr.Graph没有关系，我也不会把它算到Mr.Graph的Sample中。</p>
+<p>此Sample的例子如下：</p>
+<p><a href="http://sheldonw.sinaapp.com/mr-and-ms/Mr.Graph/samples/dragdrop.html" target="_blank" rel="external">http://sheldonw.sinaapp.com/mr-and-ms/Mr.Graph/samples/dragdrop.html</a></p>
+<p>贴图：（只是贴图）</p>
+<p><a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2011/08/dragdrop.jpg" rel="external" target="_blank"><img class="alignnone size-full wp-image-85" title="dragdrop" src="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2011/08/dragdrop.jpg" alt="" width="317" height="343"></a></p>
+<p>PS：睡着的那只猫有点像猫叔。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2011/08/27/old/2011-08-28-drag-and-dropdnd-sample/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2011/08/30/old/2011-08-31-mr-http-based-on-html5-ajax/">
+        ← Mr.Http based on Ajax
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2011/08/24/old/2011-08-25-sample8-progressbar-in-flash-update/">
+        Sample8 – ProgressBar in Flash update →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

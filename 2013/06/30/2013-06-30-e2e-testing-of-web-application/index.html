@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>Web应用E2E测试框架 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2013-06-29T16:00:00.000Z" itemprop="datePublished">
+          Jun 30 2013
+      </time>
+    
+    
+    | 
+    <a href='/tags/testing/'>testing</a>,
+    
+    <a href='/tags/e2e/'>e2e</a>,
+    
+    <a href='/tags/karma/'>karma</a>,
+    
+    <a href='/tags/selenium/'>selenium</a>
+    
+    
+</span>
+    <h1 class="post-title">Web应用E2E测试框架</h1>
+    <section class="post-content">
+      <p>Web应用E2E（End To End）测试是模拟用户进行页面操作，通过来判断页面状态的变化，从而检查功能是否运行正常的测试方法。为了模拟用户操作，开发者会选择浏览器驱动来完成，<a href="http://docs.seleniumhq.org/" target="_blank" rel="external">Selenium</a>就是其中一个。开发者可以使用多种语言开发Selenium脚本，并且运行在多种浏览器上。我是两年前接触到selenium的，当时还不知道什么是E2E测试，就知道使用了一种能够模拟用户浏览器操作的神器，那时使用的语言是C#，其实想过它是怎么工作的，但由于当时学艺不精，未能完全破解。</p>
+<p>这篇文章并不是来说Selenium的好，它的好处显而易见，而且目前几乎没有另一工具能取代它的地位。时间在推移，各种技术在飞速发展，我们却还是一如既往地在使用Selenium或者建立在它之上的测试框架。反思下，我之前从没想过开发者需要的E2E测试框架中到底应该有什么，如果你也没有想过，那看看我现在的理解是什么。</p>
+<h2 id="我期望的E2E框架">我期望的E2E框架</h2>
+<h3 id="支持多浏览器">支持多浏览器</h3>
+<p>首先，为了测试浏览器兼容性，需要考虑桌面浏览器和移动平台浏览器。目前Selenium已经解决了iOS和Android的浏览器驱动问题，可以在真实移动设备上模拟用户行为，测试移动网络上的表现。</p>
+<p>其次，每当想到所有浏览器都需要测试就觉得糟透了，即使有了自动化E2E测试，如果是每个浏览器顺序跑一遍，那么每一次提交都需要等待十多二十分钟的测试时间，当然是不能接受的。所以说，具备<strong>同时</strong>驱动所有浏览器的能力是非常必要的。</p>
+<h3 id="支持远程测试">支持远程测试</h3>
+<p>如果我把测试看成一种检测的服务，待测设备看成一个目标的话，那么只要我有设备，不管是真机还是模拟器，只要有浏览器我就可以使用该服务看Web应用在此设备上的表现。同时，我也期望设备不需要通过USB连接到电脑上来测试。<br><!--break--></p>
+<h3 id="一门语言就行">一门语言就行</h3>
+<p>模拟用户页面操作，那么现如今最直接的语言就是JavaScript，这门天生为了操作DOM的语言在此时此刻可以发挥巨大作用。Selenium提供了至少7种语言来让开发者编写测试脚本，虽然听上去足够强大，能让大批后端开发人员使用它们喜欢的语言，但是想想，如果现在一个开发Web应用的人还不会使用JavaScript编写简单脚本的话，那么他应该反思一下了；或者说，你作为全能的开发者，前端后端都靠谱，让你来选择用JavaScript还是其他语言，我觉得你会毫不犹豫的选择前者。</p>
+<p>JavaScript既有天生的优势，在NodeJS出现之后又拥有了更多的拥护和使用者，目前可以说是势不可挡。对于Web应用的E2E测试来说，一门最准确的语言就够了，多的都是浪费。</p>
+<h3 id="和现有BDD框架集成">和现有BDD框架集成</h3>
+<p>如果选择了JavaScript，那么目前有很多的前端BDD框架等着你去使用，像Jasmine/Mocha/QUnit都是非常优秀的。如果E2E测试框架能和这些集成起来，可以发挥现有测试框架的技术优势，比如代码覆盖率，报错机制，导出Report等等。到那时，E2E测试框架会变得更加轻量级，专注成为一个Test Runner而已了。</p>
+<p>现有的BDD框架如果要做功能测试，可能需要加载外部html的机制，把html片段加载到测试中，然后做初始化，事件绑定等等操作，然后在模拟用户操作。这里会有个问题，就是非Single Page这种方式的Web应用很少会用到模板技术（如果使用的模板技术，那么可以针对模板做功能测试），代码是直接利用整个文档中的一部分，那么测试的html片段和最终呈现出的代码是有差距的，即使测试通过也心里没底。那么为了解决这个问题，只有把测试提高到E2E测试。就是说，现有的BDD框架也需要这样的Test Runner。</p>
+<p>在这个Runner里，只需要指定期望的测试框架是什么，需要测试的脚本是什么，需不需要统计测试覆盖率，导出结果是json还是html就够了。</p>
+<h2 id="Karma">Karma</h2>
+<p>当然，如果是我第一个考虑这些方面的人的话，我将会创造出它来改变世界，但这不可能。改变世界这种事情当你有idea的时候，无数的人就已经在实现在推广了。持续不断地保持新鲜感，不断探索，不断思考才能让你的改变世界更进一步。先不扯淡，我发现<a href="http://karma-runner.github.io/0.8/index.html" target="_blank" rel="external">Karma</a>就是这么一个暂时满足我期望的Test Runner。</p>
+<p>Karma是基于NodeJS的，通过配置的方式支持多种浏览器，多个测试框架，监听文件修改自动运行测试。</p>
+<p>它的前身叫做Testecular，刚出来的时候是针对AngularJS的测试，在我接触AngularJS的时候，发现它的E2E测试使用的是JSTestDriver（用Java写的），所以在Testecular的出现是为了取代JSTestDriver，后来去AngularJS化之后变成了Karma，使用的范围也更加广了。另外，它们都是来自大神Google。</p>
+<p>假如我们的Web应用是在<code>http://localhost:3000</code>，Karma在测试的时候，为了可以驱动页面操作又不影响Web应用（在Web应用中插入样式或脚本），它选择的方式是启动自己的http服务<code>http://localhost:9172</code>，并把这个Web应用嵌到一个<code>iframe</code>中，通过<code>iframe</code>外的测试脚本来驱动<code>iframe</code>内的页面。为了操作不同域的Web应用，对<code>http://localhost:3000/detail.html</code>的访问会被代理到<code>http://localhost:9172/detail.html</code>。这也是突破浏览器同源策略的方法之一（我有篇文章<a href="http://ishouldbeageek.me/2013/05/31/cross-origin-request/" target="_blank" rel="external">跨了个域</a>中详解过）。这样做，既绕过了“必须”使用的浏览器Driver，也可以使用其他测试框架，还能保持被测的网站是干净的。另外，如果把Karma的测试部署到远程服务器，那么当我的移动设备访问远程地址时，就能在此设备上运行测试。</p>
+<p>Karma使用了<code>socket.io</code>，让Karma和各个浏览器之间保持一个长连接。通过这个连接来检查多浏览器是否在，利用这个连接把浏览器测试的状态快速的反馈到命令行中。同时，当检测到文件修改的时候，也可以通过这个连接发送命令给浏览器，让它刷新页面或重新运行某个测试。</p>
+<p>对，Karma就是这么做到的。为什么说是暂时满足我的需求呢？我希望我能让<a href="https://github.com/cucumber/cucumber/wiki/Gherkin" target="_blank" rel="external">Gherkin syntax</a>（Cucomber测试框架选择了这种语法）编写的测试在Karma上运行。</p>
+<p>最后，如果你被我说服了，放下手中的Selenium，试试Karma。</p>
+<p>- 完 -</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2013/06/30/2013-06-30-e2e-testing-of-web-application/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2013/06/30/2013-06-30-e2e-testing-of-web-application/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2013/06/30/2013-06-30-e2e-testing-of-web-application/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2013/06/30/2013-06-30-e2e-testing-of-web-application/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2013/09/09/2013-09-09-viff-introduction/">
+        ← Viff，一种新的页面样式测试策略
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2013/06/09/2013-06-09-strict-mode/">
+        JavaScript严格模式 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

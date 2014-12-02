@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>跨了个域 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2013-05-30T16:00:00.000Z" itemprop="datePublished">
+          May 31 2013
+      </time>
+    
+</span>
+    <h1 class="post-title">跨了个域</h1>
+    <section class="post-content">
+      <p>如今是一个平台众多，软件开发平民化，软件服务可拼凑成产品的时代。优秀的互联网产品，像微博，微信，Github，Instagram都变成平台，提供一些优雅或不优雅的API让靠谱或不靠谱的开发者来玩，这些API里肯定会涉及到跨域访问的知识。靠谱的开发者即使遇到没有开发文档也能摸索出套路，反之就需要了解下跨域访问的知识了。</p>
+<h2 id="为什么需要“踩过界”">为什么需要“踩过界”</h2>
+<p>跨域访问指的是不同源的A和B网站，A请求访问B的资源。资源包括B网站的图片、视频、数据、文件等等。例如，新浪微博提供的微博API就是提供给不同源网站访问微博数据的接口；又如，A网站嵌入了B网站的图片或视频资源也属于跨域访问。</p>
+<p>那么，为什么不能直接访问呢？等等，让我们先来聊聊浏览器<strong>同源策略（Same-Origin Policy）</strong>，同源策略限制了本网站的<strong>脚本</strong>不能对其他源的网站资源进行<strong>读</strong>和<strong>写</strong>操作。两个域必须满足协议（protocol）、端口（port）、主地址（host）都是一致的，才能相互请求资源。</p>
+<p>假设有不同源的源A和源B，源A对源B的读操作指的是：</p>
+<ol>
+<li>读取源B的JavaScript，CSS的源代码<em>（受到限制）</em></li>
+<li>读取源B的返回的文档，JSON等数据<em>（受到限制）</em></li>
+<li>读取源B的图片的二进制数据<em>（受到限制）</em></li>
+</ol>
+<p>源A对源B的写操作指的是源A发送数据到源B，主要包括：</p>
+<ol>
+<li>源A对源B进行表单，Ajax（XMLHttpRequest或XDomainRequest）<strong>POST</strong>方式提交</li>
+<li>源A嵌入指向源B的链接，点击后发生的跳转</li>
+<li>源A的脚本操作嵌入到iframe中的源B的DOM对象<em>（受到限制）</em></li>
+<li>源A使用postMessage发送嵌入到iframe中的的源B</li>
+</ol>
+<p>以上读和写操作，加上了<em>（受到限制）</em>的操作都属于浏览器同源策略限制。</p>
+<p>其中最重要的危害最大的是写操作中的对源B的DOM对象进行操作。就以支付宝做一个例子，作为攻击者，我申请了一个网址叫做<em><a href="http://alipay.tb.com" target="_blank" rel="external">http://alipay.tb.com</a></em>，整个网站没有内容就一个隐藏的iframe嵌入了<em><a href="http://alipay.com" target="_blank" rel="external">http://alipay.com</a></em>，因为支付宝会记录登陆用户的cookie为了让用户不用每次访问都需要登陆，在没有同源策略的保护下，我可以控制你支付宝，获取你的余额记录和消费记录（此时没有了读取文档限制）或直接利用脚本帮我进行支付，而用户不会洞察到什么，只是收到了消费的短信通知，钱财不翼而飞，损失很大。可见在没有同源策略下的互联网是多么的恐怖。不过放心，即使没有同源策略我们的支付宝也没有这么弱，支付时还需要支付密码。</p>
+<p>不过光有浏览器同源策略是不能完全阻止脚本在你已经登陆的网站上肆虐操作，如果用户主动点击了页面上加载不安全脚本的链接，不安全脚本也会趁虚而入，我们把这种攻击叫做<strong>XSS（Cross Site Scripting）</strong>。目前可能遇见的方式有这么几种：1、点击了链接加载不安全脚本，2、保存成bookmark的脚本不安全，3、Chrome插件被注入恶意脚本。这里就有个血淋淋的<a href="http://coolshell.cn/articles/4914.html" target="_blank" rel="external">新浪微博遭到XSS攻击的例子</a> 。</p>
+<p>在读取操作中有一项限制很有趣，就是不同源之间读取文档，JSON数据是受限制的。提供API就是为了让不同源之间可以相互访问，但是因为同源策略的存在，源B的JSON数据不能直接被读取到，导致现在出现了各种各样的跨域访问方式，例如JSONP，CORS（Cross Origin Resource Sharing），后台代理等。</p>
+<p>跨域访问需要跨越的就是同源策略的多个限制。现在我们来看看几种使用广泛的跨域访问方式是如何工作的。</p>
+<!--break-->
+
+<h2 id="跨域请求方式">跨域请求方式</h2>
+<h3 id="JSONP">JSONP</h3>
+<p>JSONP（JSON with padding)是目前使用的最广，最简单的一种跨域访问方式。既然说同源策略限制了脚本于不同源网站资源进行交互，那么JSONP的原理是什么呢？其实同源策略中还存在另一种脚本和资源的交互方式，叫做<strong>嵌入（Embed）方式</strong>。也就是说，源A可以嵌入源B的资源，比如嵌入源B中的图片、样式文件、脚本文件。样式文件和脚本文件嵌入之后会被运行。JSONP就是利用了网站可以嵌入脚本并运行这一点。</p>
+<p>让我们来看一个列子。定义了简单的后端HTTP GET服务，每次请求返回一段脚本代码，并且把后段数据“hello world”发送回去。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> </span>jsonp</div><div class="line">  str = <span class="string">'hello world'</span></div><div class="line">  func = params[<span class="symbol">:callback</span>]</div><div class="line">  render <span class="symbol">:js</span> =&gt;</div><div class="line">    <span class="string">"try{"</span> +</div><div class="line">      <span class="string">"<span class="subst">#{func}</span>({ str : '<span class="subst">#{str}</span>'});"</span> + </div><div class="line">    <span class="string">"}catch(e){"</span> +</div><div class="line">      <span class="string">"console.error('request error');"</span> + </div><div class="line">    <span class="string">"}"</span></div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+
+<p>实现一个简单的前端调用，使用的是jQuery的getJSON方法</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">$.getJSON(<span class="string">'http://localhost:3000/jsonp?callback=?'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(ret)</span> </span>{</div><div class="line">  <span class="built_in">console</span>.log(ret.str); <span class="comment">// output "hello world"</span></div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>在调用getJSON方法之后发送了callback参数告诉后端生产的JavaScript代码需要调用这个方法，并且把后端的资源“hello world”准备成该方法的一个参数返回回来，达到跨域访问的目的。为了更仔细观察整个过程，我们来看看HTTP的包是什么样子的。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">// Request</div><div class="line">GET /jsonp?callback=jQuery19008820020072162151_1359426298971 HTTP/1.1</div><div class="line"></div><div class="line">Host: localhost:3000</div><div class="line">Connection: keep-alive</div><div class="line"><span class="operator"><span class="keyword">Cache</span>-Control: <span class="keyword">max</span>-age=<span class="number">0</span></span></div><div class="line">…</div><div class="line"></div><div class="line">// Response</div><div class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</div><div class="line"></div><div class="line">Content-Type: <span class="built_in">text</span>/javascript; charset=utf-8</div><div class="line">Etag: "a60520e11c6991b89099c84cb4742f39”</div><div class="line"><span class="operator"><span class="keyword">Cache</span>-Control: <span class="keyword">max</span>-age=<span class="number">0</span>, private, must-revalidate</span></div><div class="line">Content-Length: <span class="number">112</span></div><div class="line">…</div><div class="line"></div><div class="line">try{jQuery19008820020072162151_1359426298971({ <span class="keyword">str</span> : <span class="string">'hello world'</span> });}catch(e){console.error('request error');}</div></pre></td></tr></table></figure>
+
+
+
+<p>需要注意的是jQuery为我们准备的方法叫做<code>jQuery19008820020072162151_1359426298971</code>，这和response内容中的方法调用对应。另一个需要注意的是，response的<code>Content-Type</code>为<code>text/javascript; charset=utf-8</code>，在调用方来看想要得到的是JSON数据，不是脚本，response中的描述出现了“错误”。</p>
+<p>JSONP方式请求，实质上是一个对脚本的GET请求，它不像Ajax请求那样存在加载，调用完成等状态；安全性也不是特别高，存在加载不安全的脚本在本站运行具有风险。jQuery提供的getJSON这样的方式让开发者掉用起来不会感觉和Ajax调用有多大差别。虽然它并不完善，但它的易用性使它现在适用范围最广的跨域访问方式，目前几乎所有的API都会准备JSONP调用方式。</p>
+<h3 id="CORS">CORS</h3>
+<p>CORS(Corss Origin Resource Sharing)跨域资源共享是真正用来解决资源共享问题。不像JSONP那么旁门左道，它是通过HTTP方式来实现资源共享，让每个请求的服务直接返回资源。它使用了HTTP交互方式来确定请求源是否有资格请求该资源，并且通过设置HTTP Header来控制访问资源的权限。</p>
+<p>我们来看一个例子。同样还是定义后端服务，返回的资源仍然是“hello world”。</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> </span>cors</div><div class="line">  response.headers[<span class="string">'Access-Control-Allow-Origin'</span>] = <span class="string">"*"</span></div><div class="line">  response.headers[<span class="string">'Access-Control-Allow-Methods'</span>] = <span class="string">"GET"</span></div><div class="line">  response.headers[<span class="string">'Access-Control-Max-Age'</span>] = <span class="string">'60'</span></div><div class="line">  </div><div class="line">  ret = { <span class="symbol">:str</span> =&gt; <span class="string">'hello world'</span> }</div><div class="line">  render <span class="symbol">:json</span> =&gt; ret.to_json</div><div class="line"><span class="keyword">end</span></div></pre></td></tr></table></figure>
+
+<p>看到了一些HTTP Header的配置，过会再来分析它们是什么。接着，使用jQuery简单实现前端调用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$.getJSON(<span class="string">'http://localhost:3000/cors'</span>, <span class="function"><span class="keyword">function</span> <span class="params">(ret)</span> </span>{</div><div class="line">  <span class="built_in">console</span>.log(ret.str); <span class="comment">// output "hello world"</span></div><div class="line">});</div></pre></td></tr></table></figure>
+
+<p>虽然结果是一样的，但其实其中经过了很多过程，我们看看HTTP请求过程就知道。第一次请求后端时候，浏览器意识到是访问一个跨与资源，没有直接发送GET请求获取数据，而是发送了一个OPTIONS请求询问是否可以访问该资源。我们称之为Preflight请求。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="request">OPTIONS <span class="string">/cors</span> HTTP/1.1</span></div><div class="line"></div><div class="line"><span class="avrasm"><span class="label">Host:</span> localhost:<span class="number">3000</span></span></div><div class="line"><span class="label">Origin:</span> http://localhost:<span class="number">8000</span></div><div class="line"><span class="label">Accept:</span> application/json, text/javascript, *<span class="comment">/*; q=0.01</span></div><div class="line">Access-Control-Request-Method: GET</div><div class="line">…</div></pre></td></tr></table></figure>
+
+<p>浏览器尝试用GET方式请求资源<em><a href="http://localhost:3000/cors" target="_blank" rel="external">http://localhost:3000/cors</a></em>，默认因为同源策略的存在，肯定是请求失败的，所以经常看到的一个错误<code>XMLHttpRequest cannot load http://localhost:3000/. Origin XXX is not allowed by Access-Control-Allow-Origin.</code> 就会出现。这个例子中，Preflight请求的到的response是</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="status">HTTP/1.1 <span class="number">200</span> OK</span></div><div class="line"></div><div class="line"><span class="mathematica"><span class="keyword">Date</span>: Mon, <span class="number">01</span> Dec <span class="number">2013</span> <span class="number">01</span>:<span class="number">15</span>:<span class="number">39</span> GMT</span></div><div class="line">Server: Apache/<span class="number">2.0</span><span class="number">.61</span> (Unix)</div><div class="line">Access-<span class="keyword">Control</span>-Allow-Origin: *</div><div class="line">Access-<span class="keyword">Control</span>-Allow-Methods: GET</div><div class="line">Access-<span class="keyword">Control</span>-<span class="keyword">Max</span>-Age: <span class="number">60</span></div><div class="line">Content-Encoding: gzip</div><div class="line">Content-<span class="keyword">Length</span>: <span class="number">0</span></div><div class="line">Connection: Keep-Alive</div><div class="line">Content-Type: text/text</div><div class="line">…</div></pre></td></tr></table></figure>
+
+<p>通过response，服务器告知浏览器所有域都可以使用GET方式请求请求该资源，有效时间为60秒。得到回复后，浏览器自动再次发出真正的请求并且得到真正的资源。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Actual Request</span></div><div class="line">GET /cors HTTP/<span class="number">1.1</span></div><div class="line"></div><div class="line">Host: localhost:<span class="number">3000</span></div><div class="line">Origin: http:<span class="comment">//localhost:8000</span></div><div class="line">Accept: application/json, <span class="keyword">text</span>/javascript, <span class="variable">*/</span><span class="variable">*;</span> q=<span class="number">0.01</span></div><div class="line">Referer: http:<span class="comment">//localhost:8000/temp.html</span></div><div class="line">Accept-Encoding: gzip,deflate,sdch</div><div class="line">Accept-Language: en-US,en;q=<span class="number">0.8</span></div><div class="line">…</div><div class="line"></div><div class="line"><span class="comment">// Return Resource</span></div><div class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</div><div class="line"></div><div class="line">Access-Control-Allow-Origin: *</div><div class="line">Access-Control-Allow-Methods: GET</div><div class="line">Access-Control-Max-Age: <span class="number">60</span></div><div class="line">Content-Type: application/json; charset=utf-<span class="number">8</span></div><div class="line">Content-Length: <span class="number">24</span></div><div class="line">…</div><div class="line"></div><div class="line">{ <span class="string">"str"</span> : <span class="string">"hello world"</span> }</div></pre></td></tr></table></figure>
+
+<p>和JSONP方式不同，资源最终返回到请求方时并不是脚本代码，而且资源本省，response包的<code>Content-Type</code>也正确地对资源进行了描述。虽然是两次请求，但是浏览器自动处理，开发者并不需要做其他处理。BTW，现在还有很多人分不清楚JSON数据对象和JavaScript对象的联系和区别。</p>
+<p>CORS使用HTTP Header来控制资源的可访问性，可以使用的属性主要有：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Origin</span>: &lt;origin&gt; | * // 授权的源控制</div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Max</span>-<span class="type">Age</span>: &lt;delta-seconds&gt; // 授权的时间</div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Credentials</span>: <span class="literal">true</span> | <span class="literal">false</span> // 控制是否开启与<span class="type">Ajax</span>的<span class="type">Cookie</span>提交方式</div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Methods</span>: &lt;<span class="keyword">method</span>&gt;[, &lt;<span class="keyword">method</span>&gt;]* // 允许请求的<span class="type">HTTP</span> <span class="type">Method</span></div><div class="line"><span class="type">Access</span>-<span class="type">Control</span>-<span class="type">Allow</span>-<span class="type">Headers</span>: &lt;field-name&gt;[, &lt;field-name&gt;]* // 控制哪些header能发送真正的请求</div></pre></td></tr></table></figure>
+
+<p>CORS方式我很喜欢，目前支持的浏览器有Chrome 4+, FF 3.5+, IE 8+, Opera 12+, Safari 4+，虽然不是全都支持，但是这种优雅的方式会渐渐取代JSONP成为主流，目前发现的Github, W3C文档都已经实现。</p>
+<h3 id="后端请求">后端请求</h3>
+<p>后端请求没有存在同源策略，因为后端请求不会发送Cookie到后端，不存在登陆过的网站Cookie被其他域的网站调用的情况，所以后端请求也经常用来作为跨域访问。有时提供资源方只让授权的第三方请求数据，往往会给予一个token个第三方，作为请求时的验证信息。这种做法是非常安全的。</p>
+<p>前端需要显示跨域资源时，往往时发送请求到自己的后端，通过后端请求到跨域资源并且返回，像代理一样工作。比起前两种，无疑需要更多的开发工作去设计并实现包装的接口。此方式比较简单，我们看一个请求新浪微博的例子。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> httplib</div><div class="line">conn = httplib.HTTPSConnection(<span class="string">"api.weibo.com"</span>)</div><div class="line">conn.request(<span class="string">"GET"</span>, </div><div class="line">  <span class="string">"/2/statuses/user_timeline.json?source=3168xxx&uid=264xxx"</span>)</div><div class="line">response = conn.getresponse()</div><div class="line"><span class="keyword">print</span> response.read()</div><div class="line">conn.close()</div></pre></td></tr></table></figure>
+
+<h2 id="其他方式">其他方式</h2>
+<p>当然还有很多跨域方式，在这就不一一详细介绍了：</p>
+<ul>
+<li>域与子域之间的跨域访问通过<code>document.domain</code>来解决</li>
+<li>新的HTML5中window.postMessage API可以让消息在多个窗口中传递</li>
+<li>还有之前flash使用的crossdomain.xml文件</li>
+</ul>
+<p>更多理论的介绍可以去Google上搜索，不过还时推荐几篇文章给大家，<a href="https://developer.mozilla.org/en-US/docs/JavaScript/Same_origin_policy_for_JavaScript?redirectlocale=en-US&amp;redirectslug=Same_origin_policy_for_JavaScript" target="_blank" rel="external">Same-origin Policy – MDN</a>，<a href="http://blogs.msdn.com/b/ieinternals/archive/2009/08/28/explaining-same-origin-policy-part-1-deny-read.aspx" target="_blank" rel="external">Same Origin Policy Part1 – No Peeking</a>，<a href="http://blogs.msdn.com/b/ieinternals/archive/2012/04/03/explaining-same-origin-policy-part-2-limited-write.aspx" target="_blank" rel="external">Same Origin Policy Part2 – Limited Write</a>，<a href="https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS" target="_blank" rel="external">CORS – MDN</a>。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2013/05/31/2013-05-31-cross-origin-request/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2013/05/31/2013-05-31-cross-origin-request/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2013/05/31/2013-05-31-cross-origin-request/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2013/05/31/2013-05-31-cross-origin-request/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2013/06/09/2013-06-09-strict-mode/">
+        ← JavaScript严格模式
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/11/20/2012-11-20-what-i-found-form-drupal/">
+        Drupal开发体验 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" >
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>我所坚持的渐进增强 | 瘦人说</title>
+  <meta name="description" content="" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="MobileOptimized" content="320" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/css/screen.css" />
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <meta name="generator" content="瘦人说">
+
+  
+  
+  
+
+  
+</head>
+
+<!--
+<body class="post-template">
+-->
+<body class="home-template">
+<div id="perspective" class="perspective effect-movedown">
+  <div class="container">
+    <!-- wrapper -->
+    <div class="wrapper">
+
+      <header class="site-head"  style="background: #24282b url(/img/img-bg.jpg) 0 -20%" >
+    <div class="vertical">
+        <div class="site-head-content inner">
+             <a class="blog-logo" href="/"><img src="/img/logo.svg" alt="Blog Logo"/></a> 
+            <h1 class="blog-title">瘦人说</h1>
+            <h2 class="blog-description"><button id="showMenu">Show Menu</button></h2>
+        </div>
+    </div>
+</header>
+
+      
+
+<main class="content" role="main">
+  <article class="post">
+    <span class="post-meta">
+      <time datetime="2012-06-11T07:40:42.000Z" itemprop="datePublished">
+          Jun 11 2012
+      </time>
+    
+    
+    | 
+    <a href='/tags/javascript/'>javascript</a>,
+    
+    <a href='/tags/progressive-enhancement/'>progressive enhancement</a>,
+    
+    <a href='/tags/Web-Development/'>Web Development</a>,
+    
+    <a href='/tags/Note/'>Note</a>,
+    
+    <a href='/tags/session/'>session</a>,
+    
+    <a href='/tags/Web-Development/'>Web Development</a>
+    
+    
+</span>
+    <h1 class="post-title">我所坚持的渐进增强</h1>
+    <section class="post-content">
+      <p>这周四要在百度者开发大会上做一个技术分享，题目是《移动Web Development中的渐进增强》，说真的，没有想到这种机会会落到我身上，我激动也十分地紧张。在公司讲过几次session，都不如这个给我带来的影响大，为了不丢人，我认真的花了一周时间去做这个演讲的PPT。</p>
+<p>上周四在公司内部预先讲了一次，我觉得效果不好。主要遇到两个问题，演讲时间安排不合理，和例子不足够吸引人，对我来说，我感觉是“众口难调”的同时，我自己的演讲能力也需要加强，尤其最近老发现，我说话说不到重点，无论中文英文；思维变得跳跃，容易开小差，有点语言障碍的意思。所以我打算在博客中再讲一遍，如果你没听懂我讲的，或许可以从我的字里行间体会点东西。PPT为初稿版本，请自行下载，<a href="http://sheldonw-wordpress.stor.sinaapp.com/uploads/2012/06/移动Web Development中的渐进增强.pptx" target="_blank" rel="external">《移动Web Development中的渐进增强》</a>。</p>
+<h1 style="text-align: left;">《移动Web Development中的渐进增强》</h1>
+<p>本次演讲的主要内容会分为三个部分：</p>
+<ol>
+<li>渐进增强开发思想介绍</li>
+<li>移动Web Development中的关注点</li>
+<li>渐进增强的Testing</li>
+</ol>
+<h2>Progressive Enhancement</h2>
+<p>随着互联网的发展，浏览器的发展也突飞猛进，在原来的多浏览器厂商并分天下的局面下，现在还出现了多平台的划分。开发人员面对原来五大浏览器IE、火狐、Opera、Safari、Chrome的局面已经有些不知所措，何况现在我们还需要处理iphone、ipad、android的mobile浏览器、其他智能手机中带有的非现代浏览器（对浏览器标准支持不完整的）。在这种情况下，如果你想要让你的网站变得广为人知，那么必须从新思考兼容性的问题。</p>
+<p>渐进增强PE可以帮助大家较好的解决这个问题。PE是以内容为核心的开发方式，在内容的基础上，开发人员使用css加工样式，利用javascript添加行为来提升用户的使用体验，由于是以内容为核心，所以使用PE的同时，亦解决的兼容性问题。</p>
+<p>那么，PE中提到的内容核心是什么？对于用户、BA、UX来说，内容可以是网站给访问的用户带来的内容和功能，具体可以单纯到只是网站中的文字，也包括网站带给用户的交互功能，比如说发送邮件，填写表单，甚至还可能为给用户带来的视觉效果、颜色搭配、排版、阅读体验等等。但是，对于我们开发者来说，PE核心内容就是我们的HTML代码，简洁易懂的标记们。HTML是我们制作页面功能的基础，也是几乎所有浏览器呈现页面功能的基础，开发人员通过添加css样式和js代码使内容在更强的浏览器上工作得更好，提升用户体验。</p>
+<p>在这边举一个例子，80后可能都会有印象，家里的电视机是又90年代初的黑白电视机换到00年初的CRT彩色电视机，接着随着科技发展，到现在LED高清电视机，甚至都出现了3D电视机。对于用户来说，电视机给他们带来的是电视节目，看中央一台也看了这么多年了，但是先进的电视机给用户带来了新的观赏体验，不仅带来了色彩，还带来了高清的画质，丰富的观影体验。反过来看，同样内容的电视节目同样可以在旧的电视机上播出，内容一样能被用户获取到，这一切都是向后兼容的，PE给我们带来的好处就在于此。浏览器的发展，从Netscape到现在的Chrome也是类似的一个发展过程。那么，我们的网站给用户带来的是尽可能一样的体验，而并非是完全一样的。你也不能奢望一个kindle的silk浏览器能像chrome表现得那么出色。</p>
+<p>由此看来，我们需要从新审视解决浏览器兼容性这个问题，我们的开发需要从一直一来的以兼容性为目标的开发转化为以可用性为目标的开发，可用性指的是网站带给用户的功能从一开始就是跨浏览器的。</p>
+<h2>移动Web Development中的关注点</h2>
+<p>对于开发者来说，移动Web Development和传统桌面Web Development的流程是一样的，但是页面设计和信息架构会有很大改变：1、表单样式机会都会被重置。2、列表页面普遍会是大块面积的可点区域、左上角会出现back按钮，右上角可能会出现下一步或者搜索按钮。这种设计都是来源于Native App的设计方式，目的是为了让web程序工作得更像原生应用一样，给用户带来一致的体验。</p>
+<p>新的设计含有很多复杂的交互，使得HTML结构更混乱一些，但是开发时也需要从最基本的有语义的标签着手，因为简单有语义的标签可以让开发人员更容易去制作交互，所有好的设计都是从简单出发的，而且，我们开发的时候考虑的应该是我们需要什么样的控件去收集用户的有效信息，而不应该只关注于样子。比如一个on/off的开关，它想获取的是一个互斥的数据值，我们可以使用一组同名的radio按钮去完成，也可以使用含有on和off选项的下拉款完成。另外，我们使用简单语义的标签，让阅读器也能很好的加载我们的内容。</p>
+<p>其次，现在iphone当道，android横行，它们所搭载的浏览器都是基于webkit核心的，很好的支持HTML5和CSS3。这两项基础能给我们带来更多的语义的标签、本地存储的能力、更多更强的样式支持、强大的DOM API等等，我们可以在这些平台上大展手脚，如果由于先进的技术忘记了PE的本质，那么你的网站也就只能限制在这些平台上被访问到。如果你的客户使用不支持以上技术的浏览器、或者禁用到js或者css、又或者网络比较慢时访问你的网站，你什么都不能提供给他们，没有用户访问便没有了价值。话句话说，先进的技术给用户带来更好更多的获取核心内容的使用体验。比如说一个图片查看，在普通浏览器上，可以使用一个单独的页面打开图片，利用浏览器特性进行缩放，而如果是支持touch的手机浏览器上，我便可以支持在有图片显示的地方直接缩放。</p>
+<p>另外，我们在使用PE的过程中，并不是针对某个平台进行增强，而是判断当前运行的平台是否支持某种能力，比如多点触摸能力、是否支持canvas。如果坚持判断浏览器是否是IE，那么当IE更新后，用户依然也使用不了高级功能。</p>
+<p>PE在当前这个环境下，已经不仅仅是HTML+CSS+JS三层了。在复杂的环境下，PE的模型已经变为多层结构。在基础功能完整的情况下，利用CSS进行增强，再利用js进行增强，甚至在多层的基础上，还会产生增强依赖，比如在某一个增强存在的基础上，去检测另一个浏览器能力，支持某一特定的功能。例如，Google Galaxy手机主站上的展示页面，在仅仅支持js的浏览器上，可以进行左右，上下的拖动查看手机外观。但是如果浏览器支持WebGL，那么可以进入到WebGL模式，3D+360度旋转观察手机外观。</p>
+<p>如果想要很好的开发PE，那么框架是不可缺少的部分，EnhanceJS和Modernizr都是比较好的渐进增强库，它们都支持：1、浏览器能力检测 2、动态加载样式和脚本 3、可扩展新的浏览器能力检测方法。相比之下，Modernizr要比前者更强大一些，尤其在HTML5和CSS3的能力检测方面。</p>
+<p>如果需要支持样式reset，那么jQuery Mobile是一个不错的UI库，使用它可以制作出精美的类Native App的Web程序UI，支持多平台浏览器。</p>
+<h2>渐进增强的Testing</h2>
+<p>PE确实给用户带来了更好的使用体验，但是，如果用户在网络比较慢，或者通过不支持增强的浏览器上访问网站，或者用户处于安全性考虑禁用掉脚本时，我们需要提供给他们一个完整可用的版本。而且我们需要用过Testing来保证我们每个增强前后的版本都是工作的。我提出几个想法：</p>
+<ol>
+<li>面向对象的开发各个增强，每个增强都可以进行开关。这样做的好处是，可以方便的管理增强，每个独立增强不影响之前的功能；通过开关增强，不仅可以Testing增强前后的版本是否都可以正常工作，而且还可以通过同一级别的增强可以相互组合进行Testing，查看是否相互影响；如果对象化的管理增强，可以很方便的开发“回到基础版本”这样的功能，让用户在低带宽情况下主动切换版本，像Gmail移动web版本一样。有人质疑过这样做会不会带来更多开发成本，我的答案是不，良好的结构可以带给程序健壮性和扩张性，就像面向对象开发一样。另外，模块化的前端开发并不会给代码造成混乱而会更容易的管理前端代码。</li>
+<li>自动化Testing选择适当的驱动。要做到解决兼容性，不可能把所有平台都Testing一遍，一些和特定能力无关的Testing可以在同一浏览器上进行Testing，和特定能力相关的Testing便需要选择适当的自动化浏览器驱动。比如，如果是需要Testingmobile safari上Testing特有功能，那么可以选择直接驱动mobile safari浏览器，但是一般的链接跳转，form提交之类的功能可以在chrome上进行Testing。</li>
+<li>如果是Testingmobile上的touch功能，也可以通过在chrome或者firefox上进行Testing，因为在mobile中的touch增强，实质上是绑定了touchstart、touchmove、touchend事件，那么这些事件在不支持touch的浏览器上是被视为自定义事件，通过出发自定义事件便可以进行Testing。</li>
+</ol>
+<p>-PPT内容完-</p>
+<p>最近我在思考，由于前端模块化开发和Testing技术日趋成熟，前端MVC框架和模板技术已经有很多，HTML富客户端模式的开发和PE产生了一个矛盾，“我们现在还需要兼容那些不支持js的浏览器么？”这个问题一直会在我耳边回荡。相比之下，我能想到PE的好处是：1、PE通过HTML带给用户核心功能得以保障，即使不支持js 2、阅读器依赖有语义的HTML 3、不用维护过多的页面状态，开发复杂度不高。4、扩张性好，维护成本，对前端开发技能要求低。</p>
+<p>但是富媒体客户端在各种强力前端框架的支持下，可以有保证的通过各种前端技术带给用户最好的用户体验，我想富媒体客户端和web游戏开发将会成为重要的开发方向，值得继续研究。不过，实际问题实际出发，不同的技术都有自己的优势，重要的是在项目中怎么使用这些优势来解决问题。不说某个技术绝对好，但求灵活地游刃有余的运用它们。</p>
+
+    </section>
+    <footer class="post-footer">
+      <section class="author">
+    <h4>Slenderman 瘦人</h4>
+    <p></p>
+</section>
+      <section class="share">
+    <h4>Share this post</h4>
+    <a class="icon-sina-weibo" href="http://v.t.sina.com.cn/share/share.php?title= ?url=http://winsonwq.github.io/2012/06/11/old/2012-06-12-my-progressive-enhancement/" target="_blank">
+        <span class="hidden">weibo</span>
+    </a>
+    <a class="icon-twitter" href="http://twitter.com/share?url=http://winsonwq.github.io/2012/06/11/old/2012-06-12-my-progressive-enhancement/"
+       onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <span class="hidden">Twitter</span>
+    </a>
+    <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u=http://winsonwq.github.io/2012/06/11/old/2012-06-12-my-progressive-enhancement/"
+       onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <span class="hidden">Facebook</span>
+    </a>
+    <a class="icon-google-plus" href="https://plus.google.com/share?url=http://winsonwq.github.io/2012/06/11/old/2012-06-12-my-progressive-enhancement/"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    </footer>
+  </article>
+  <nav class="pagination" role="pagination">
+    
+    <a class="newer-posts" href="/2012/07/06/old/2012-07-07-the-late-mr-coverage/">
+        ← 迟到的Mr.Coverage
+    </a>
+    
+    <span class="icon-logo">•</span>
+    
+    <a class="older-posts" href="/2012/05/19/old/2012-05-20-dive-into-javascript-session3-script-style/">
+        《Dive Into JavaScript》Session3之脚本与样式 →
+    </a>
+    
+</nav>
+
+  <div id="comment" class="comments-area">
+    <h4 class="title"><a href="#disqus_comments" name="disqus_comments">Comments</a></h4>
+    
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+    
+</div>
+
+</main>
+
+
+      
+<footer class="site-footer">
+  
+  <div class="inner">
+     <section class="copyright">All content copyright <a href="/">瘦人说</a> &copy; 2014 &bull; All rights reserved.</section>
+     <section class="poweredby">Proudly published with <a class="icon-ghost" href="http://zespia.tw/hexo/">Hexo</a></section>
+  </div>
+</footer>
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.fitvids.js"></script>
+<script type="text/javascript" src="/js/index.js"></script>
+<script type="text/javascript" src="/js/menu.js"></script>
+
+
+<script type="text/javascript">
+    var disqus_shortname = 'slenderman001';
+
+    (function(){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+  </div>
+</div>
+
+<nav  class="outer-nav top horizontal">
+
+          <a class="icon-home"  href="/"><span>Home</span></a>
+
+          <a class="icon-news"  href="/"><span>Archive</span></a>
+
+          <a class="icon-image"  href="/"><span>Images</span></a>
+
+          <a class="icon-wiki"  href="/"><span>Wiki</span></a>
+
+          <a class="icon-Favorites"  href="/"><span>Favorites</span></a>
+
+          <a class="icon-mail"  href="/"><span>Contact</span></a>
+
+</nav>
+
+</div>
+</body>
+</html>
